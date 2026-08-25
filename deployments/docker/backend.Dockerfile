@@ -1,5 +1,5 @@
 FROM golang:1.22-alpine AS builder
-RUN apk add --no-cache git ca-certificates tzdata
+RUN apk add --no-cache git=2.47.3-r0 ca-certificates=20260413-r0 tzdata=2026c-r0
 WORKDIR /app
 COPY go.mod ./
 RUN go mod download || true
@@ -11,6 +11,6 @@ WORKDIR /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /app/bin/pulse-monolith /pulse-monolith
-USER nonroot:nonroot
+USER 65532:65532
 EXPOSE 8080
 ENTRYPOINT ["/pulse-monolith"]

@@ -5,7 +5,7 @@ CREATE TABLE core.pools (
     sport_id UUID NOT NULL,
     code VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 COMMENT ON TABLE core.pools IS 'Age pools grouping athletes of the same category (e.g. U9-U10 Summer 2026).';

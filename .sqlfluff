@@ -1,0 +1,5 @@
+[sqlfluff]
+dialect = postgres
+max_line_length = 120
+# "name"/"code" are common domain column names, not ambiguous with SQL keywords here.
+exclude_rules = RF04
