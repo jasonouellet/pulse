@@ -1,0 +1,74 @@
+repos:
+  # ---------------------------------------------------------------------------
+  # 1. Hooks Généraux (Nettoyage de base)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: check-merge-conflict
+
+  # ---------------------------------------------------------------------------
+  # 2. Hooks Backend Go
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-imports
+      - id: golangci-lint
+      - id: go-unit-tests
+
+  # ---------------------------------------------------------------------------
+  # 3. Hooks Frontend React / TypeScript
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, css, scss, json, markdown]
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v10.9.0
+    hooks:
+      - id: eslint
+        files: \.(js|jsx|ts|tsx)$
+        additional_dependencies:
+          - eslint
+          - typescript
+          - "@typescript-eslint/parser"
+          - "@typescript-eslint/eslint-plugin"
+
+  # ---------------------------------------------------------------------------
+  # 4. Hooks SQL & Docker
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.5.0
+    hooks:
+      - id: sqlfluff-lint
+        args: [--dialect, postgres]
+        files: ^migrations/
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        files: Dockerfile$|\.Dockerfile$
+
+  # ---------------------------------------------------------------------------
+  # 5. Contrôle d'Architecture & Sécurité (Règles PULSE)
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      # Empêche les JOIN inter-schémas dans les migrations SQL (ADR-003)
+      - id: check-no-cross-schema-join
+        name: Vérification Isolation des Schémas SQL (ADR-003)
+        entry: 'JOIN\s+(core|tournament|scheduling|finance|evaluation)\.'
+        language: pygrep
+        types: [sql]
+        files: ^migrations/
