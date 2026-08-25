@@ -13,9 +13,9 @@ Universal SaaS platform for managing team sports (multi-level, age pools, epheme
 2. Start the full infrastructure:
 
    ```bash
-   docker compose up -d
-   # or with Podman:
-   # podman-compose up -d
+   podman-compose up -d
+   # or with Docker:
+   # docker compose up -d
    ```
 
 3. Check the backend health:

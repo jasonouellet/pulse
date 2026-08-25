@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to **Project PULSE** ("the Project").
 
-To protect the Project, maintain our licensing model (*Source-Available Non-Commercial*), and ensure the code can continue to be distributed to sports clubs while preserving the intellectual property of the Principal Author, we must establish this Contributor License Agreement ("CLA").
+To protect the Project, maintain our licensing model (_Source-Available Non-Commercial_), and ensure the code can continue to be distributed to sports clubs while preserving the intellectual property of the Principal Author, we must establish this Contributor License Agreement ("CLA").
 
 Please read this document carefully before submitting any Contribution.
 
@@ -10,9 +10,9 @@ Please read this document carefully before submitting any Contribution.
 
 ## 1. Definitions
 
-* **"You" or "the Contributor"** means the individual who holds the copyright or who is authorized by the copyright holder to submit the Contribution.
-* **"Contribution"** means any source code, documentation, patch, modification, improvement, or other creation submitted by You to the Principal Author for inclusion in the Project (for example via a *Pull Request*, a *Commit*, or an *Issue*).
-* **"Principal Author"** means the owner and founder of Project PULSE [Your Name / Your Company Name].
+- **"You" or "the Contributor"** means the individual who holds the copyright or who is authorized by the copyright holder to submit the Contribution.
+- **"Contribution"** means any source code, documentation, patch, modification, improvement, or other creation submitted by You to the Principal Author for inclusion in the Project (for example via a _Pull Request_, a _Commit_, or an _Issue_).
+- **"Principal Author"** means the owner and founder of Project PULSE [Your Name / Your Company Name].
 
 ---
 
@@ -22,9 +22,9 @@ By submitting a Contribution, You grant the Principal Author a worldwide, perpet
 
 1. Reproduce, modify, adapt, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contribution and any derivative works thereof.
 2. Distribute and re-license the Contribution under any license chosen by the Principal Author, including but not limited to:
-   * *Source-Available* licenses with commercial restrictions (e.g. BSL, PolyForm NonCommercial).
-   * Traditional Open-Source licenses.
-   * **Paid Commercial Licenses** granted to third parties.
+   - _Source-Available_ licenses with commercial restrictions (e.g. BSL, PolyForm NonCommercial).
+   - Traditional Open-Source licenses.
+   - **Paid Commercial Licenses** granted to third parties.
 
 ---
 
@@ -52,11 +52,11 @@ You understand and agree that the Principal Author has no obligation to include 
 
 ## 6. Signature / Acceptance Procedure
 
-By submitting a *Pull Request*, by including the statement `"I have read and agree to the CLA in CLA.md"` in your submission, or by electronically signing this document, You agree to be bound by the terms of this Agreement.
+By submitting a _Pull Request_, by including the statement `"I have read and agree to the CLA in CLA.md"` in your submission, or by electronically signing this document, You agree to be bound by the terms of this Agreement.
 
 ---
 
-**Contributor Name:** ____________________________________  
-**GitHub Username:** __________________________  
-**Email:** _____________________________________________  
+**Contributor Name:** ____________________________________
+**GitHub Username:** __________________________
+**Email:** _____________________________________________
 **Date:** _________________________________________________

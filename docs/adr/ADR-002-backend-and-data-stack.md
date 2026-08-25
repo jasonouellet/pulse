@@ -1,12 +1,15 @@
 # ADR 002-B : Choix de la Pile Backend Compilée et Stratégie de Données Hybride
 
 ## Statut
+
 Accepté (Remplace l'ADR 002 initial)
 
 ## Contexte
+
 Recherche de performances élevées, d'une faible empreinte mémoire et d'une sécurité à la compilation pour les moteurs de calculs (calendriers, brackets de tournois), tout en garantissant un support hautement concurrent pour le rafraîchissement des scores sur le terrain.
 
 ## Décisions
+
 1. **Framework Backend :** Go (Golang) avec architecture hexagonale (Clean Architecture).
    - Utilisation de `Chi` comme routeur HTTP/REST.
    - Utilisation de WebSockets pour les mises à jour de matchs en temps réel.
@@ -18,6 +21,7 @@ Recherche de performances élevées, d'une faible empreinte mémoire et d'une s�
    - Gestion du Pub/Sub pour la diffusion en temps réel des scores.
 
 ## Conséquences
+
 - Temps de réponse de l'API extrêmement rapides.
 - Consommation mémoire du serveur backend réduite (< 50 Mo de RAM au repos).
 - Nécessité de maintenir un DTO structuré entre le backend Go et le frontend React.

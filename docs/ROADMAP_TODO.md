@@ -1,6 +1,6 @@
 # ROADMAP ET SUIVI DES TÂCHES — PROJECT PULSE
 
-**Nom de code projet :** Project PULSE (PULSE OS)  
+**Nom de code projet :** Project PULSE (PULSE OS)
 **Architecture :** Monolithe Modulaire Go (Clean Architecture / Ports & Adapters), PostgreSQL 16+ (Isolation par schémas SQL), Redis, React.js (TypeScript, Tailwind, Radix UI).
 **Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Gratuit pour auto-hébergement des clubs à but non lucratif.
 **Périmètre :** Multi-sports collectifs (Focus Phase 1 : Soccer).
@@ -9,14 +9,14 @@
 
 ## 📊 Tableau de Bord de l'Avancement (Phase 1)
 
-| Domaine / Module | Statut | Progression |
-| :--- | :---: | :---: |
-| **Ingénierie & Context Engineering** | **TERMINÉ** | 100% |
-| **Architecture C4 & ADRs (001 à 005 + CLA)** | **TERMINÉ** | 100% |
-| **Analyse Comparative & Modèle de Noms** | **TERMINÉ** | 100% |
-| **Backend Go & OCI images (Scaffolding & sqlc)** | **TERMINÉ** | 100% |
-| **Schéma de Données SQL (`core`, `tournament`, etc.)** | **À FAIRE** | 0% |
-| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)** | **À FAIRE** | 0% |
+| Domaine / Module                                           |   Statut    | Progression |
+| :--------------------------------------------------------- | :---------: | :---------: |
+| **Ingénierie & Context Engineering**                       | **TERMINÉ** |    100%     |
+| **Architecture C4 & ADRs (001 à 005 + CLA)**               | **TERMINÉ** |    100%     |
+| **Analyse Comparative & Modèle de Noms**                   | **TERMINÉ** |    100%     |
+| **Backend Go & OCI images (Scaffolding & sqlc)**           | **TERMINÉ** |    100%     |
+| **Schéma de Données SQL (`core`, `tournament`, etc.)**     | **À FAIRE** |     0%      |
+| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)** | **À FAIRE** |     0%      |
 
 ---
 

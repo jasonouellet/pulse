@@ -37,7 +37,7 @@ En mode Microservice (futur), l'adaptateur bascule en gRPC sans modifier la logi
 - **`ADR-001-frontend-stack.md` :** Choix de React, TypeScript, Tailwind, Radix UI et norme WCAG 2.1 AA.
 - **`ADR-002-backend-and-data-stack.md` :** Choix de Go, PostgreSQL (sqlc) et Redis.
 - **`ADR-003-modular-monolith-to-microservices.md` :** Choix du Monolithe Modulaire avec migration microservices sans refactoring via Ports & Adapters.
-- 
+-
 
 ---
 
@@ -45,7 +45,6 @@ En mode Microservice (futur), l'adaptateur bascule en gRPC sans modifier la logi
 
 [ ] Structurer la gateway WebSocket en Go pour pousser les scores depuis Redis.
 [ ] Valider la stratégie de fallback hors-ligne (Offline PWA) pour la saisie des présences par les entraîneurs sur le terrain.
-
 
 ## 5. Fichier `docs/ROADMAP_TODO.md` (Roadmap & Suivi des tâches)
 

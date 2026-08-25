@@ -2,12 +2,12 @@
 
 ## Isolation des Schémas SQL
 
-| Schéma | Domaine | Responsabilité principale |
-| :--- | :--- | :--- |
-| `core` | Utilisateurs & Structure | Gestion des comptes, liens familiaux, bassins (`pools`), sports. |
-| `tournament` | Compétition | Brackets, sous-inscriptions, rosters éphémères. |
-| `scheduling` | Logistique | Terrains, sous-découpage (11v11 -> 7v7), calendriers, présences. |
-| `finance` | Comptabilité | Budgets d'événements, dépenses, rétribution arbitres. |
+| Schéma       | Domaine                  | Responsabilité principale                                        |
+| :----------- | :----------------------- | :--------------------------------------------------------------- |
+| `core`       | Utilisateurs & Structure | Gestion des comptes, liens familiaux, bassins (`pools`), sports. |
+| `tournament` | Compétition              | Brackets, sous-inscriptions, rosters éphémères.                  |
+| `scheduling` | Logistique               | Terrains, sous-découpage (11v11 -> 7v7), calendriers, présences. |
+| `finance`    | Comptabilité             | Budgets d'événements, dépenses, rétribution arbitres.            |
 
 ## Règle d'Or d'Architecture
 

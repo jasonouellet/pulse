@@ -64,7 +64,7 @@ C4Container
 
     Rel(api, stripe, "Initialise paiements", "HTTPS / REST")
     Rel(api, push, "Envoie alertes", "HTTPS / REST")
- ```
+```
 
 ## 3. Composants Backend (Niveau 3)
 
@@ -117,4 +117,5 @@ C4Component
 - [ ] Modéliser le schéma de données détaillé du module `evaluation` (grilles dynamiques JSONB).
 
 ```mermaid
+
 ```
