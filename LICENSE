@@ -1,21 +1,20 @@
-MIT License
+# LICENCE D'UTILISATION — PROJECT PULSE (PULSE OS)
 
-Copyright (c) 2026 Jason Ouellet
+Copyright (c) 2026 [Votre Nom / Nom de votre entreprise]
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 1. Utilisation Personnelle et Assoctiative (Non Commerciale)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+L'accès au code source, sa modification et son déploiement sont GRATUITS et AUTORISÉS pour :
+- Les clubs sportifs, associations et organismes à but non lucratif s'auto-hébergeant pour leur propre gestion interne.
+- Les développeurs à des fins d'apprentissage, d'audit ou de contribution au projet.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 2. Restrictions Commerciales
+
+Toute utilisation commerciale du présent code source par des tiers est STRICTEMENT INTERDITE sans l'accord écrit préalable du titulaire des droits. 
+Sont notamment interdits :
+- La revente ou la redistribution du logiciel sous forme de service hébergé (SaaS / Cloud payant).
+- L'intégration de tout ou partie du code dans une offre logicielle commerciale tierce.
+
+## 3. Demande de Licence Commerciale
+
+Pour tout besoin d'exploitation commerciale, d'intégration ou d'hébergement géré par un tiers, contactez : [votre-courriel@domaine.com]
