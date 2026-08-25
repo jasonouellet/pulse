@@ -70,18 +70,18 @@
 - [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/monolith/main.go`.
 - [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`).
 - [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
-- [ ] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
-- [ ] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le monolithe.
+- [x] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
+- [x] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le monolithe.
 
 ---
 
-### 1.4 — Socle Frontend React (PULSE UI System)
+### 1.4 — Socle Frontend React (🔄 En cours)
 
-- [ ] Initialiser le projet Vite + React + TypeScript dans `frontend/`.
-- [ ] Configurer Tailwind CSS, Radix UI et le système de thèmes (Dark/Day mode).
-- [ ] Intégrer les packages d'instrumentation web OpenTelemetry (`@opentelemetry/sdk-trace-web`).
-- [ ] Créer les composants de base accessibles WCAG (Button, Modal, Dynamic Data Table, Card).
-- [ ] Mettre en place le dictionnaire de termes par sport (Lexique Soccer).
+- [x] Initialiser le projet Vite + React + TypeScript dans `frontend/`.
+- [x] Configurer Tailwind CSS, Radix UI et le système de thèmes (Dark/Day mode).
+- [x] Intégrer les packages d'instrumentation web OpenTelemetry (`@opentelemetry/sdk-trace-web`).
+- [x] Créer les composants de base accessibles WCAG (Button, Modal, Dynamic Data Table, Card).
+- [x] Mettre en place le dictionnaire de termes par sport (Lexique Soccer).
 
 ---
 
