@@ -2,7 +2,7 @@
 
 **Nom de code projet :** Project PULSE (PULSE OS)  
 **Architecture :** Monolithe Modulaire Go (Clean Architecture / Ports & Adapters), PostgreSQL 16+ (Isolation par schémas SQL), Redis, React.js (TypeScript, Tailwind, Radix UI).
-**Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Gratuit pour auto-hébergement des clubs à but non lucratif.  
+**Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Gratuit pour auto-hébergement des clubs à but non lucratif.
 **Périmètre :** Multi-sports collectifs (Focus Phase 1 : Soccer).
 
 ---
@@ -108,3 +108,8 @@
 1. **Paiements :** Choix entre Stripe Connect (ventilation automatique par club) ou Stripe Checkout standard.
 2. **Notifications Urgentes :** Priorité aux WebPush ou intégration Twilio SMS pour les annulations de terrain sur le coup (ex: orages).
 3. **Identité Finale :** Choix définitif de la marque commerciale (ex: Rostra vs Kipup) avant la mise en production.
+4. **Évolutivité :** Préparer le projet pour une future migration vers une architecture microservices si nécessaire (ADR-003).
+5. **Multi-Sports :** Définir la stratégie d'ajout de nouveaux sports (soccer, basketball, volleyball, etc.) et l'impact sur le modèle de données et les interfaces utilisateur.
+6. **SDLC :** Définir le cycle de vie du développement logiciel, y compris les phases de planification, de conception, de développement, de test et de déploiement.
+7. **Sécurité :** Mettre en place des pratiques de sécurité robustes, y compris la gestion des identités et des accès, la protection contre les attaques courantes et la conformité aux réglementations pertinentes (ex: RGPD).
+8. Environnement de déploiement : Définir les environnements de développement, de test et de production, ainsi que les stratégies de déploiement continu et d'intégration continue (CI/CD).
