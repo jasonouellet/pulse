@@ -25,7 +25,7 @@ func NewPostgresPool(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 
 	poolConfig, err := pgxpool.ParseConfig(connString)
 	if err != nil {
-		return nil, fmt.Errorf("impossible de parser la chaîne de connexion: %w", err)
+		return nil, fmt.Errorf("unable to parse connection string: %w", err)
 	}
 
 	poolConfig.MaxConns = 25
@@ -38,12 +38,12 @@ func NewPostgresPool(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 
 	pool, err := pgxpool.NewWithConfig(connCtx, poolConfig)
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la création du pool pgx: %w", err)
+		return nil, fmt.Errorf("error creating pgx pool: %w", err)
 	}
 
 	if err := pool.Ping(connCtx); err != nil {
 		pool.Close()
-		return nil, fmt.Errorf("impossible de joindre PostgreSQL (ping échoué): %w", err)
+		return nil, fmt.Errorf("unable to reach PostgreSQL (ping failed): %w", err)
 	}
 
 	return pool, nil

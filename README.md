@@ -1,24 +1,24 @@
 # PULSE
 
-Plateforme SaaS universelle de gestion de sports collectifs (multi-niveaux, bassins d'âges, rosters éphémères, tournois et calendrier dynamique).
+Universal SaaS platform for managing team sports (multi-level, age pools, ephemeral rosters, tournaments, and dynamic scheduling).
 
-## 🚀 Démarrage Rapide (Docker / Podman)
+## 🚀 Quick Start (Docker / Podman)
 
-1. Copier les variables d'environnement :
+1. Copy the environment variables:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Lancer l'infrastructure complète:
+2. Start the full infrastructure:
 
    ```bash
    docker compose up -d
-   # ou avec Podman :
+   # or with Podman:
    # podman-compose up -d
    ```
 
-3. Vérifier la santé du backend :
+3. Check the backend health:
 
    ```bash
    curl http://localhost:8080/healthz
@@ -26,8 +26,8 @@ Plateforme SaaS universelle de gestion de sports collectifs (multi-niveaux, bass
 
 ## 📚 Documentation
 
-- `docs/SYSTEM_CONTEXT.md` : Analyse d'affaires et cas d'usage.
-- `docs/ARCHITECTURE.md` : Choix techniques et découpage des modules.
-- `docs/ROADMAP_TODO.md` : Suivi de l'avancement.
-- `docs/adr/` : Registre des décisions d'architecture (ADRs 001 à 005).
-- `LICENSE` & `CLA.md` : Licence BSL Non-Commerciale et accord de contribution.
+- `docs/SYSTEM_CONTEXT.md`: Business analysis and use cases.
+- `docs/ARCHITECTURE.md`: Technical choices and module breakdown.
+- `docs/ROADMAP_TODO.md`: Progress tracking.
+- `docs/adr/`: Architecture decision records (ADR 001 to 005).
+- `LICENSE` & `CLA.md`: Non-Commercial BSL license and contributor agreement.

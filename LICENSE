@@ -1,32 +1,32 @@
 # Business Source License 1.1
 
 Licensor: Services-Conseils TI PME / Jason Ouellet
-Licensed Work: Project PULSE (PULSE OS) et l'ensemble de ses composants logiciels associés.
-Change Date: [Date du jour + 4 ans, ex: 2030-08-25]
+Licensed Work: Project PULSE (PULSE OS) and all of its associated software components.
+Change Date: [Today's date + 4 years, e.g. 2030-08-25]
 Change License: Apache License, Version 2.0
 
 ## 1. Grant of License
 
 The Licensor hereby grants you the right to use, copy, modify, create derivative works, distribute, and publicly display the Licensed Work, subject to the terms and Additional Use Grants specified below.
 
-## 2. Additional Use Grants (Permissions Accordées)
+## 2. Additional Use Grants (Granted Permissions)
 
-Vous êtes expressément autorisé à exécuter, héberger, modifier et utiliser le logiciel **GRATUITEMENT** pour :
-1. **Auto-hébergement associatif et clubs :** Tout club sportif, association ou organisme à but non lucratif qui déploie et utilise l'application pour sa propre gestion interne et la coordination de ses membres.
-2. **Utilisation personnelle et académique :** Tout développeur ou étudiant souhaitant auditer, tester, apprendre ou contribuer au projet.
+You are expressly authorized to run, host, modify, and use the software **FREE OF CHARGE** for:
+1. **Non-profit self-hosting for associations and clubs:** Any sports club, association, or non-profit organization that deploys and uses the application for its own internal management and member coordination.
+2. **Personal and academic use:** Any developer or student wishing to audit, test, learn from, or contribute to the project.
 
-## 3. License Limitations (Restrictions Commerciales)
+## 3. License Limitations (Commercial Restrictions)
 
-Toute utilisation du logiciel pour fournir un service payant à des tiers ou concourir directement avec l'offre commerciale du Licenciateur est **INTERDITE** sans l'acquisition préalable d'une Licence Commerciale.
+Any use of the software to provide a paid service to third parties or to directly compete with the Licensor's commercial offering is **PROHIBITED** without first acquiring a Commercial License.
 
-Sont notamment considérés comme des usages restreints nécessitant une licence payante :
-- La revente ou l'hébergement du logiciel sous forme de service Cloud / SaaS (Software as a Service) commercialisé auprès de tiers.
-- L'intégration de tout ou partie du code source dans une offre logicielle propriétaire payante.
+The following are notably considered restricted uses requiring a paid license:
+- Reselling or hosting the software as a Cloud / SaaS (Software as a Service) offering marketed to third parties.
+- Integrating all or part of the source code into a paid proprietary software offering.
 
-## 4. Change License (Clause de Conversion Open-Source)
+## 4. Change License (Open-Source Conversion Clause)
 
-À la date spécifiée dans la rubrique **Change Date** ci-dessus (ou 4 ans après la publication de chaque version spécifique du code), la licence applicable à cette version du logiciel basculera automatiquement et définitivement sous les termes de la licence open-source **Apache License, Version 2.0**.
+On the date specified in the **Change Date** field above (or 4 years after the release of each specific version of the code), the license applicable to that version of the software will automatically and permanently convert to the terms of the **Apache License, Version 2.0** open-source license.
 
 ## 5. Commercial Licensing
 
-Pour toute demande d'exploitation commerciale, d'intégration ou d'hébergement géré ne respectant pas la section 2, veuillez contacter le Licenciateur à : [info@tipme.ca]
+For any request regarding commercial exploitation, integration, or managed hosting that does not comply with section 2, please contact the Licensor at: [info@tipme.ca]

@@ -21,7 +21,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	slog.Info("Démarrage de Project PULSE (Monolithe Modulaire)...")
+	slog.Info("Starting Project PULSE (Modular Monolith)...")
 
 	dbCfg := database.Config{
 		Host:     getEnv("DB_HOST", "localhost"),
@@ -35,15 +35,15 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	slog.Info("Connexion au pool PostgreSQL...")
+	slog.Info("Connecting to PostgreSQL pool...")
 	dbPool, err := database.NewPostgresPool(ctx, dbCfg)
 	if err != nil {
-		slog.Error("Échec critique lors de l'initialisation de la base de données", "error", err)
+		slog.Error("Critical failure while initializing the database", "error", err)
 		os.Exit(1)
 	}
 	defer dbPool.Close()
 
-	slog.Info("Connexion PostgreSQL établie avec succès !")
+	slog.Info("PostgreSQL connection established successfully!")
 
 	r := chi.NewRouter()
 
@@ -73,7 +73,7 @@ func main() {
 
 	serverErrors := make(chan error, 1)
 	go func() {
-		slog.Info(fmt.Sprintf("Serveur HTTP à l'écoute sur le port :%s", port))
+		slog.Info(fmt.Sprintf("HTTP server listening on port :%s", port))
 		serverErrors <- server.ListenAndServe()
 	}()
 
@@ -83,24 +83,24 @@ func main() {
 	select {
 	case err := <-serverErrors:
 		if !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("Erreur critique du serveur HTTP", "error", err)
+			slog.Error("Critical HTTP server error", "error", err)
 		}
 
 	case sig := <-shutdown:
-		slog.Info("Signal d'arrêt reçu, fermeture propre des ressources...", "signal", sig.String())
+		slog.Info("Shutdown signal received, gracefully closing resources...", "signal", sig.String())
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
 
 		if err := server.Shutdown(shutdownCtx); err != nil {
-			slog.Error("Fermeture forcée du serveur HTTP", "error", err)
+			slog.Error("Forced HTTP server shutdown", "error", err)
 			if err := server.Close(); err != nil {
-				slog.Error("Erreur lors de la fermeture directe des sockets", "error", err)
+				slog.Error("Error while directly closing sockets", "error", err)
 			}
 		}
 	}
 
-	slog.Info("Arrêt complet et propre de Project PULSE.")
+	slog.Info("Project PULSE shut down cleanly.")
 }
 
 func getEnv(key, fallback string) string {
