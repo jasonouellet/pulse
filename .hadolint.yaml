@@ -1,0 +1,5 @@
+ignored:
+  - DL3008 # Autorise les versions de packages apt sans pin strict
+  - DL3018 # Autorise les packages apk sans pin strict
+
+failure-threshold: warning

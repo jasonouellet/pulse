@@ -1,0 +1,21 @@
+# Métadonnées
+sonar.organization=jasonouellet
+sonar.projectKey=jasonouellet_pulse
+sonar.projectName=Project PULSE
+sonar.projectVersion=1.0
+
+# Path is relative to the sonar-project.properties file.
+#sonar.sources=.
+
+# Encoding of the source code. Default is default system encoding
+#sonar.sourceEncoding=UTF-8
+
+# Exclusions et inclusions
+sonar.sources=internal,pkg,cmd,frontend/src
+sonar.tests=internal,pkg,frontend/src
+sonar.test.inclusions=**/*_test.go,**/*.test.tsx,**/*.test.ts
+sonar.exclusions=**/vendor/**,**/node_modules/**,**/docs/**
+
+# Rapports de couverture
+sonar.go.coverage.reportPaths=coverage-go.out
+sonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info

@@ -19,8 +19,24 @@ import (
 	corePostgres "pulse/internal/core/adapters/postgres"
 	"pulse/pkg/database"
 	"pulse/pkg/observability"
+
+	_ "pulse/docs/openapi" // Importer la doc générée
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           Project PULSE API
+// @version         1.0
+// @description     API du monolithe modulaire pour la gestion de clubs sportifs (PULSE OS).
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Équipe Project PULSE
+// @contact.url    https://github.com/jasonouellet/pulse
+
+// @license.name  Source-Available Non-Commercial (ADR-005)
+
+// @host      localhost:8080
+// @BasePath  /api/v1
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
@@ -80,6 +96,10 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-monolith"}`))
 	})
+
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	// 4. Register Core Module Routes
 	coreRepo := corePostgres.NewUserRepository(dbPool)

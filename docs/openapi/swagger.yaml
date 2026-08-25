@@ -1,0 +1,15 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    name: Équipe Project PULSE
+    url: https://github.com/jasonouellet/pulse
+  description: API du monolithe modulaire pour la gestion de clubs sportifs (PULSE
+    OS).
+  license:
+    name: Source-Available Non-Commercial (ADR-005)
+  termsOfService: http://swagger.io/terms/
+  title: Project PULSE API
+  version: "1.0"
+paths: {}
+swagger: "2.0"

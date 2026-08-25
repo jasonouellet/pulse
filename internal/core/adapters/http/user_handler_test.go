@@ -24,6 +24,17 @@ func NewMockUserRepository() *MockUserRepository {
 	return &MockUserRepository{users: make(map[uuid.UUID]ports.UserDTO)}
 }
 
+// CreateUserHandler gère la création d'un utilisateur.
+// @Summary      Créer un utilisateur
+// @Description  Crée un nouvel utilisateur dans le schéma Core
+// @Tags         core/users
+// @Accept       json
+// @Produce      json
+// @Param        user  body      CreateUserRequest  true  "Données utilisateur"
+// @Success      201   {object}  UserResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      500   {object}  ErrorResponse
+// @Router       /core/users [post]
 func (m *MockUserRepository) CreateUser(ctx context.Context, p ports.CreateUserParams) (*ports.UserDTO, error) {
 	id := uuid.New()
 	u := ports.UserDTO{
