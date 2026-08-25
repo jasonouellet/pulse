@@ -1,5 +1,5 @@
-FROM golang:1.22-alpine AS builder
-RUN apk add --no-cache git=2.47.3-r0 ca-certificates=20260413-r0 tzdata=2026c-r0
+FROM golang:1.25-alpine AS builder
+RUN apk add --no-cache git=2.54.0-r0 ca-certificates=20260611-r0 tzdata=2026c-r0
 WORKDIR /app
 COPY go.mod ./
 RUN go mod download || true
