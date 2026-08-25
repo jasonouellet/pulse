@@ -56,7 +56,7 @@ En soumettant une *Pull Request*, en inscrivant la mention `"I have read and agr
 
 ---
 
-**Nom du Contributeur :** ____________________________________  
-**Nom d'utilisateur GitHub / GitLab :** __________________________  
-**Courriel :** _____________________________________________  
-**Date :** _________________________________________________
+**Nom du Contributeur:** ____________________________________  
+**Nom d'utilisateur GitHub:** __________________________  
+**Courriel:** _____________________________________________  
+**Date:** _________________________________________________

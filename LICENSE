@@ -1,20 +1,32 @@
-# LICENCE D'UTILISATION — PROJECT PULSE (PULSE OS)
+# Business Source License 1.1
 
-Copyright (c) 2026 [Votre Nom / Nom de votre entreprise]
+Licensor: Services-Conseils TI PME / Jason Ouellet
+Licensed Work: Project PULSE (PULSE OS) et l'ensemble de ses composants logiciels associés.
+Change Date: [Date du jour + 4 ans, ex: 2030-08-25]
+Change License: Apache License, Version 2.0
 
-## 1. Utilisation Personnelle et Assoctiative (Non Commerciale)
+## 1. Grant of License
 
-L'accès au code source, sa modification et son déploiement sont GRATUITS et AUTORISÉS pour :
-- Les clubs sportifs, associations et organismes à but non lucratif s'auto-hébergeant pour leur propre gestion interne.
-- Les développeurs à des fins d'apprentissage, d'audit ou de contribution au projet.
+The Licensor hereby grants you the right to use, copy, modify, create derivative works, distribute, and publicly display the Licensed Work, subject to the terms and Additional Use Grants specified below.
 
-## 2. Restrictions Commerciales
+## 2. Additional Use Grants (Permissions Accordées)
 
-Toute utilisation commerciale du présent code source par des tiers est STRICTEMENT INTERDITE sans l'accord écrit préalable du titulaire des droits. 
-Sont notamment interdits :
-- La revente ou la redistribution du logiciel sous forme de service hébergé (SaaS / Cloud payant).
-- L'intégration de tout ou partie du code dans une offre logicielle commerciale tierce.
+Vous êtes expressément autorisé à exécuter, héberger, modifier et utiliser le logiciel **GRATUITEMENT** pour :
+1. **Auto-hébergement associatif et clubs :** Tout club sportif, association ou organisme à but non lucratif qui déploie et utilise l'application pour sa propre gestion interne et la coordination de ses membres.
+2. **Utilisation personnelle et académique :** Tout développeur ou étudiant souhaitant auditer, tester, apprendre ou contribuer au projet.
 
-## 3. Demande de Licence Commerciale
+## 3. License Limitations (Restrictions Commerciales)
 
-Pour tout besoin d'exploitation commerciale, d'intégration ou d'hébergement géré par un tiers, contactez : [votre-courriel@domaine.com]
+Toute utilisation du logiciel pour fournir un service payant à des tiers ou concourir directement avec l'offre commerciale du Licenciateur est **INTERDITE** sans l'acquisition préalable d'une Licence Commerciale.
+
+Sont notamment considérés comme des usages restreints nécessitant une licence payante :
+- La revente ou l'hébergement du logiciel sous forme de service Cloud / SaaS (Software as a Service) commercialisé auprès de tiers.
+- L'intégration de tout ou partie du code source dans une offre logicielle propriétaire payante.
+
+## 4. Change License (Clause de Conversion Open-Source)
+
+À la date spécifiée dans la rubrique **Change Date** ci-dessus (ou 4 ans après la publication de chaque version spécifique du code), la licence applicable à cette version du logiciel basculera automatiquement et définitivement sous les termes de la licence open-source **Apache License, Version 2.0**.
+
+## 5. Commercial Licensing
+
+Pour toute demande d'exploitation commerciale, d'intégration ou d'hébergement géré ne respectant pas la section 2, veuillez contacter le Licenciateur à : [info@tipme.ca]

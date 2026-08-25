@@ -14,8 +14,8 @@
 | **Ingénierie & Context Engineering** | **TERMINÉ** | 100% |
 | **Architecture C4 & ADRs (001 à 005 + CLA)** | **TERMINÉ** | 100% |
 | **Analyse Comparative & Modèle de Noms** | **TERMINÉ** | 100% |
+| **Backend Go & OCI images (Scaffolding & sqlc)** | **TERMINÉ** | 100% |
 | **Schéma de Données SQL (`core`, `tournament`, etc.)** | **À FAIRE** | 0% |
-| **Backend Go (Scaffolding Monolithe & sqlc)** | **À FAIRE** | 0% |
 | **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)** | **À FAIRE** | 0% |
 
 ---
