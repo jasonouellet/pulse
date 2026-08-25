@@ -19,7 +19,7 @@ jobs:
 
       # --- Markdown Lint ---
       - name: Markdown Lint
-        uses: nosorn/markdownlint-cli2-action@v1
+        uses: DavidAnson/markdownlint-cli2-action@v16
         with:
           globs: '**/*.md'
 
@@ -89,7 +89,7 @@ jobs:
           npm ci
           npm run test -- --coverage
 
-      # Upload des artefacts de couverture pour Sonar
+      # Upload de l'artefact de couverture Go pour SonarCloud
       - name: Upload Go Coverage
         uses: actions/upload-artifact@v4
         with:
@@ -103,26 +103,47 @@ jobs:
     name: Snyk Security Scan
     runs-on: ubuntu-latest
     needs: [lint, test]
+    if: ${{ secrets.SNYK_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Scan des dépendances Go & Node.js
-      - name: Run Snyk Open Source
-        uses: snyk/actions/golang@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          args: --all-projects --severity-threshold=high
+          go-version: '1.22'
 
-      # Scan des vulnérabilités dans le Dockerfile / Container
-      - name: Run Snyk Container Scan
-        uses: snyk/actions/docker@master
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+
+      # Scan du code Backend Go
+      - name: Snyk Go Test
+        run: snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: pulse-monolith:latest
-          args: --file=Dockerfile --severity-threshold=high
+
+      # Scan du code Frontend React
+      - name: Snyk Frontend Test
+        run: |
+          cd frontend
+          npm ci
+          snyk test --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Construction et scan du conteneur Docker
+      - name: Build Docker image for scanning
+        run: docker build -t pulse-monolith:test .
+
+      - name: Snyk Container Test
+        run: snyk container test pulse-monolith:test --file=Dockerfile --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # 4. ANALYSE SONARQUBE / SONARCLOUD
@@ -131,11 +152,12 @@ jobs:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     needs: [test]
+    if: ${{ secrets.SONAR_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Nécessaire pour l'analyse du blame Git par Sonar
+          fetch-depth: 0
 
       - name: Download Go Coverage Artifact
         uses: actions/download-artifact@v4
