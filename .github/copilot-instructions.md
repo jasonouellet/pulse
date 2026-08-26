@@ -8,12 +8,14 @@ See `docs/ARCHITECTURE.md`, `docs/ArchitectureTechnique.md`, `docs/ArchitectureC
 
 - **Pattern**: Hexagonal (Ports & Adapters) per module, inside a modular monolith (`cmd/monolith/main.go`).
 - **Modules** (`internal/{module}/`): `core`, `tournament`, `scheduling`, `finance`, `evaluation`. Each follows the structure:
-  ```
+
+  ```text
   internal/{module}/
   ├── domain/    # pure business logic, no external dependencies
   ├── ports/     # interfaces (input/output contracts)
   └── adapters/postgres/queries/{entity}.sql  # sqlc-style queries
   ```
+
 - **Strict module isolation**: all inter-module communication goes through a Go interface (port). **No SQL JOIN across PostgreSQL schemas is allowed** — one Postgres schema per module (`core`, `tournament`, `scheduling`, `finance`, `evaluation`).
 - **Adapter duality**: each module's port must be implementable by an `in-memory` adapter (monolith mode, current default) and, later, a `gRPC/event` adapter (microservice mode) — selected at startup via configuration/env vars, per ADR-003. Never bypass the port to call another module's adapter directly.
 - **Multi-sport**: all relevant entities carry a `sport_id` (UUID) to prepare for multi-sport support (Soccer in phase 1).

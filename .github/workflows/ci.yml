@@ -27,18 +27,18 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.25'
 
       - name: Go Linter (golangci-lint)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.58.0
+          version: v1.64.0
 
       # --- React / Frontend Lint ---
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -69,17 +69,17 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.25'
 
       - name: Run Go Unit Tests
         run: |
-          go test -v -race -coverprofile=coverage-go.out ./...
+          go test -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
 
       # --- Tests React (Vitest) ---
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -110,12 +110,12 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.25'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master

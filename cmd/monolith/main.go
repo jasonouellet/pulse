@@ -13,7 +13,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelchi"
+	"github.com/riandyrn/otelchi"
 
 	coreHTTP "pulse/internal/core/adapters/http"
 	corePostgres "pulse/internal/core/adapters/postgres"
