@@ -54,9 +54,9 @@ repos:
     hooks:
       - id: eslint
         name: ESLint
-        entry: bash -c 'cd frontend && npx eslint "$@"' --
+        entry: bash -c 'cd frontend && npm run lint'
         language: system
-        files: \.(js|jsx|ts|tsx)$
+        files: ^frontend/src/.*\.(js|jsx|ts|tsx)$
 
   # ---------------------------------------------------------------------------
   # 4. Hooks SQL & Docker
