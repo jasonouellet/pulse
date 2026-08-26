@@ -83,7 +83,11 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
+	// Le nginx en amont (contrôlé par nous) écrase X-Real-IP via
+	// `proxy_set_header X-Real-IP $remote_addr;` — donc aucune valeur
+	// fournie par le client ne peut passer. Voir GHSA-3fxj-6jh8-hvhx pour
+	// le contexte sur l'ancien middleware.RealIP, déprécié et vulnérable.
+	r.Use(middleware.ClientIPFromHeader("X-Real-IP"))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-monolith-api"))

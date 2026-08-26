@@ -22,28 +22,41 @@ repos:
     hooks:
       - id: go-fmt
       - id: go-imports
-      - id: golangci-lint
       - id: go-unit-tests
+
+  # golangci-lint via le repo officiel : la version est pinnée et téléchargée
+  # par pre-commit lui-même (contrairement au hook golangci-lint de
+  # dnephin/pre-commit-golang, qui appelle le binaire déjà présent sur le
+  # PATH — non déterministe d'une machine à l'autre). Garder ce numéro
+  # aligné avec `version:` dans le workflow GitHub Actions.
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.13.1
+    hooks:
+      - id: golangci-lint
 
   # ---------------------------------------------------------------------------
   # 3. Hooks Frontend React / TypeScript
   # ---------------------------------------------------------------------------
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
+  # pre-commit/mirrors-prettier est archivé et ne référence plus que des
+  # versions alpha depuis prettier v3.1.0. rbubley/mirrors-prettier est le
+  # fork communautaire maintenu qui ne mirrore que les versions stables.
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.9.6
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, css, scss, json, markdown]
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.9.1
+  # pre-commit/mirrors-eslint casse avec la flat config d'ESLint 9+
+  # (environnement isolé du hook, résolution de module en échec sur
+  # eslint.config.mjs). La solution recommandée par l'équipe ESLint est de
+  # faire tourner eslint via le node_modules réel du projet.
+  - repo: local
     hooks:
       - id: eslint
+        name: ESLint
+        entry: bash -c 'cd frontend && npx eslint "$@"' --
+        language: system
         files: \.(js|jsx|ts|tsx)$
-        additional_dependencies:
-          - eslint
-          - typescript
-          - "@typescript-eslint/parser"
-          - "@typescript-eslint/eslint-plugin"
 
   # ---------------------------------------------------------------------------
   # 4. Hooks SQL & Docker
