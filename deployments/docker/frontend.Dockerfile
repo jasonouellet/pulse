@@ -1,9 +1,9 @@
 FROM node:24-alpine AS builder
 WORKDIR /app
-COPY package.json ./
-RUN npm install --package-lock-only || true
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
-RUN npm run build || mkdir -p dist && echo "<html><body>PULSE UI</body></html>" > dist/index.html
+RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:alpine-slim
 COPY --from=builder /app/dist /usr/share/nginx/html
