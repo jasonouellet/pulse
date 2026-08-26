@@ -2,9 +2,11 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"pulse/internal/core/ports"
@@ -45,7 +47,10 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*ports.
 		&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.Phone, &u.Role, &u.IsActive,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("user not found: %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ports.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get user by id: %w", err)
 	}
 	return &u, nil
 }
@@ -61,7 +66,10 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*por
 		&u.ID, &u.Email, &u.FirstName, &u.LastName, &u.Phone, &u.Role, &u.IsActive,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("user not found: %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ports.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
 	return &u, nil
 }

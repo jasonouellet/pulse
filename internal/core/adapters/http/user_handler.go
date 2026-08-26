@@ -19,6 +19,19 @@ import (
 // qu'un payload démesuré ne consomme la mémoire du serveur.
 const maxCreateUserBodyBytes = 1 << 20 // 1 MiB
 
+// createUserRequest est le DTO de transport HTTP pour la création d'un
+// utilisateur. Le mot de passe en clair reste ici, côté handler — il ne
+// doit jamais transiter par ports.CreateUserParams, qui ne porte que le
+// hash destiné à la persistence.
+type createUserRequest struct {
+	Email     string  `json:"email"`
+	Password  string  `json:"password"`
+	FirstName string  `json:"first_name"`
+	LastName  string  `json:"last_name"`
+	Phone     *string `json:"phone,omitempty"`
+	Role      string  `json:"role"`
+}
+
 type UserHandler struct {
 	repo ports.UserRepository
 }
@@ -38,7 +51,7 @@ func (h *UserHandler) RegisterRoutes(r chi.Router) {
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, maxCreateUserBodyBytes)
 
-	var req ports.CreateUserParams
+	var req createUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
 		return
@@ -60,9 +73,17 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	req.PasswordHash = string(hash)
 
-	user, err := h.repo.CreateUser(r.Context(), req)
+	params := ports.CreateUserParams{
+		Email:        req.Email,
+		PasswordHash: string(hash),
+		FirstName:    req.FirstName,
+		LastName:     req.LastName,
+		Phone:        req.Phone,
+		Role:         req.Role,
+	}
+
+	user, err := h.repo.CreateUser(r.Context(), params)
 	if err != nil {
 		slog.Error("Failed to create user", "error", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

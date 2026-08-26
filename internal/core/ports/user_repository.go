@@ -2,9 +2,13 @@ package ports
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 )
+
+// ErrUserNotFound is returned when a requested user does not exist.
+var ErrUserNotFound = errors.New("user not found")
 
 // UserDTO represents the user entity transferred across boundaries.
 type UserDTO struct {

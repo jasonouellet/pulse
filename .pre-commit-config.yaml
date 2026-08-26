@@ -44,7 +44,7 @@ repos:
     rev: v3.9.6
     hooks:
       - id: prettier
-        types_or: [javascript, jsx, ts, tsx, css, scss, json, markdown]
+        types_or: [javascript, jsx, ts, tsx, css, scss, json]
 
   # pre-commit/mirrors-eslint casse avec la flat config d'ESLint 9+
   # (environnement isolé du hook, résolution de module en échec sur
@@ -54,9 +54,9 @@ repos:
     hooks:
       - id: eslint
         name: ESLint
-        entry: bash -c 'cd frontend && npm run lint'
+        entry: frontend/node_modules/.bin/eslint --config frontend/eslint.config.js
         language: system
-        files: ^frontend/src/.*\.(js|jsx|ts|tsx)$
+        files: ^frontend/.*\.(js|jsx|ts|tsx)$
 
   # ---------------------------------------------------------------------------
   # 4. Hooks SQL & Docker

@@ -26,7 +26,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   className,
   variant = "primary",
-  size = "md",
+  _size = "md", // TODO: brancher les variantes de taille
   ...props
 }) => {
   const baseStyles =

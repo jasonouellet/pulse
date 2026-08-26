@@ -18,5 +18,18 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Un identifiant préfixé par _ est volontairement non utilisé pour
+      // l'instant (scaffold, prop réservée pour une itération future) —
+      // le linter ne doit pas bloquer dessus.
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+        },
+      ],
+    },
   },
 ]);

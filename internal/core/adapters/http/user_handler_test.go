@@ -24,17 +24,6 @@ func NewMockUserRepository() *MockUserRepository {
 	return &MockUserRepository{users: make(map[uuid.UUID]ports.UserDTO)}
 }
 
-// CreateUserHandler gère la création d'un utilisateur.
-// @Summary      Créer un utilisateur
-// @Description  Crée un nouvel utilisateur dans le schéma Core
-// @Tags         core/users
-// @Accept       json
-// @Produce      json
-// @Param        user  body      CreateUserRequest  true  "Données utilisateur"
-// @Success      201   {object}  UserResponse
-// @Failure      400   {object}  ErrorResponse
-// @Failure      500   {object}  ErrorResponse
-// @Router       /core/users [post]
 func (m *MockUserRepository) CreateUser(ctx context.Context, p ports.CreateUserParams) (*ports.UserDTO, error) {
 	id := uuid.New()
 	u := ports.UserDTO{
@@ -52,13 +41,13 @@ func (m *MockUserRepository) CreateUser(ctx context.Context, p ports.CreateUserP
 func (m *MockUserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*ports.UserDTO, error) {
 	u, exists := m.users[id]
 	if !exists {
-		return nil, nil
+		return nil, ports.ErrUserNotFound
 	}
 	return &u, nil
 }
 
 func (m *MockUserRepository) GetUserByEmail(ctx context.Context, email string) (*ports.UserDTO, error) {
-	return nil, nil
+	return nil, ports.ErrUserNotFound
 }
 
 func (m *MockUserRepository) ListUsers(ctx context.Context, limit, offset int32) ([]ports.UserDTO, error) {
@@ -76,8 +65,18 @@ func TestCreateUser_Success(t *testing.T) {
 	r := chi.NewRouter()
 	handler.RegisterRoutes(r)
 
-	payload := ports.CreateUserParams{
+	// Reflète le DTO HTTP réel (createUserRequest côté handler), pas
+	// ports.CreateUserParams qui n'a pas de champ pour le mot de passe
+	// en clair.
+	payload := struct {
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Role      string `json:"role"`
+	}{
 		Email:     "coach@pulse.local",
+		Password:  "S3cur3P@ssw0rd!",
 		FirstName: "Jean",
 		LastName:  "Dupont",
 		Role:      "COACH",
