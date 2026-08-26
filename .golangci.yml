@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 5m
   modules-download-mode: readonly
@@ -10,18 +12,15 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
+    - gofumpt
     - misspell
     - revive
 
-linters-settings:
-  gofmt:
-    simplify: true
-  revive:
-    severity: warning
+  settings:
+    revive:
+      severity: warning
 
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
+  

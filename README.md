@@ -16,25 +16,27 @@
 Le projet est conçu selon les principes de la **Clean Architecture (Ports & Adapters)** sous forme de **Monolithe Modulaire Go**, garantissant une séparation stricte des domaines métier et permettant une migration vers des microservices sans refactorisation lourde (`ADR-003`).
 
 ### Backend
-* **Langage :** Go 1.22+
-* **Routeur HTTP :** Chi Router (API RESTful)
-* **Base de données :** PostgreSQL 16+ avec isolation stricte par schémas (`core`, `tournament`, `scheduling`, `finance`)
-* **Génération SQL :** `sqlc` (requêtes type-safe compilées en Go)
-* **Migrations :** `golang-migrate` (exécution automatique au démarrage)
-* **Observabilité :** OpenTelemetry OTLP/gRPC (`otelchi`, `otelslog`, `otelpgx`) (`ADR-006`)
+
+- **Langage :** Go 1.22+
+- **Routeur HTTP :** Chi Router (API RESTful)
+- **Base de données :** PostgreSQL 16+ avec isolation stricte par schémas (`core`, `tournament`, `scheduling`, `finance`)
+- **Génération SQL :** `sqlc` (requêtes type-safe compilées en Go)
+- **Migrations :** `golang-migrate` (exécution automatique au démarrage)
+- **Observabilité :** OpenTelemetry OTLP/gRPC (`otelchi`, `otelslog`, `otelpgx`) (`ADR-006`)
 
 ### Frontend
-* **Framework :** React + Vite (TypeScript)
-* **Styling & UI :** Tailwind CSS, Radix UI (Thème Day/Dark, accessibilité WCAG 2.1 AA)
-* **Icônes :** Lucide React
-* **Testing :** Vitest + React Testing Library + Happy-DOM + Vitest-Axe
-* **Observabilité Web :** OpenTelemetry Web SDK (`@opentelemetry/sdk-trace-web`)
+
+- **Framework :** React + Vite (TypeScript)
+- **Styling & UI :** Tailwind CSS, Radix UI (Thème Day/Dark, accessibilité WCAG 2.1 AA)
+- **Icônes :** Lucide React
+- **Testing :** Vitest + React Testing Library + Happy-DOM + Vitest-Axe
+- **Observabilité Web :** OpenTelemetry Web SDK (`@opentelemetry/sdk-trace-web`)
 
 ---
 
 ## 📁 Structure du Projet
 
-```text
+````text
 pulse/
 ├── cmd/
 │   └── monolith/          # Point d'entrée du serveur Go Monolithe
@@ -76,4 +78,4 @@ export PORT=8080
 
 # Lancer le monolithe
 go run cmd/monolith/main.go
-
+````

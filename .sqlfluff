@@ -1,5 +1,16 @@
+
 [sqlfluff]
 dialect = postgres
-max_line_length = 120
-# "name"/"code" are common domain column names, not ambiguous with SQL keywords here.
+templater = raw
+max_line_length = 160
+
 exclude_rules = RF04
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.types]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower

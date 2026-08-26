@@ -1,34 +1,32 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-      "config:recommended"
-    ],
-    "timezone": "America/Toronto",
-    "schedule": ["before 6am on monday"],
-    "packageRules": [
-      {
-        "matchMatchers": ["gomod"],
-        "groupName": "Go Backend Dependencies",
-        "labels": ["dependencies", "backend", "go"],
-        "commitMessagePrefix": "chore(deps-go): "
-      },
-      {
-        "matchMatchers": ["npm"],
-        "groupName": "React Frontend Dependencies",
-        "labels": ["dependencies", "frontend", "react"],
-        "commitMessagePrefix": "chore(deps-npm): "
-      },
-      {
-        "matchMatchers": ["dockerfile", "docker-compose"],
-        "groupName": "Docker Infrastructure Dependencies",
-        "labels": ["dependencies", "docker"],
-        "commitMessagePrefix": "chore(deps-docker): "
-      },
-      {
-        "matchMatchers": ["github-actions"],
-        "groupName": "GitHub Actions Dependencies",
-        "labels": ["dependencies", "ci"],
-        "commitMessagePrefix": "chore(deps-ci): "
-      }
-    ]
-  }
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "America/Toronto",
+  "schedule": ["before 6am on monday"],
+  "packageRules": [
+    {
+      "matchMatchers": ["gomod"],
+      "groupName": "Go Backend Dependencies",
+      "labels": ["dependencies", "backend", "go"],
+      "commitMessagePrefix": "chore(deps-go): "
+    },
+    {
+      "matchMatchers": ["npm"],
+      "groupName": "React Frontend Dependencies",
+      "labels": ["dependencies", "frontend", "react"],
+      "commitMessagePrefix": "chore(deps-npm): "
+    },
+    {
+      "matchMatchers": ["dockerfile", "docker-compose"],
+      "groupName": "Docker Infrastructure Dependencies",
+      "labels": ["dependencies", "docker"],
+      "commitMessagePrefix": "chore(deps-docker): "
+    },
+    {
+      "matchMatchers": ["github-actions"],
+      "groupName": "GitHub Actions Dependencies",
+      "labels": ["dependencies", "ci"],
+      "commitMessagePrefix": "chore(deps-ci): "
+    }
+  ]
+}
