@@ -32,7 +32,7 @@ jobs:
       - name: Go Linter (golangci-lint)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.64.6
+          version: v2.5.0
 
       # --- React / Frontend Lint ---
       - name: Setup Node.js
