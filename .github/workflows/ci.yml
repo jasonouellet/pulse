@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # --- Markdown Lint ---
       - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v16
+        uses: DavidAnson/markdownlint-cli2-action@v17
         with:
           globs: '**/*.md'
 
@@ -30,13 +30,13 @@ jobs:
           go-version: '1.25'
 
       - name: Go Linter (golangci-lint)
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.5.0
+          version: v2.13.1
 
       # --- React / Frontend Lint ---
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'npm'
@@ -51,7 +51,7 @@ jobs:
 
       # --- Dockerfile Lint ---
       - name: Lint Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
 
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # --- Tests Go ---
       - name: Setup Go
@@ -77,7 +77,7 @@ jobs:
 
       # --- Tests React (Vitest) ---
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'npm'
@@ -91,13 +91,13 @@ jobs:
 
       # Upload des artefacts de couverture (Go + Frontend)
       - name: Upload Go Coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-go
           path: coverage-go.out
 
       - name: Upload Frontend Coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-frontend
           path: frontend/coverage/
@@ -111,7 +111,7 @@ jobs:
     needs: [lint, test]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -119,10 +119,14 @@ jobs:
           go-version: '1.25'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
+      # NOTE: snyk/actions ne publie pas de tags versionnés (v1, v2, ...),
+      # seulement @master. C'est un choix des mainteneurs, pas un oubli
+      # de notre part. Si tu veux éliminer le risque d'un tag/branche
+      # mouvant, épingle un SHA de commit précis à la place de @master.
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
 
@@ -135,28 +139,30 @@ jobs:
   # 4. ANALYSE SONARQUBE / SONARCLOUD
   # ---------------------------------------------------------------------------
   sonar:
-    name: SonarCloud Analysis
+    name: SonarQube Cloud Analysis
     runs-on: ubuntu-latest
     needs: [test]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Download Go Coverage Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: coverage-go
 
       - name: Download Frontend Coverage Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: coverage-frontend
           path: frontend/coverage/
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      # sonarcloud-github-action est dépréciée; remplacée par
+      # sonarqube-scan-action, qui couvre SonarCloud et SonarQube Server.
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
