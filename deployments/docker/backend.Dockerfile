@@ -1,10 +1,12 @@
-FROM golang:1.25-alpine AS builder
-RUN apk add --no-cache git=2.54.0-r0 ca-certificates=20260611-r0 tzdata=2026c-r0
+FROM golang:1.27.0-alpine3.24 AS builder
+RUN apk add --no-cache git ca-certificates tzdata
 WORKDIR /app
-COPY go.mod ./
-RUN go mod download || true
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build     -ldflags="-w -s -extldflags '-static'"     -o /app/bin/pulse-monolith ./cmd/monolith/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-w -s -extldflags '-static'" \
+    -o /app/bin/pulse-monolith ./cmd/monolith/main.go
 
 FROM gcr.io/distroless/static-debian12:nonroot
 WORKDIR /
