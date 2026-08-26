@@ -10,7 +10,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Installation des outils Go
-# Note : Pour figer une version compatible Go 1.25 sans dépendre de GOTOOLCHAIN=auto, 
+# Note : Pour figer une version compatible Go 1.25 sans dépendre de GOTOOLCHAIN=auto,
 # vous pouvez remplacer @latest par @v1.28.0
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest \
     && go install github.com/air-verse/air@latest

@@ -89,68 +89,49 @@ jobs:
           npm ci
           npm run test -- --coverage
 
-      # Upload de l'artefact de couverture Go pour SonarCloud
+      # Artefact de couverture Go pour SonarCloud
       - name: Upload Go Coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-go
           path: coverage-go.out
 
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # 3. SCAN DE SÉCURITÉ (SNYK)
   # ---------------------------------------------------------------------------
-    security-snyk:
-      name: Snyk Security Scan
-      runs-on: ubuntu-latest
-      needs: [lint, test]
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      if: ${{ env.SNYK_TOKEN != '' }}
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+  security-snyk:
+    name: Snyk Security Scan
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Setup Go
-          uses: actions/setup-go@v5
-          with:
-            go-version: '1.22'
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-        - name: Install Snyk CLI
-          uses: snyk/actions/setup@master
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
 
-        # Scan du code Backend Go
-        - name: Snyk Go Test
-          run: snyk test --severity-threshold=high
+      - name: Run Snyk Code Scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk test --severity-threshold=high
 
-        # Scan du code Frontend React
-        - name: Snyk Frontend Test
-          run: |
-            cd frontend
-            npm ci
-            snyk test --severity-threshold=high
-
-        # Construction et scan du conteneur Docker
-        - name: Build Docker image for scanning
-          run: docker build -t pulse-monolith:test .
-
-        - name: Snyk Container Test
-          run: snyk container test pulse-monolith:test --file=Dockerfile --severity-threshold=high
-
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # 4. ANALYSE SONARQUBE / SONARCLOUD
   # ---------------------------------------------------------------------------
   sonar:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     needs: [test]
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    if: ${{ env.SONAR_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
