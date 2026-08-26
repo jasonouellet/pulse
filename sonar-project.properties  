@@ -4,17 +4,14 @@ sonar.projectKey=jasonouellet_pulse
 sonar.projectName=Project PULSE
 sonar.projectVersion=1.0
 
-# Path is relative to the sonar-project.properties file.
-#sonar.sources=.
+# Encodage
+sonar.sourceEncoding=UTF-8
 
-# Encoding of the source code. Default is default system encoding
-#sonar.sourceEncoding=UTF-8
-
-# Exclusions et inclusions
+# Sources et Tests
 sonar.sources=internal,pkg,cmd,frontend/src
-sonar.tests=internal,pkg,frontend/src
-sonar.test.inclusions=**/*_test.go,**/*.test.tsx,**/*.test.ts
-sonar.exclusions=**/vendor/**,**/node_modules/**,**/docs/**
+sonar.tests=internal,frontend/src
+sonar.test.inclusions=**/*_test.go,**/*.test.tsx,**/*.test.ts,**/*.spec.ts,**/*.spec.tsx
+sonar.exclusions=**/vendor/**,**/node_modules/**,**/docs/**,**/*.d.ts
 
 # Rapports de couverture
 sonar.go.coverage.reportPaths=coverage-go.out
