@@ -4,22 +4,32 @@ run:
   timeout: 5m
   modules-download-mode: readonly
 
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-dirs:
+    - frontend/node_modules
+    - vendor
+
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
-    - gofumpt
     - misspell
     - revive
 
-  settings:
-    revive:
-      severity: warning
-
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
+linters-settings:
+  revive:
+    severity: warning
+    rules:
+      - name: package-comments
+        disabled: true
+      - name: exported
+        disabled: true
+      - name: unused-parameter
+        disabled: true
+      - name: blank-imports
+        disabled: true

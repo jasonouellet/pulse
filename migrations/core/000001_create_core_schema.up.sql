@@ -36,61 +36,61 @@ CREATE TYPE core.relationship_type AS ENUM (
 -- TABLE: core.sports
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.sports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code VARCHAR(32) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100) NOT NULL UNIQUE,
-    default_periods INT NOT NULL DEFAULT 2,
-    default_period_duration_minutes INT NOT NULL DEFAULT 25,
-    rules_config JSONB NOT NULL DEFAULT '{}'::jsonb,
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    code varchar(32) NOT NULL UNIQUE,
+    name varchar(100) NOT NULL,
+    slug varchar(100) NOT NULL UNIQUE,
+    default_periods int NOT NULL DEFAULT 2,
+    default_period_duration_minutes int NOT NULL DEFAULT 25,
+    rules_config jsonb NOT NULL DEFAULT '{}'::jsonb,
+    is_active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
 );
 
 -- ----------------------------------------------------------------------------
 -- TABLE: core.users
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(30),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email varchar(255) NOT NULL UNIQUE,
+    password_hash varchar(255) NOT NULL,
+    first_name varchar(100) NOT NULL,
+    last_name varchar(100) NOT NULL,
+    phone varchar(30),
     role core.user_role NOT NULL DEFAULT 'PARENT',
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    last_login_at TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    is_active boolean NOT NULL DEFAULT true,
+    last_login_at timestamp with time zone,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
 );
 
 -- ----------------------------------------------------------------------------
 -- TABLE: core.player_profiles
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.player_profiles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID UNIQUE REFERENCES core.users(id) ON DELETE SET NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    date_of_birth DATE NOT NULL,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid UNIQUE REFERENCES core.users (id) ON DELETE SET NULL,
+    first_name varchar(100) NOT NULL,
+    last_name varchar(100) NOT NULL,
+    date_of_birth date NOT NULL,
     gender core.gender_category NOT NULL,
-    medical_notes TEXT,
-    emergency_contact_name VARCHAR(200),
-    emergency_contact_phone VARCHAR(30),
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    medical_notes text,
+    emergency_contact_name varchar(200),
+    emergency_contact_phone varchar(30),
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
 );
 
 -- ----------------------------------------------------------------------------
 -- TABLE: core.parents_children
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.parents_children (
-    parent_id UUID NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
-    child_id UUID NOT NULL REFERENCES core.player_profiles(id) ON DELETE CASCADE,
+    parent_id uuid NOT NULL REFERENCES core.users (id) ON DELETE CASCADE,
+    child_id uuid NOT NULL REFERENCES core.player_profiles (id) ON DELETE CASCADE,
     relationship core.relationship_type NOT NULL DEFAULT 'LEGAL_GUARDIAN',
-    is_primary_contact BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_primary_contact boolean NOT NULL DEFAULT false,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (parent_id, child_id)
 );
 
@@ -98,29 +98,29 @@ CREATE TABLE core.parents_children (
 -- TABLE: core.pools
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.pools (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    sport_id UUID NOT NULL REFERENCES core.sports(id) ON DELETE RESTRICT,
-    name VARCHAR(100) NOT NULL,
-    code VARCHAR(50) NOT NULL,
-    min_age INT NOT NULL,
-    max_age INT NOT NULL,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    sport_id uuid NOT NULL REFERENCES core.sports (id) ON DELETE RESTRICT,
+    name varchar(100) NOT NULL,
+    code varchar(50) NOT NULL,
+    min_age int NOT NULL,
+    max_age int NOT NULL,
     gender core.gender_category NOT NULL DEFAULT 'MIXED',
-    season_year INT NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    season_year int NOT NULL,
+    is_active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
     CONSTRAINT uk_pool_sport_season UNIQUE (sport_id, code, season_year)
 );
 
 -- ----------------------------------------------------------------------------
 -- INDEXES
 -- ----------------------------------------------------------------------------
-CREATE INDEX idx_sports_code ON core.sports(code);
-CREATE INDEX idx_users_email ON core.users(email);
-CREATE INDEX idx_users_role ON core.users(role);
-CREATE INDEX idx_player_profiles_dob ON core.player_profiles(date_of_birth);
-CREATE INDEX idx_parents_children_child ON core.parents_children(child_id);
-CREATE INDEX idx_pools_sport_season ON core.pools(sport_id, season_year);
+CREATE INDEX idx_sports_code ON core.sports (code);
+CREATE INDEX idx_users_email ON core.users (email);
+CREATE INDEX idx_users_role ON core.users (role);
+CREATE INDEX idx_player_profiles_dob ON core.player_profiles (date_of_birth);
+CREATE INDEX idx_parents_children_child ON core.parents_children (child_id);
+CREATE INDEX idx_pools_sport_season ON core.pools (sport_id, season_year);
 
 -- ----------------------------------------------------------------------------
 -- DOCUMENTATION (COMMENT ON)
