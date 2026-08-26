@@ -1,0 +1,245 @@
+{
+  "sport": {
+    "id": "sport_soccer",
+    "name": "Soccer"
+  },
+  "framework": {
+    "id": "fw_soccer_ltpd_u10_u12_detailed",
+    "name": "DLTJ / LTPD Soccer Québec - Grille Approfondie (CDC U10-U12)",
+    "age_min": 9,
+    "age_max": 12,
+    "pillars": [
+      {
+        "id": "pil_tech_indiv",
+        "name": "Technique & Tactique Individuelle",
+        "weighting_percent": 25,
+        "criteria": [
+          {
+            "id": "crit_tech_ball_mastery",
+            "name": "Maîtrise & Conduite de balle",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_first_touch",
+            "name": "Contrôle orienté",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_short_pass",
+            "name": "Jeu court (Passes)",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_long_pass_strike",
+            "name": "Jeu long & Frappes",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_1v1_offense",
+            "name": "Duels offensifs (1v1)",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_1v1_defense",
+            "name": "Duels défensifs (1v1)",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_scanning",
+            "name": "Prise d'information (Scanning)",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tech_decision_making",
+            "name": "Prise de décision",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          }
+        ]
+      },
+      {
+        "id": "pil_tact_collective",
+        "name": "Tactique Collective & Vision du Jeu",
+        "weighting_percent": 15,
+        "criteria": [
+          {
+            "id": "crit_tact_spatial_awareness",
+            "name": "Occupation du terrain",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tact_support",
+            "name": "Offre de solution (Soutien)",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tact_role_understanding",
+            "name": "Compréhension des rôles",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tact_trans_att_def",
+            "name": "Transition Attaque -> Défense",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_tact_trans_def_att",
+            "name": "Transition Défense -> Attaque",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          }
+        ]
+      },
+      {
+        "id": "pil_physique",
+        "name": "Physique & Motricité",
+        "weighting_percent": 20,
+        "criteria": [
+          {
+            "id": "crit_phys_aec",
+            "name": "Agilité & Équilibre",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_phys_coordination",
+            "name": "Coordination motrice",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_phys_acceleration",
+            "name": "Vitesse / Explosivité",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_phys_max_speed",
+            "name": "Vitesse maximale",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_phys_stamina",
+            "name": "Endurance active",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_phys_weak_foot",
+            "name": "Aisance du pied faible",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          }
+        ]
+      },
+      {
+        "id": "pil_mental",
+        "name": "Mental & Cognitif",
+        "weighting_percent": 20,
+        "criteria": [
+          {
+            "id": "crit_ment_focus",
+            "name": "Concentration & Écoute",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_ment_resilience",
+            "name": "Résilience (Gestion de l'erreur)",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_ment_work_ethic",
+            "name": "Intensité & Combativité",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_ment_autonomy",
+            "name": "Autonomie & Initiative",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_ment_pressure_handling",
+            "name": "Gestion de la pression",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          }
+        ]
+      },
+      {
+        "id": "pil_socio_emotional",
+        "name": "Socio-Émotionnel",
+        "weighting_percent": 20,
+        "criteria": [
+          {
+            "id": "crit_socio_comms",
+            "name": "Communication positive",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_socio_teamwork",
+            "name": "Coopération & Esprit d'équipe",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_socio_respect",
+            "name": "Respect & Étiquette",
+            "is_quick_eval": true,
+            "scale_min": 1,
+            "scale_max": 5
+          },
+          {
+            "id": "crit_socio_attendance",
+            "name": "Assiduité & Ponctualité",
+            "is_quick_eval": false,
+            "scale_min": 1,
+            "scale_max": 5
+          }
+        ]
+      }
+    ]
+  }
+}
