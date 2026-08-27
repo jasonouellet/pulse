@@ -2,10 +2,10 @@
 
 ## 1. Vue d'Ensemble C4
 
-- **Frontend :** SPA React.js avec TypeScript, Tailwind CSS et Radix UI (PWA & Responsive, Day/Dark Mode).
-- **Backend :** Go (Golang) utilisant le pattern Monolithe Modulaire (Modular Monolith).
-- **Stockage :** PostgreSQL (Isolation par schémas SQL : `core`, `tournament`, `scheduling`, `finance`, `evaluation`).
-- **Cache & Real-time :** Redis (Cache HTTP, verrous distribués et Pub/Sub WebSockets pour les scores).
+* **Frontend :** SPA React.js avec TypeScript, Tailwind CSS et Radix UI (PWA & Responsive, Day/Dark Mode).
+* **Backend :** Go (Golang) utilisant le pattern Monolithe Modulaire (Modular Monolith).
+* **Stockage :** PostgreSQL (Isolation par schémas SQL : `core`, `tournament`, `scheduling`, `finance`, `evaluation`).
+* **Cache & Real-time :** Redis (Cache HTTP, verrous distribués et Pub/Sub WebSockets pour les scores).
 
 ## 2. Abstraction Multi-Sports (`ADR-004`)
 
@@ -34,10 +34,10 @@ En mode Microservice (futur), l'adaptateur bascule en gRPC sans modifier la logi
 
 ### 4. Registre ADR
 
-- **`ADR-001-frontend-stack.md` :** Choix de React, TypeScript, Tailwind, Radix UI et norme WCAG 2.1 AA.
-- **`ADR-002-backend-and-data-stack.md` :** Choix de Go, PostgreSQL (sqlc) et Redis.
-- **`ADR-003-modular-monolith-to-microservices.md` :** Choix du Monolithe Modulaire avec migration microservices sans refactoring via Ports & Adapters.
--
+* **`ADR-001-frontend-stack.md` :** Choix de React, TypeScript, Tailwind, Radix UI et norme WCAG 2.1 AA.
+* **`ADR-002-backend-and-data-stack.md` :** Choix de Go, PostgreSQL (sqlc) et Redis.
+* **`ADR-003-modular-monolith-to-microservices.md` :** Choix du Monolithe Modulaire avec migration microservices sans refactoring via Ports & Adapters.
+*
 
 ---
 

@@ -13,15 +13,15 @@ Cependant, les licences open-source permissives (MIT, Apache 2.0) ou Copyleft st
 ## Décisions
 
 1. **Licence Source-Available Non-Commercial (BSL 1.1 / PolyForm NonCommercial) :**
-   - **Auto-hébergement par les clubs :** Tout club sportif ou association à but non lucratif a le droit de télécharger et déployer l'application gratuitement pour sa propre gestion interne.
-   - **Transparence :** Le code source reste public, auditable et ouvert aux contributions.
+   * **Auto-hébergement par les clubs :** Tout club sportif ou association à but non lucratif a le droit de télécharger et déployer l'application gratuitement pour sa propre gestion interne.
+   * **Transparence :** Le code source reste public, auditable et ouvert aux contributions.
 2. **Restrictions Commerciales :**
-   - Il est strictement interdit à un tiers de proposer le Project PULSE sous forme de service hébergé payant (SaaS / Cloud Managed) ou de revendre le logiciel.
+   * Il est strictement interdit à un tiers de proposer le Project PULSE sous forme de service hébergé payant (SaaS / Cloud Managed) ou de revendre le logiciel.
 3. **Modèle de Double Licence (Dual-Licensing) :**
-   - L'auteur principal conserve 100 % du Copyright. Une entreprise ou une ligue professionnelle souhaitant exploiter le logiciel dans un cadre commercial dérogeant à la licence doit acquérir une **Licence Commerciale** auprès de l'auteur.
+   * L'auteur principal conserve 100 % du Copyright. Une entreprise ou une ligue professionnelle souhaitant exploiter le logiciel dans un cadre commercial dérogeant à la licence doit acquérir une **Licence Commerciale** auprès de l'auteur.
 
 ## Conséquences
 
-- Protection absolue contre la captation de valeur commerciale par des tiers.
-- Auto-hébergement totalement gratuit garanti pour les clubs amateurs.
-- Exigence d'un accord de contribution (CLA.md) pour les contributeurs externes.
+* Protection absolue contre la captation de valeur commerciale par des tiers.
+* Auto-hébergement totalement gratuit garanti pour les clubs amateurs.
+* Exigence d'un accord de contribution (CLA.md) pour les contributeurs externes.

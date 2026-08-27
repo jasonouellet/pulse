@@ -18,5 +18,5 @@ L'application doit supporter plusieurs profils (Parents, Sportifs, Administrateu
 
 ## Conséquences
 
-- Développement accéléré de composants accessibles grâce aux primitives Radix UI.
-- Performance élevée et empreinte mémoire faible adaptée au réseau mobile du terrain.
+* Développement accéléré de composants accessibles grâce aux primitives Radix UI.
+* Performance élevée et empreinte mémoire faible adaptée au réseau mobile du terrain.

@@ -6,7 +6,8 @@
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "24"
+      "version": "24",
+      "globalModules": "markdownlint-cli2"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
@@ -25,7 +26,8 @@
         "mtxr.sqltools",
         "mtxr.sqltools-driver-pg",
         "eamodio.gitlens",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "DavidAnson.vscode-markdownlint"
       ]
     }
   },

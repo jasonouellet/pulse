@@ -16,5 +16,5 @@ L'application vise à terme la gestion de multiples sports collectifs (hockey, b
 
 ## Conséquences
 
-- Zéro refactoring de la base de données lorsque le 2e sport sera ajouté.
-- Nécessité de maintenir un dictionnaire de termes/lexique par sport pour la couche d'affichage React.
+* Zéro refactoring de la base de données lorsque le 2e sport sera ajouté.
+* Nécessité de maintenir un dictionnaire de termes/lexique par sport pour la couche d'affichage React.

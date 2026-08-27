@@ -11,5 +11,5 @@
 
 ## Règle d'Or d'Architecture
 
-- **Aucune clé étrangère (FK) inter-schémas.**
-- L'intégrité entre les schémas `core.pools` et `tournament.rosters` est maintenue applicativement dans le backend Go via des UUIDs.
+* **Aucune clé étrangère (FK) inter-schémas.**
+* L'intégrité entre les schémas `core.pools` et `tournament.rosters` est maintenue applicativement dans le backend Go via des UUIDs.

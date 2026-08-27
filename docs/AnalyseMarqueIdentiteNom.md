@@ -6,37 +6,37 @@ Ce document détaille l'analyse linguistique, juridique et le positionnement de 
 
 ### 1. Origine & Signification
 
-- **Origine :** Dérivé du mot anglais _Roster_ (alignement d'équipe / liste des membres) et du latin _Rostra_ (plateforme d'expression / tribune).
-- **Concept :** Évoque directement le cœur d'innovation du produit : la gestion et la composition dynamique des alignements sportifs.
+* **Origine :** Dérivé du mot anglais _Roster_ (alignement d'équipe / liste des membres) et du latin _Rostra_ (plateforme d'expression / tribune).
+* **Concept :** Évoque directement le cœur d'innovation du produit : la gestion et la composition dynamique des alignements sportifs.
 
 ### 2. Évaluation Linguistique (Bilinguisme FR/EN)
 
-- **Prononciation FR :** _Ros-tra_ — Très fluide, sonne professionnel, structuré et technologique.
-- **Prononciation EN :** _Ros-tra_ — Naturel pour un anglophone (association immédiate avec "Roster").
-- **Identité visuelle potentielle :** Logo axé sur des lignes de terrain, des blocs qui s'assemblent ou un "R" stylisé avec des noeuds de connexions.
+* **Prononciation FR :** _Ros-tra_ — Très fluide, sonne professionnel, structuré et technologique.
+* **Prononciation EN :** _Ros-tra_ — Naturel pour un anglophone (association immédiate avec "Roster").
+* **Identité visuelle potentielle :** Logo axé sur des lignes de terrain, des blocs qui s'assemblent ou un "R" stylisé avec des noeuds de connexions.
 
 ### 3. Analyse de Risque & Propriété Intellectuelle
 
-- **Conflits commerciaux :** Très faible risque de confusion avec des marques de sport majeures.
-- **Disponibilité :** Excellente flexibilité pour obtenir des noms de domaine (ex: `rostra.app`, `rostrasport.com`, `rostra.io`).
+* **Conflits commerciaux :** Très faible risque de confusion avec des marques de sport majeures.
+* **Disponibilité :** Excellente flexibilité pour obtenir des noms de domaine (ex: `rostra.app`, `rostrasport.com`, `rostra.io`).
 
 ## OPTION 2 : KIPUP (ou KIPP)
 
 ### 1. Origine & Signification
 
-- **Origine :** Mot-valise combinant « Équipe » (FR) et l'expression anglaise « Keep up » (rester synchronisé / garder le rythme).
-- **Concept :** Mettant l'accent sur la coordination, le suivi en temps réel et la communication fluide entre clubs, entraîneurs et parents.
+* **Origine :** Mot-valise combinant « Équipe » (FR) et l'expression anglaise « Keep up » (rester synchronisé / garder le rythme).
+* **Concept :** Mettant l'accent sur la coordination, le suivi en temps réel et la communication fluide entre clubs, entraîneurs et parents.
 
 ### 2. Évaluation Linguistique (Bilinguisme FR/EN)
 
-- **Prononciation FR :** _Kip-up_ — Dynamique, jeune, rappelle le mot « Équipe ».
-- **Prononciation EN :** _Keep-up_ — Phonétiquement identique à une expression anglaise courante, très facile à retenir.
-- **Identité visuelle potentielle :** Logo orienté mouvement, flèches vers le haut, typographie moderne et énergique.
+* **Prononciation FR :** _Kip-up_ — Dynamique, jeune, rappelle le mot « Équipe ».
+* **Prononciation EN :** _Keep-up_ — Phonétiquement identique à une expression anglaise courante, très facile à retenir.
+* **Identité visuelle potentielle :** Logo orienté mouvement, flèches vers le haut, typographie moderne et énergique.
 
 ### 3. Analyse de Risque & Propriété Intellectuelle
 
-- **Conflits commerciaux :** Aucun conflit majeur identifié dans le secteur des logiciels de gestion sportive.
-- **Disponibilité :** Forte disponibilité pour les extensions de domaine SaaS (ex: `getkipup.com`, `kipup.app`).
+* **Conflits commerciaux :** Aucun conflit majeur identifié dans le secteur des logiciels de gestion sportive.
+* **Disponibilité :** Forte disponibilité pour les extensions de domaine SaaS (ex: `getkipup.com`, `kipup.app`).
 
 ---
 

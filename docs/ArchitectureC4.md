@@ -34,10 +34,10 @@ C4Context
 
 ## 2. Conteneurs (Niveau 2)
 
-- **Frontend SPA :** React.js + TypeScript (Mobile-First, PWA, Dark/Day Mode, WCAG 2.1 AA).
-- **Backend API :** Go (Golang) sous forme de Monolithe Modulaire.
-- **Base de Données :** PostgreSQL 16+ avec un schéma dédié par module.
-- **Cache & Direct :** Redis (Pub/Sub WebSockets pour les scores et cache d'horaires).
+* **Frontend SPA :** React.js + TypeScript (Mobile-First, PWA, Dark/Day Mode, WCAG 2.1 AA).
+* **Backend API :** Go (Golang) sous forme de Monolithe Modulaire.
+* **Base de Données :** PostgreSQL 16+ avec un schéma dédié par module.
+* **Cache & Direct :** Redis (Pub/Sub WebSockets pour les scores et cache d'horaires).
 
 ```mermaid
 C4Container
@@ -70,9 +70,9 @@ C4Container
 
 Chaque module dans `/internal/` respecte l'Architecture Hexagonale:
 
-- **`domain` :** Modèles et règles métier purement Go (aucune dépendance).
-- **`ports` :** Interfaces de communication d'entrée et de sortie.
-- **`adapters` :** Implémentations concrètes (sqlc/PostgreSQL, Redis, In-Memory ou gRPC).
+* **`domain` :** Modèles et règles métier purement Go (aucune dépendance).
+* **`ports` :** Interfaces de communication d'entrée et de sortie.
+* **`adapters` :** Implémentations concrètes (sqlc/PostgreSQL, Redis, In-Memory ou gRPC).
 
 ```mermaid
 C4Component
@@ -113,8 +113,8 @@ C4Component
 
 ## [TODO ARCHITECTURE C4]
 
-- [ ] Spécifier les contrats protobuf/gRPC si un module doit être extrait en microservice.
-- [ ] Modéliser le schéma de données détaillé du module `evaluation` (grilles dynamiques JSONB).
+* [ ] Spécifier les contrats protobuf/gRPC si un module doit être extrait en microservice.
+* [ ] Modéliser le schéma de données détaillé du module `evaluation` (grilles dynamiques JSONB).
 
 ```mermaid
 

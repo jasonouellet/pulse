@@ -10,9 +10,9 @@ Please read this document carefully before submitting any Contribution.
 
 ## 1. Definitions
 
-- **"You" or "the Contributor"** means the individual who holds the copyright or who is authorized by the copyright holder to submit the Contribution.
-- **"Contribution"** means any source code, documentation, patch, modification, improvement, or other creation submitted by You to the Principal Author for inclusion in the Project (for example via a _Pull Request_, a _Commit_, or an _Issue_).
-- **"Principal Author"** means the owner and founder of Project PULSE [Your Name / Your Company Name].
+* **"You" or "the Contributor"** means the individual who holds the copyright or who is authorized by the copyright holder to submit the Contribution.
+* **"Contribution"** means any source code, documentation, patch, modification, improvement, or other creation submitted by You to the Principal Author for inclusion in the Project (for example via a _Pull Request_, a _Commit_, or an _Issue_).
+* **"Principal Author"** means the owner and founder of Project PULSE [Your Name / Your Company Name].
 
 ---
 
@@ -22,9 +22,9 @@ By submitting a Contribution, You grant the Principal Author a worldwide, perpet
 
 1. Reproduce, modify, adapt, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contribution and any derivative works thereof.
 2. Distribute and re-license the Contribution under any license chosen by the Principal Author, including but not limited to:
-   - _Source-Available_ licenses with commercial restrictions (e.g. BSL, PolyForm NonCommercial).
-   - Traditional Open-Source licenses.
-   - **Paid Commercial Licenses** granted to third parties.
+   * _Source-Available_ licenses with commercial restrictions (e.g. BSL, PolyForm NonCommercial).
+   * Traditional Open-Source licenses.
+   * **Paid Commercial Licenses** granted to third parties.
 
 ---
 
