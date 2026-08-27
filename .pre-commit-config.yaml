@@ -68,11 +68,14 @@ repos:
         args: [--dialect, postgres]
         files: ^migrations/
 
-#  - repo: https://github.com/hadolint/hadolint
-#    rev: v2.12.0
-#    hooks:
-#      - id: hadolint-docker
-#        files: Dockerfile$|\.Dockerfile$
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.14.0
+    hooks:
+      - id: hadolint-docker
+        name: dockerfile lint (hadolint)
+        entry: hadolint/hadolint:latest hadolint
+        language: docker_image
+        files: (.*[/\\])?Dockerfile.*
 
   # ---------------------------------------------------------------------------
   # 5. Contrôle d'Architecture & Sécurité (Règles PULSE)
