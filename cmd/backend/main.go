@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,10 +22,6 @@ import (
 	corePostgres "pulse/internal/core/adapters/postgres"
 	"pulse/pkg/database"
 	"pulse/pkg/observability"
-
-	_ "pulse/docs/openapi" // Importer la doc générée
-
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // @title           Project PULSE API
@@ -93,16 +91,27 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
 
-	r.Get("/healthz", newHealthHandler(dbPool))
+	apiConfig := huma.DefaultConfig("Project PULSE API", "1.0.0")
+	apiConfig.OpenAPIPath = "/openapi"
+	apiConfig.DocsPath = "/docs"
+	apiConfig.DocsRenderer = huma.DocsRendererSwaggerUI
+	api := humachi.New(r, apiConfig)
 
-	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
-	))
+	huma.Register(api, huma.Operation{
+		OperationID:   "health-check",
+		Method:        http.MethodGet,
+		Path:          "/healthz",
+		Summary:       "Check service health",
+		Description:   "Verifies that the backend and its database connection are available.",
+		Tags:          []string{"Health"},
+		DefaultStatus: http.StatusOK,
+		Errors:        []int{http.StatusServiceUnavailable},
+	}, newHealthHandler(dbPool))
 
 	// 4. Register Core Module Routes
 	coreRepo := corePostgres.NewUserRepository(dbPool)
 	coreHandler := coreHTTP.NewUserHandler(coreRepo)
-	coreHandler.RegisterRoutes(r)
+	coreHandler.RegisterRoutes(api)
 
 	// 5. Graceful HTTP Shutdown Server
 	port := getEnv("PORT", "8080")
@@ -140,25 +149,17 @@ type healthResponse struct {
 	Service string `json:"service"`
 }
 
-// newHealthHandler creates the health check endpoint handler.
-//
-// @Summary      Check service health
-// @Description  Verifies that the backend and its database connection are available.
-// @Tags         Health
-// @Produce      json
-// @Success      200  {object}  healthResponse
-// @Failure      503  {string}  string  "Database unavailable"
-// @Router       /healthz [get]
-func newHealthHandler(dbPool *pgxpool.Pool) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := dbPool.Ping(r.Context()); err != nil {
-			http.Error(w, "Database Unavailable", http.StatusServiceUnavailable)
-			return
+type healthOutput struct {
+	Body healthResponse
+}
+
+func newHealthHandler(dbPool *pgxpool.Pool) func(context.Context, *struct{}) (*healthOutput, error) {
+	return func(ctx context.Context, _ *struct{}) (*healthOutput, error) {
+		if err := dbPool.Ping(ctx); err != nil {
+			return nil, huma.Error503ServiceUnavailable("Database unavailable")
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-backend"}`))
+		return &healthOutput{Body: healthResponse{Status: "OK", Service: "pulse-backend"}}, nil
 	}
 }
 

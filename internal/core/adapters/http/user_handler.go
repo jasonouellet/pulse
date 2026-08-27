@@ -1,34 +1,50 @@
 package http
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"pulse/internal/core/ports"
 )
 
-// maxCreateUserBodyBytes borne la taille du corps accepté pour éviter
-// qu'un payload démesuré ne consomme la mémoire du serveur.
-const maxCreateUserBodyBytes = 1 << 20 // 1 MiB
+const maxCreateUserBodyBytes = 1 << 20
 
-// CreateUserRequest is the HTTP transport DTO for user creation. The plain
-// text password remains in the handler and must not be passed to
-// ports.CreateUserParams, which carries only the persistence hash.
+// CreateUserRequest is the HTTP transport DTO for user creation.
 type CreateUserRequest struct {
-	Email     string  `json:"email"`
-	Password  string  `json:"password"`
+	Email     string  `json:"email" doc:"User email address"`
+	Password  string  `json:"password" minLength:"8" doc:"Plain text password; never returned"`
 	FirstName string  `json:"first_name"`
 	LastName  string  `json:"last_name"`
 	Phone     *string `json:"phone,omitempty"`
 	Role      string  `json:"role"`
+}
+
+type CreateUserInput struct {
+	Body CreateUserRequest
+}
+
+type GetUserInput struct {
+	ID string `path:"id" format:"uuid" doc:"User UUID"`
+}
+
+type ListUsersInput struct {
+	Limit  int `query:"limit" default:"20" minimum:"1" maximum:"100" doc:"Maximum number of users to return"`
+	Offset int `query:"offset" default:"0" minimum:"0" doc:"Number of users to skip"`
+}
+
+type UserOutput struct {
+	Body ports.UserDTO
+}
+
+type UsersOutput struct {
+	Body []ports.UserDTO
 }
 
 type UserHandler struct {
@@ -39,140 +55,95 @@ func NewUserHandler(repo ports.UserRepository) *UserHandler {
 	return &UserHandler{repo: repo}
 }
 
-func (h *UserHandler) RegisterRoutes(r chi.Router) {
-	r.Route("/api/v1/core/users", func(r chi.Router) {
-		r.Post("/", h.CreateUser)
-		r.Get("/", h.ListUsers)
-		r.Get("/{id}", h.GetUserByID)
-	})
+func (h *UserHandler) RegisterRoutes(api huma.API) {
+	huma.Register(api, huma.Operation{
+		OperationID:   "create-core-user",
+		Method:        http.MethodPost,
+		Path:          "/api/v1/core/users/",
+		Summary:       "Create a user",
+		Description:   "Creates a user and stores a bcrypt hash of the supplied password.",
+		Tags:          []string{"Core users"},
+		DefaultStatus: http.StatusCreated,
+		MaxBodyBytes:  maxCreateUserBodyBytes,
+		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
+	}, h.CreateUser)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "list-core-users",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/core/users/",
+		Summary:     "List users",
+		Description: "Returns Core users using offset pagination.",
+		Tags:        []string{"Core users"},
+		Errors:      []int{http.StatusInternalServerError},
+	}, h.ListUsers)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-core-user",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/core/users/{id}",
+		Summary:     "Get a user",
+		Description: "Returns a Core user for the supplied UUID.",
+		Tags:        []string{"Core users"},
+		Errors:      []int{http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError},
+	}, h.GetUserByID)
 }
 
-// CreateUser creates a user in the Core module.
-//
-// @Summary      Create a user
-// @Description  Creates a user and stores a bcrypt hash of the supplied password.
-// @Tags         Core users
-// @Accept       json
-// @Produce      json
-// @Param        user  body      CreateUserRequest  true  "User to create"
-// @Success      201   {object}  ports.UserDTO
-// @Failure      400   {string}  string  "Invalid request"
-// @Failure      500   {string}  string  "Internal server error"
-// @Router       /api/v1/core/users/ [post]
-func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, maxCreateUserBodyBytes)
-
-	var req CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
-		return
+func (h *UserHandler) CreateUser(ctx context.Context, input *CreateUserInput) (*UserOutput, error) {
+	input.Body.Email = strings.TrimSpace(input.Body.Email)
+	if input.Body.Email == "" {
+		return nil, huma.Error400BadRequest("Email is required")
+	}
+	if input.Body.Password == "" {
+		return nil, huma.Error400BadRequest("Password is required")
 	}
 
-	req.Email = strings.TrimSpace(req.Email)
-	if req.Email == "" {
-		http.Error(w, "Email is required", http.StatusBadRequest)
-		return
-	}
-	if req.Password == "" {
-		http.Error(w, "Password is required", http.StatusBadRequest)
-		return
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Body.Password), bcrypt.DefaultCost)
 	if err != nil {
 		slog.Error("Failed to hash password", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, huma.Error500InternalServerError("Internal server error")
 	}
 
-	params := ports.CreateUserParams{
-		Email:        req.Email,
+	user, err := h.repo.CreateUser(ctx, ports.CreateUserParams{
+		Email:        input.Body.Email,
 		PasswordHash: string(hash),
-		FirstName:    req.FirstName,
-		LastName:     req.LastName,
-		Phone:        req.Phone,
-		Role:         req.Role,
-	}
-
-	user, err := h.repo.CreateUser(r.Context(), params)
+		FirstName:    input.Body.FirstName,
+		LastName:     input.Body.LastName,
+		Phone:        input.Body.Phone,
+		Role:         input.Body.Role,
+	})
 	if err != nil {
 		slog.Error("Failed to create user", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, huma.Error500InternalServerError("Internal server error")
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(user)
+	return &UserOutput{Body: *user}, nil
 }
 
-// GetUserByID returns a user by its UUID.
-//
-// @Summary      Get a user
-// @Description  Returns a Core user for the supplied UUID.
-// @Tags         Core users
-// @Produce      json
-// @Param        id   path      string         true  "User UUID"  format(uuid)
-// @Success      200  {object}  ports.UserDTO
-// @Failure      400  {string}  string  "Invalid UUID format"
-// @Failure      404  {string}  string  "User not found"
-// @Failure      500  {string}  string  "Internal server error"
-// @Router       /api/v1/core/users/{id} [get]
-func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+func (h *UserHandler) GetUserByID(ctx context.Context, input *GetUserInput) (*UserOutput, error) {
+	id, err := uuid.Parse(input.ID)
 	if err != nil {
-		http.Error(w, "Invalid UUID format", http.StatusBadRequest)
-		return
+		return nil, huma.Error400BadRequest("Invalid UUID format")
 	}
 
-	user, err := h.repo.GetUserByID(r.Context(), id)
+	user, err := h.repo.GetUserByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, ports.ErrUserNotFound) {
-			http.Error(w, "User not found", http.StatusNotFound)
-			return
+			return nil, huma.Error404NotFound("User not found")
 		}
 		slog.Error("Failed to get user", "error", err, "user_id", id)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, huma.Error500InternalServerError("Internal server error")
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(user)
+	return &UserOutput{Body: *user}, nil
 }
 
-// ListUsers returns a paginated list of users.
-//
-// @Summary      List users
-// @Description  Returns Core users using offset pagination. The default limit is 20 and the maximum is 100.
-// @Tags         Core users
-// @Produce      json
-// @Param        limit   query     integer  false  "Maximum number of users to return"  default(20)  minimum(1)  maximum(100)
-// @Param        offset  query     integer  false  "Number of users to skip"             default(0)   minimum(0)
-// @Success      200     {array}   ports.UserDTO
-// @Failure      500     {string}  string  "Internal server error"
-// @Router       /api/v1/core/users/ [get]
-func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-
-	if limit <= 0 {
-		limit = 20
-	}
-	if limit > 100 {
-		limit = 100
-	}
-	if offset < 0 {
-		offset = 0
-	}
-
-	users, err := h.repo.ListUsers(r.Context(), int32(limit), int32(offset))
+func (h *UserHandler) ListUsers(ctx context.Context, input *ListUsersInput) (*UsersOutput, error) {
+	users, err := h.repo.ListUsers(ctx, int32(input.Limit), int32(input.Offset))
 	if err != nil {
 		slog.Error("Failed to list users", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		return nil, huma.Error500InternalServerError("Internal server error")
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(users)
+	return &UsersOutput{Body: users}, nil
 }
