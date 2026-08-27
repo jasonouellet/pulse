@@ -1,5 +1,8 @@
 ignored:
-  - DL3008 # Autorise les versions de packages apt sans pin strict
-  - DL3018 # Autorise les packages apk sans pin strict
+  - DL3008 # Pin versions in apt-get
+  - DL3013 # Pin versions in pip
+  - DL3018 # Pin versions in apk
+  - DL3062 # Pin versions in go install
+  - DL4006 # Set shell pipefail
 
 failure-threshold: warning

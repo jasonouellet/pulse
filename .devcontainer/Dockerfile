@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/devcontainers/go:1.26-bookworm
 ENV GOTOOLCHAIN=auto
 
 # 2. Installation des dépendances système & Node.js avec nettoyage propre du cache apt
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
