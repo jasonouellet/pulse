@@ -3,32 +3,13 @@ package openapi
 
 import "github.com/swaggo/swag"
 
-const docTemplate = `{
-    "schemes": {{ marshal .Schemes }},
-    "swagger": "2.0",
-    "info": {
-        "description": "{{escape .Description}}",
-        "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "Équipe Project PULSE",
-            "url": "https://github.com/jasonouellet/pulse"
-        },
-        "license": {
-            "name": "Source-Available Non-Commercial (ADR-005)"
-        },
-        "version": "{{.Version}}"
-    },
-    "host": "{{.Host}}",
-    "basePath": "{{.BasePath}}",
-    "paths": {}
-}`
+const docTemplate = `{"swagger":"2.0","info":{"description":"{{escape .Description}}","title":"{{.Title}}","termsOfService":"http://swagger.io/terms/","contact":{"name":"Équipe Project PULSE","url":"https://github.com/jasonouellet/pulse"},"license":{"name":"Source-Available Non-Commercial (ADR-005)"},"version":"{{.Version}}"},"host":"{{.Host}}","basePath":"{{.BasePath}}","paths":{"/healthz":{"get":{"produces":["application/json"],"tags":["Health"],"summary":"Check service health","description":"Verifies that the backend and its database connection are available.","responses":{"200":{"description":"OK","schema":{"$ref":"#/definitions/main.healthResponse"}},"503":{"description":"Database unavailable","schema":{"type":"string"}}}}},"/api/v1/core/users/":{"get":{"produces":["application/json"],"tags":["Core users"],"summary":"List users","description":"Returns Core users using offset pagination. The default limit is 20 and the maximum is 100.","parameters":[{"type":"integer","default":20,"minimum":1,"maximum":100,"description":"Maximum number of users to return","name":"limit","in":"query"},{"type":"integer","default":0,"minimum":0,"description":"Number of users to skip","name":"offset","in":"query"}],"responses":{"200":{"description":"OK","schema":{"type":"array","items":{"$ref":"#/definitions/ports.UserDTO"}}},"500":{"description":"Internal server error","schema":{"type":"string"}}}},"post":{"consumes":["application/json"],"produces":["application/json"],"tags":["Core users"],"summary":"Create a user","description":"Creates a user and stores a bcrypt hash of the supplied password.","parameters":[{"description":"User to create","name":"user","in":"body","required":true,"schema":{"$ref":"#/definitions/http.CreateUserRequest"}}],"responses":{"201":{"description":"Created","schema":{"$ref":"#/definitions/ports.UserDTO"}},"400":{"description":"Invalid request","schema":{"type":"string"}},"500":{"description":"Internal server error","schema":{"type":"string"}}}}},"/api/v1/core/users/{id}":{"get":{"produces":["application/json"],"tags":["Core users"],"summary":"Get a user","description":"Returns a Core user for the supplied UUID.","parameters":[{"type":"string","format":"uuid","description":"User UUID","name":"id","in":"path","required":true}],"responses":{"200":{"description":"OK","schema":{"$ref":"#/definitions/ports.UserDTO"}},"400":{"description":"Invalid UUID format","schema":{"type":"string"}},"404":{"description":"User not found","schema":{"type":"string"}},"500":{"description":"Internal server error","schema":{"type":"string"}}}}}},"definitions":{"http.CreateUserRequest":{"type":"object","required":["email","password"],"properties":{"email":{"type":"string"},"first_name":{"type":"string"},"last_name":{"type":"string"},"password":{"type":"string"},"phone":{"type":"string"},"role":{"type":"string"}}},"main.healthResponse":{"type":"object","properties":{"service":{"type":"string"},"status":{"type":"string"}}},"ports.UserDTO":{"type":"object","properties":{"email":{"type":"string"},"first_name":{"type":"string"},"id":{"type":"string","format":"uuid"},"is_active":{"type":"boolean"},"last_name":{"type":"string"},"phone":{"type":"string"},"role":{"type":"string"}}}}}`
 
-// SwaggerInfo holds exported Swagger Info so clients can modify it
+// SwaggerInfo holds exported Swagger Info so clients can modify it.
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Project PULSE API",
 	Description:      "API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).",

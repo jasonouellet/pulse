@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/riandyrn/otelchi"
 
 	coreHTTP "pulse/internal/core/adapters/http"
@@ -36,7 +37,7 @@ import (
 // @license.name  Source-Available Non-Commercial (ADR-005)
 
 // @host      localhost:8080
-// @BasePath  /api/v1
+// @BasePath  /
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
@@ -92,14 +93,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
 
-	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		if err := dbPool.Ping(r.Context()); err != nil {
-			http.Error(w, "Database Unavailable", http.StatusServiceUnavailable)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-backend"}`))
-	})
+	r.Get("/healthz", newHealthHandler(dbPool))
 
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
@@ -138,6 +132,33 @@ func main() {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
 		_ = server.Shutdown(shutdownCtx)
+	}
+}
+
+type healthResponse struct {
+	Status  string `json:"status"`
+	Service string `json:"service"`
+}
+
+// newHealthHandler creates the health check endpoint handler.
+//
+// @Summary      Check service health
+// @Description  Verifies that the backend and its database connection are available.
+// @Tags         Health
+// @Produce      json
+// @Success      200  {object}  healthResponse
+// @Failure      503  {string}  string  "Database unavailable"
+// @Router       /healthz [get]
+func newHealthHandler(dbPool *pgxpool.Pool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := dbPool.Ping(r.Context()); err != nil {
+			http.Error(w, "Database Unavailable", http.StatusServiceUnavailable)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-backend"}`))
 	}
 }
 
