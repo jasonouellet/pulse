@@ -1,73 +1,99 @@
-# Project PULSE (PULSE OS)
+# Project PULSE
 
-[![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=flat&logo=go)](https://go.dev/)
-[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Go Version](https://img.shields.io/badge/Go-1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![React](https://img.shields.io/badge/React-19.x-61DAFB?style=flat&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-4169E1?style=flat&logo=postgresql)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-Source--Available_Non--Commercial-blue.svg)](docs/adr/ADR-005.md)
+[![License](https://img.shields.io/badge/License-BSL_1.1_Non--Commercial-blue.svg)](docs/adr/ADR-005-source-available-licence.md)
 [![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG_2.1_AA-success.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 
-**PULSE OS** est un système de gestion moderne, modulaire et hautement disponible conçu pour les clubs sportifs jeunesse multi-sports (avec un focus initial sur le soccer). Il prend en charge l'administration des bassins d'âges, la constitution d'équipes éphémères, la sous-inscription à la carte pour les événements, ainsi que la logistique dynamique des terrains et des tournois.
+**PULSE** is a modern, modular, highly available management system built for multi-sport youth clubs (with an initial focus on soccer). It handles age-pool administration, ephemeral roster/team building, à-la-carte sub-registration for events, and dynamic field/tournament logistics.
 
 ---
 
-## 🏗️ Architecture & Stack Technique
+## 🏗️ Architecture & Tech Stack
 
-Le projet est conçu selon les principes de la **Clean Architecture (Ports & Adapters)** sous forme de **Backend monolithique modulaire Go**, garantissant une séparation stricte des domaines métier et permettant une migration vers des microservices sans refactorisation lourde (`ADR-003`).
+The project follows **Clean Architecture (Ports & Adapters)** principles as a **modular monolithic Go backend**, ensuring strict separation of business domains and enabling a future migration to microservices without heavy refactoring (see `ADR-003`).
 
 ### Backend
 
-* **Langage :** Go 1.22+
-* **Routeur HTTP :** Chi Router (API RESTful)
-* **Base de données :** PostgreSQL 16+ avec isolation stricte par schémas (`core`, `tournament`, `scheduling`, `finance`)
-* **Génération SQL :** `sqlc` (requêtes type-safe compilées en Go)
-* **Migrations :** `golang-migrate` (exécution automatique au démarrage)
-* **Observabilité :** OpenTelemetry OTLP/gRPC (`otelchi`, `otelslog`, `otelpgx`) (`ADR-006`)
+* **Language:** Go 1.26
+* **HTTP router:** Chi Router (RESTful API)
+* **Database:** PostgreSQL 16+ with strict schema isolation (`core`, `tournament`, `scheduling`, `finance`, `evaluation`) — no cross-schema joins allowed (see `ADR-003`)
+* **DB driver:** `pgx/v5` via `pgxpool`
+* **Migrations:** `golang-migrate` (run automatically on startup)
+* **API docs:** OpenAPI/Swagger generated with `swaggo/swag`, served at `/swagger/*`
+* **Observability:** OpenTelemetry OTLP/gRPC (`otelchi`) (see `ADR-006`)
+* **Security:** passwords hashed with `bcrypt`, client IP resolved via `middleware.ClientIPFromHeader` (not the deprecated, CVE-affected `RealIP`)
+* **Container:** multi-stage build, final image on `distroless/static-debian12:nonroot`
 
 ### Frontend
 
-* **Framework :** React + Vite (TypeScript)
-* **Styling & UI :** Tailwind CSS, Radix UI (Thème Day/Dark, accessibilité WCAG 2.1 AA)
-* **Icônes :** Lucide React
-* **Testing :** Vitest + React Testing Library + Happy-DOM + Vitest-Axe
-* **Observabilité Web :** OpenTelemetry Web SDK (`@opentelemetry/sdk-trace-web`)
+* **Framework:** React 19 + Vite (TypeScript)
+* **Styling & UI:** Tailwind CSS v4, Radix UI, `clsx` + `tailwind-merge` (Light/Dark theme, WCAG 2.1 AA accessibility)
+* **Icons:** Lucide React
+* **Testing:** Vitest + React Testing Library + Happy-DOM + `vitest-axe`
+* **Web observability:** OpenTelemetry Web SDK (`@opentelemetry/sdk-trace-web`)
+
+### Infrastructure & Tooling
+
+* **Containerization:** Docker Compose (`postgres`, `redis`, `backend`, `frontend`) — see `docker-compose.yml`
+* **Dev environment:** Devcontainer (GitHub Codespaces / VS Code), see `.devcontainer/`
+* **CI/CD:** GitHub Actions — lint, unit tests + coverage, security scanning (Snyk), quality analysis (SonarQube Cloud), image build & publish to GHCR
+* **Code quality:** `pre-commit` (golangci-lint, ESLint, Prettier, markdownlint, sqlfluff, cross-schema-join guard)
 
 ---
 
-## 📁 Structure du Projet
+## 📁 Project Structure
 
-````text
+```text
 pulse/
 ├── cmd/
-│   └── backend/          # Point d'entrée du serveur Go Backend
+│   └── backend/                   # Go server entry point
 ├── internal/
-│   ├── core/              # Module Core (Users, Pools, Sports abstraction)
-│   ├── tournament/        # Module Tournois (Rosters éphémères, Brackets)
-│   ├── scheduling/        # Module Horaires (Fields, Matches, Attendance)
-│   └── finance/           # Module Finance (Expenses, Payments)
-├── migrations/            # Scripts SQL par schéma (000001_create_*.up.sql)
+│   └── core/
+│       ├── adapters/
+│       │   ├── http/              # HTTP handlers (chi)
+│       │   └── postgres/          # Repository implementations
+│       └── ports/                 # Domain contracts (interfaces, DTOs)
+├── migrations/                    # SQL scripts, per schema
 ├── pkg/
-│   ├── database/          # Connexion PGX & Runner de migrations
-│   └── observability/     # Pipeline OpenTelemetry Tracer & Loggers
-├── frontend/              # Application Vite + React + TypeScript
-└── docs/
-    ├── adr/               # Architecture Decision Records (001 à 006)
-    └── ROADMAP_TODO.md    # Suivi d'avancement du projet
+│   ├── database/                  # PGX connection & migration runner
+│   └── observability/             # OpenTelemetry pipeline
+├── frontend/                      # Vite + React + TypeScript app
+├── deployments/
+│   └── docker/                    # Backend & frontend Dockerfiles
+├── docs/
+│   ├── adr/                       # Architecture Decision Records
+│   └── ROADMAP_TODO.md            # Project progress tracking
+├── docker-compose.yml
+└── .devcontainer/                 # Codespaces / VS Code config
+```
 
-## 🚀 Démarrage Rapide (Développement Local)
+---
 
-### Prérequis
-* **Go** 1.22 ou plus récent
-* **Node.js** v18+ & `npm`
-* **PostgreSQL** 16+
-* **Podman** / **Docker** (Optionnel pour la stack complète)
+## 🚀 Quick Start
 
-### 1. Démarrer le Backend Go
-
-Définissez vos variables d'environnement et lancez le serveur :
+### Option A — Docker Compose (recommended)
 
 ```bash
-# Variables d'environnement de dev
+cp .env.example .env   # create it if it doesn't exist yet, see the variables below
+docker compose up -d
+```
+
+The backend listens on `http://localhost:8080` (see `API_PORT`), the frontend on `http://localhost:3000` (see `FRONTEND_PORT`).
+
+### Option B — Local development without containers
+
+**Prerequisites**
+
+* Go 1.26+
+* Node.js 24+ & npm
+* PostgreSQL 16+ and Redis (local, or via `docker compose up -d postgres redis`)
+
+**Backend**
+
+```bash
 export DB_HOST=localhost
 export DB_PORT=5432
 export DB_USER=postgres
@@ -76,6 +102,58 @@ export DB_NAME=pulse_db
 export DB_SSLMODE=disable
 export PORT=8080
 
-# Lancer le backend
-go run cmd/backend/main.go
-````
+go mod download
+go run ./cmd/backend
+```
+
+**Frontend**
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+### Option C — Codespaces / Devcontainer
+
+Open the repo in GitHub Codespaces, or via "Reopen in Container" in VS Code. The environment (Go, Node, `sqlc`, `air`, `golang-migrate`, `postgresql-client`) is provisioned automatically, and Postgres/Redis start via `docker compose`.
+
+---
+
+## 🧪 Tests & Quality
+
+```bash
+# Backend
+go test -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
+
+# Frontend
+cd frontend && npm run test -- --coverage
+
+# Pre-commit (full lint before every commit)
+pre-commit install
+pre-commit run --all-files
+```
+
+---
+
+## 📚 Documentation
+
+* [`docs/adr/`](docs/adr/) — Architecture Decision Records (justified technical decisions)
+* [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — architecture overview
+* [`docs/SCHEMA.md`](docs/SCHEMA.md) — database schema
+* [`docs/ROADMAP_TODO.md`](docs/ROADMAP_TODO.md) — progress tracking
+* `/swagger/index.html` (with the backend running) — interactive API documentation
+
+---
+
+## 🤝 Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Any external contribution requires accepting the [`CLA.md`](CLA.md) (see `ADR-005`).
+
+## 🔐 Security
+
+See [`SECURITY.md`](SECURITY.md) to report a vulnerability.
+
+## 📄 License
+
+This project is distributed under the **Business Source License 1.1**, non-commercial (see `ADR-005`). Self-hosting is free for non-profit clubs and associations; reselling or operating it as a commercial SaaS is prohibited without a separate commercial license. Full details: [`ADR-005`](docs/adr/ADR-005-source-available-licence.md) and [`LICENSE`](LICENSE).
