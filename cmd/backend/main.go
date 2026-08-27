@@ -98,15 +98,16 @@ func main() {
 	api := humachi.New(r, apiConfig)
 
 	huma.Register(api, huma.Operation{
-		OperationID:   "health-check",
+		OperationID:   "liveness-check",
 		Method:        http.MethodGet,
-		Path:          "/healthz",
-		Summary:       "Check service health",
-		Description:   "Verifies that the backend and its database connection are available.",
+		Path:          "/livez",
+		Summary:       "Check process liveness",
+		Description:   "Verifies that the backend process can serve requests.",
 		Tags:          []string{"Health"},
 		DefaultStatus: http.StatusOK,
-		Errors:        []int{http.StatusServiceUnavailable},
-	}, newHealthHandler(dbPool))
+	}, liveHandler)
+	huma.Register(api, huma.Operation{OperationID: "readiness-check", Method: http.MethodGet, Path: "/readyz", Summary: "Check service readiness", Tags: []string{"Health"}, Errors: []int{http.StatusServiceUnavailable}}, readyHandler(dbPool))
+	huma.Register(api, huma.Operation{OperationID: "health-check", Method: http.MethodGet, Path: "/healthz", Summary: "Check service health", Tags: []string{"Health"}, Errors: []int{http.StatusServiceUnavailable}}, readyHandler(dbPool))
 
 	// 4. Register Core Module Routes
 	coreRepo := corePostgres.NewUserRepository(dbPool)
@@ -153,7 +154,11 @@ type healthOutput struct {
 	Body healthResponse
 }
 
-func newHealthHandler(dbPool *pgxpool.Pool) func(context.Context, *struct{}) (*healthOutput, error) {
+func liveHandler(_ context.Context, _ *struct{}) (*healthOutput, error) {
+	return &healthOutput{Body: healthResponse{Status: "OK", Service: "pulse-backend"}}, nil
+}
+
+func readyHandler(dbPool *pgxpool.Pool) func(context.Context, *struct{}) (*healthOutput, error) {
 	return func(ctx context.Context, _ *struct{}) (*healthOutput, error) {
 		if err := dbPool.Ping(ctx); err != nil {
 			return nil, huma.Error503ServiceUnavailable("Database unavailable")
