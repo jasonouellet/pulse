@@ -14,6 +14,16 @@ repos:
         args: ['--maxkb=2000']
       - id: check-merge-conflict
 
+# ---------------------------------------------------------------------------
+  # Documentation Markdown
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.2
+    hooks:
+      - id: markdownlint-cli2
+        name: markdownlint
+        files: \.md$
+
   # ---------------------------------------------------------------------------
   # 2. Hooks Backend Go
   # ---------------------------------------------------------------------------
@@ -75,7 +85,7 @@ repos:
         name: dockerfile lint (hadolint)
         entry: hadolint/hadolint:latest hadolint
         language: docker_image
-        files: (.*[/\\])?Dockerfile.*
+        files: (.*/)?Dockerfile.*
 
   # ---------------------------------------------------------------------------
   # 5. Contrôle d'Architecture & Sécurité (Règles PULSE)
