@@ -50,6 +50,11 @@ jobs:
           npx tsc --noEmit
 
       # --- Dockerfile Lint ---
+      - name: Lint DevContainer Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: .devcontainer/Dockerfile
+
       - name: Lint Backend Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@v3.3.0
         with:
