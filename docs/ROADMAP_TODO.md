@@ -92,7 +92,7 @@
 ### Z — Tooling
 
 * [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
-* [ ] Ajouter les outils Score(https://docs.score.dev/docs/score-implementation/).
+* [ ] Ajouter les outils [Score](https://docs.score.dev/docs/score-implementation/).
 * [ ] Implémenter le déploiement sur kubernetes
 
 ---

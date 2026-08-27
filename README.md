@@ -85,13 +85,13 @@ The backend listens on `http://localhost:8080` (see `API_PORT`), the frontend on
 
 ### Option B — Local development without containers
 
-**Prerequisites**
+#### Prerequisites
 
 * Go 1.26+
 * Node.js 24+ & npm
 * PostgreSQL 16+ and Redis (local, or via `docker compose up -d postgres redis`)
 
-**Backend**
+#### Backend
 
 ```bash
 export DB_HOST=localhost
@@ -106,7 +106,7 @@ go mod download
 go run ./cmd/backend
 ```
 
-**Frontend**
+#### Frontend
 
 ```bash
 cd frontend
