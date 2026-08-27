@@ -62,16 +62,16 @@
 
 ---
 
-### 1.3 — Socle Backend Go & Tooling (🔄 En cours)
+### 1.3 — Socle Backend Go (🔄 En cours)
 
 * [x] Mettre en place la structure Hexagonale du dépôt Go (`/cmd/backend`, `/internal/core`, etc.).
 * [x] Implémenter le Port `UserRepository` et l'Adaptateur PostgreSQL pour le module Core.
 * [x] Implémenter le contrôleur HTTP (Chi Handler) pour l'API `/api/v1/core/users`.
 * [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/backend/main.go`.
 * [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`).
-* [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
 * [x] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
 * [x] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le backend.
+* [ ] Augmenter la couverture de tests.
 
 ---
 
@@ -82,6 +82,18 @@
 * [x] Intégrer les packages d'instrumentation web OpenTelemetry (`@opentelemetry/sdk-trace-web`).
 * [x] Créer les composants de base accessibles WCAG (Button, Modal, Dynamic Data Table, Card).
 * [x] Mettre en place le dictionnaire de termes par sport (Lexique Soccer).
+* [x] Configurer l'exportation OpenTelemetry.
+* [ ] Augmenter la couverture de tests.
+
+---
+
+## Amélioration continue SLDC (🔄 En cours)
+
+### Z — Tooling
+
+* [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
+* [ ] Ajouter les outils Score(https://docs.score.dev/docs/score-implementation/).
+* [ ] Implémenter le déploiement sur kubernetes
 
 ---
 
