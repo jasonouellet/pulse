@@ -1,0 +1,51 @@
+version: 2
+updates:
+  # 1. Écosystème Go (Backend)
+  - package-ecosystem: "gofmt" # "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "backend"
+      - "go"
+    commit-message:
+      prefix: "chore(deps-go)"
+
+  # 2. Écosystème Node.js / npm (Frontend React)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "react"
+    commit-message:
+      prefix: "chore(deps-npm)"
+
+  # 3. Écosystème Docker (Dockerfile & Container Images)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps-docker)"
+
+  # 4. CI/CD - Workflows GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(deps-ci)"

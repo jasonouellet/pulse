@@ -1,0 +1,91 @@
+repos:
+  # ---------------------------------------------------------------------------
+  # 1. Hooks Généraux (Nettoyage de base)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: ^frontend/tsconfig.*\.json$
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: check-merge-conflict
+
+  # ---------------------------------------------------------------------------
+  # 2. Hooks Backend Go
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+      - id: go-imports
+      - id: go-unit-tests
+
+  # golangci-lint via le repo officiel : la version est pinnée et téléchargée
+  # par pre-commit lui-même (contrairement au hook golangci-lint de
+  # dnephin/pre-commit-golang, qui appelle le binaire déjà présent sur le
+  # PATH — non déterministe d'une machine à l'autre). Garder ce numéro
+  # aligné avec `version:` dans le workflow GitHub Actions.
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.13.1
+    hooks:
+      - id: golangci-lint
+
+  # ---------------------------------------------------------------------------
+  # 3. Hooks Frontend React / TypeScript
+  # ---------------------------------------------------------------------------
+  # pre-commit/mirrors-prettier est archivé et ne référence plus que des
+  # versions alpha depuis prettier v3.1.0. rbubley/mirrors-prettier est le
+  # fork communautaire maintenu qui ne mirrore que les versions stables.
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.9.6
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, css, scss, json]
+
+  # pre-commit/mirrors-eslint casse avec la flat config d'ESLint 9+
+  # (environnement isolé du hook, résolution de module en échec sur
+  # eslint.config.mjs). La solution recommandée par l'équipe ESLint est de
+  # faire tourner eslint via le node_modules réel du projet.
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: frontend/node_modules/.bin/eslint --config frontend/eslint.config.js
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx)$
+
+  # ---------------------------------------------------------------------------
+  # 4. Hooks SQL & Docker
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 4.3.0
+    hooks:
+      - id: sqlfluff-lint
+        args: [--dialect, postgres]
+        files: ^migrations/
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.14.0
+    hooks:
+      - id: hadolint-docker
+        name: dockerfile lint (hadolint)
+        entry: hadolint/hadolint:latest hadolint
+        language: docker_image
+        files: (.*[/\\])?Dockerfile.*
+
+  # ---------------------------------------------------------------------------
+  # 5. Contrôle d'Architecture & Sécurité (Règles PULSE)
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      # Empêche les JOIN inter-schémas dans les migrations SQL (ADR-003)
+      - id: check-no-cross-schema-join
+        name: Vérification Isolation des Schémas SQL (ADR-003)
+        entry: 'JOIN\s+(core|tournament|scheduling|finance|evaluation)\.'
+        language: pygrep
+        types: [sql]
+        files: ^migrations/

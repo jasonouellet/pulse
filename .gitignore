@@ -16,6 +16,7 @@
 coverage.*
 *.coverprofile
 profile.cov
+coverage/
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -23,6 +24,9 @@ profile.cov
 # Go workspace file
 go.work
 go.work.sum
+
+# Node JS dependencies
+node_modules/
 
 # env file
 .env

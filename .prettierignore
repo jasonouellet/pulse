@@ -1,0 +1,10 @@
+dist
+node_modules
+coverage
+coverage-go.out
+frontend/node_modules
+frontend/dist
+frontend/coverage
+docs/openapi
+*.min.js
+package-lock.json

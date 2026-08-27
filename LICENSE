@@ -1,21 +1,32 @@
-MIT License
+# Business Source License 1.1
 
-Copyright (c) 2026 Jason Ouellet
+Licensor: Services-Conseils TI PME / Jason Ouellet
+Licensed Work: Project PULS and all of its associated software components.
+Change Date: [Today's date + 4 years, e.g. 2030-08-25]
+Change License: Apache License, Version 2.0
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 1. Grant of License
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The Licensor hereby grants you the right to use, copy, modify, create derivative works, distribute, and publicly display the Licensed Work, subject to the terms and Additional Use Grants specified below.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 2. Additional Use Grants (Granted Permissions)
+
+You are expressly authorized to run, host, modify, and use the software **FREE OF CHARGE** for:
+1. **Non-profit self-hosting for associations and clubs:** Any sports club, association, or non-profit organization that deploys and uses the application for its own internal management and member coordination.
+2. **Personal and academic use:** Any developer or student wishing to audit, test, learn from, or contribute to the project.
+
+## 3. License Limitations (Commercial Restrictions)
+
+Any use of the software to provide a paid service to third parties or to directly compete with the Licensor's commercial offering is **PROHIBITED** without first acquiring a Commercial License.
+
+The following are notably considered restricted uses requiring a paid license:
+- Reselling or hosting the software as a Cloud / SaaS (Software as a Service) offering marketed to third parties.
+- Integrating all or part of the source code into a paid proprietary software offering.
+
+## 4. Change License (Open-Source Conversion Clause)
+
+On the date specified in the **Change Date** field above (or 4 years after the release of each specific version of the code), the license applicable to that version of the software will automatically and permanently convert to the terms of the **Apache License, Version 2.0** open-source license.
+
+## 5. Commercial Licensing
+
+For any request regarding commercial exploitation, integration, or managed hosting that does not comply with section 2, please contact the Licensor at: [info@tipme.ca]

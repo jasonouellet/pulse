@@ -1,0 +1,36 @@
+{
+  "name": "PULSE",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24",
+      "globalModules": "markdownlint-cli2"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "go.useLanguageServer": true,
+        "go.gopath": "/go",
+        "go.inlayHints.compositeLiteralTypes": true,
+        "go.inlayHints.constantValues": true,
+        "go.inlayHints.parameterNames": true,
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "golang.Go",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "eamodio.gitlens",
+        "bradlc.vscode-tailwindcss",
+        "DavidAnson.vscode-markdownlint"
+      ]
+    }
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "go install golang.org/x/tools/cmd/goimports@latest && go mod download"
+}
