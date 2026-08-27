@@ -50,10 +50,15 @@ jobs:
           npx tsc --noEmit
 
       # --- Dockerfile Lint ---
-      - name: Lint Dockerfile (Hadolint)
+      - name: Lint Backend Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: deployments/docker/backend.Dockerfile
+
+      - name: Lint Frontend Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: deployments/docker/frontend.Dockerfile
 
   # ---------------------------------------------------------------------------
   # 2. TESTS UNITAIRES & COUVERTURE
@@ -185,10 +190,10 @@ jobs:
         include:
           - image: pulse-backend
             context: .
-            dockerfile: Dockerfile
+            dockerfile: deployments/docker/backend.Dockerfile
           - image: pulse-frontend
             context: frontend
-            dockerfile: frontend/Dockerfile
+            dockerfile: deployments/docker/frontend.Dockerfile
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
