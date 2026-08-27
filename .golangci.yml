@@ -17,7 +17,7 @@ linters:
   settings:
     revive:
       severity: warning
-      rules:
+      rules: []
   exclusions:
     paths:
       - frontend/node_modules
