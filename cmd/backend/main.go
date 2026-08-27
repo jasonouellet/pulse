@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/riandyrn/otelchi"
 
 	coreHTTP "pulse/internal/core/adapters/http"
@@ -29,8 +30,8 @@ import (
 // @description     API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).
 // @termsOfService  http://swagger.io/terms/
 
-// @contact.name   Équipe Project PULSE
-// @contact.url    https://github.com/jasonouellet/pulse
+// @contact.name    Équipe Project PULSE
+// @contact.url     https://github.com/jasonouellet/pulse
 
 // @license.name  Source-Available Non-Commercial (ADR-005)
 
@@ -90,6 +91,9 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
+
+	// Endpoint des métriques Prometheus
+	r.Handle("/metrics", promhttp.Handler())
 
 	apiConfig := huma.DefaultConfig("Project PULSE API", "1.0.0")
 	apiConfig.OpenAPIPath = "/openapi"
