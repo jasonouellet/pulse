@@ -27,7 +27,7 @@ import (
 
 // @title           Project PULSE API
 // @version         1.0
-// @description     API du monolithe modulaire pour la gestion de clubs sportifs (PULSE OS).
+// @description     API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   Équipe Project PULSE
@@ -41,14 +41,14 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	slog.Info("Starting Project PULSE (Modular Monolith)...")
+	slog.Info("Starting Project PULSE (Modular Backend)...")
 
 	// 1. OTEL Observability Setup
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	otelCollector := getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317")
-	shutdownTracer, err := observability.InitTracer(ctx, "pulse-monolith", otelCollector)
+	shutdownTracer, err := observability.InitTracer(ctx, "pulse-backend", otelCollector)
 	if err != nil {
 		slog.Warn("OpenTelemetry initialization skipped", "reason", err.Error())
 	} else {
@@ -90,7 +90,7 @@ func main() {
 	r.Use(middleware.ClientIPFromHeader("X-Real-IP"))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(otelchi.Middleware("pulse-monolith-api"))
+	r.Use(otelchi.Middleware("pulse-backend-api"))
 
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := dbPool.Ping(r.Context()); err != nil {
@@ -98,7 +98,7 @@ func main() {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-monolith"}`))
+		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-backend"}`))
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(
@@ -121,7 +121,7 @@ func main() {
 
 	serverErrors := make(chan error, 1)
 	go func() {
-		slog.Info(fmt.Sprintf("PULSE Monolith HTTP listening on :%s", port))
+		slog.Info(fmt.Sprintf("PULSE Backend HTTP listening on :%s", port))
 		serverErrors <- server.ListenAndServe()
 	}()
 
@@ -134,7 +134,7 @@ func main() {
 			slog.Error("Server shutdown unexpectedly", "error", err)
 		}
 	case sig := <-shutdown:
-		slog.Info("Shutting down PULSE monolith cleanly...", "signal", sig.String())
+		slog.Info("Shutting down PULSE backend cleanly...", "signal", sig.String())
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
 		_ = server.Shutdown(shutdownCtx)

@@ -1,6 +1,6 @@
 # ROADMAP ET SUIVI DES TÂCHES — PROJECT PULSE
 
-**Nom de code projet :** Project PULSE (PULSE OS)
+**Nom de code projet :** Project PULSE
 **Architecture :** Monolithe Modulaire Go (Clean Architecture / Ports & Adapters), PostgreSQL 16+ (Isolation par schémas SQL), Redis, React.js (TypeScript, Tailwind, Radix UI).
 **Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Gratuit pour auto-hébergement des clubs à but non lucratif.
 **Périmètre :** Multi-sports collectifs (Focus Phase 1 : Soccer).
@@ -64,14 +64,14 @@
 
 ### 1.3 — Socle Backend Go & Tooling (🔄 En cours)
 
-* [x] Mettre en place la structure Hexagonale du dépôt Go (`/cmd/monolith`, `/internal/core`, etc.).
+* [x] Mettre en place la structure Hexagonale du dépôt Go (`/cmd/backend`, `/internal/core`, etc.).
 * [x] Implémenter le Port `UserRepository` et l'Adaptateur PostgreSQL pour le module Core.
 * [x] Implémenter le contrôleur HTTP (Chi Handler) pour l'API `/api/v1/core/users`.
-* [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/monolith/main.go`.
+* [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/backend/main.go`.
 * [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`).
 * [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
 * [x] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
-* [x] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le monolithe.
+* [x] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le backend.
 
 ---
 

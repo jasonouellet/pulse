@@ -1,12 +1,12 @@
 # PULSE — AI Agent Instructions
 
-Universal SaaS platform for managing team sports (multi-sport, multi-level, ephemeral rosters, tournaments, dynamic scheduling). Modular monolith in Go designed for a future extraction into microservices.
+Universal SaaS platform for managing team sports (multi-sport, multi-level, ephemeral rosters, tournaments, dynamic scheduling). Modular backend in Go designed for a future extraction into microservices.
 
 ## Architecture
 
 See `docs/ARCHITECTURE.md`, `docs/ArchitectureTechnique.md`, `docs/ArchitectureC4.md`, and the ADRs in `docs/adr/` (source of truth for any structural decision). Always validate a change against these documents before making it.
 
-* **Pattern**: Hexagonal (Ports & Adapters) per module, inside a modular monolith (`cmd/monolith/main.go`).
+* **Pattern**: Hexagonal (Ports & Adapters) per module, inside a modular backend (`cmd/backend/main.go`).
 * **Modules** (`internal/{module}/`): `core`, `tournament`, `scheduling`, `finance`, `evaluation`. Each follows the structure:
 
   ```text
@@ -17,7 +17,7 @@ See `docs/ARCHITECTURE.md`, `docs/ArchitectureTechnique.md`, `docs/ArchitectureC
   ```
 
 * **Strict module isolation**: all inter-module communication goes through a Go interface (port). **No SQL JOIN across PostgreSQL schemas is allowed** — one Postgres schema per module (`core`, `tournament`, `scheduling`, `finance`, `evaluation`).
-* **Adapter duality**: each module's port must be implementable by an `in-memory` adapter (monolith mode, current default) and, later, a `gRPC/event` adapter (microservice mode) — selected at startup via configuration/env vars, per ADR-003. Never bypass the port to call another module's adapter directly.
+* **Adapter duality**: each module's port must be implementable by an `in-memory` adapter (monolithic backend mode, current default) and, later, a `gRPC/event` adapter (microservice mode) — selected at startup via configuration/env vars, per ADR-003. Never bypass the port to call another module's adapter directly.
 * **Multi-sport**: all relevant entities carry a `sport_id` (UUID) to prepare for multi-sport support (Soccer in phase 1).
 
 ## Tech stack

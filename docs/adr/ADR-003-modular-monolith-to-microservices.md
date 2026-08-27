@@ -20,7 +20,7 @@ Afin de limiter la complexité opérationnelle initiale, le projet doit démarre
    * Chaque module expose un adaptateur `In-Memory` (pour le mode Monolithe) et un adaptateur `gRPC/Event` (pour le mode Microservice).
    * L'instanciation de l'adaptateur se fait au démarrage du conteneur via la configuration/variables d'environnement.
 4. **Conteneurisation (Docker)**
-   * Utilisation de _Multi-stage Builds_ Docker permettant de produire soit le binaire global (`cmd/monolith`), soit un microservice spécifique (`cmd/services/X`).
+   * Utilisation de _Multi-stage Builds_ Docker permettant de produire soit le binaire global (`cmd/backend`), soit un microservice spécifique (`cmd/services/X`).
 
 ## Conséquences
 

@@ -13,7 +13,7 @@
 
 ## 🏗️ Architecture & Stack Technique
 
-Le projet est conçu selon les principes de la **Clean Architecture (Ports & Adapters)** sous forme de **Backend monolithique modulaire Go**, garantissant une séparation stricte des domaines métier et permettant une migration vers des microservices sans refactorisation lourde (`ADR-003`).
+Le projet est conçu selon les principes de la **Clean Architecture (Ports & Adapters)** sous forme de **backende Modulaire Go**, garantissant une séparation stricte des domaines métier et permettant une migration vers des microservices sans refactorisation lourde (`ADR-003`).
 
 ### Backend
 

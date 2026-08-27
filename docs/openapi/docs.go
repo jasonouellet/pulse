@@ -31,7 +31,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Project PULSE API",
-	Description:      "API du monolithe modulaire pour la gestion de clubs sportifs (PULSE OS).",
+	Description:      "API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

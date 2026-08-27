@@ -4,7 +4,7 @@ info:
   contact:
     name: Équipe Project PULSE
     url: https://github.com/jasonouellet/pulse
-  description: API du monolithe modulaire pour la gestion de clubs sportifs (PULSE
+  description: API du backend modulaire pour la gestion de clubs sportifs (PULSE
     OS).
   license:
     name: Source-Available Non-Commercial (ADR-005)

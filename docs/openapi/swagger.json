@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "API du monolithe modulaire pour la gestion de clubs sportifs (PULSE OS).",
+    "description": "API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).",
     "title": "Project PULSE API",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
