@@ -12,12 +12,13 @@
 | Domaine / Module                                            |    Statut    | Progression |
 | :---------------------------------------------------------- | :----------: | :---------: |
 | **Ingénierie & Context Engineering**                        | **TERMINÉ**  |    100%     |
-| **Architecture C4 & ADRs (001 à 006 + CLA)**                | **TERMINÉ**  |    100%     |
+| **Architecture C4 & ADRs (001 à 006 + CLA)**                | **EN COURS** |     90%     |
 | **Analyse Comparative & Validation des Fichiers Tournois**  | **TERMINÉ**  |    100%     |
-| **Backend Go & Architecture Hexagonale (Core Module)**      | **EN COURS** |     75%     |
+| **Backend Go & Architecture Hexagonale (Core Module)**      | **EN COURS** |     85%     |
 | **Schéma de Données SQL (`core` révisé, `tournament`, etc.) | **EN COURS** |     30%     |
-| **Environnement DevContainer & Observabilité OTEL**         | **TERMINÉ**  |    100%     |
-| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)**  | **À FAIRE**  |     0%      |
+| **Environnement DevContainer & Observabilité OTEL**         | **EN COURS** |     90%     |
+| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)**  | **EN COURS** |     40%     |
+| **Gouvernance de dépôt (Licence, CONTRIBUTING, SECURITY)**  | **EN COURS** |     60%     |
 
 ---
 
@@ -44,9 +45,39 @@
 
 ---
 
-### 1.2 — Modèle de Données & Migrations SQL (🔄 En cours)
+### 1.1.B — Dette technique identifiée à l'audit du 28 août 2026 (🔴 À résorber avant de poursuivre)
 
-* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` & `.down.sql` (Anglais strict, UUID `gen_random_uuid()`)
+Un audit complet du dépôt sur `feature/core` a révélé plusieurs écarts entre ce que ce ROADMAP déclarait "fait" et l'état réel du code. Cette section documente ce qui doit être réglé **avant** d'attaquer les schémas `tournament`/`scheduling`/`finance`, pour éviter d'empiler de la dette sur de la dette.
+
+#### Migrations & données
+
+* [ ] Écrire `migrations/core/000001_create_core_schema.down.sql` — actuellement absent malgré la case cochée ; aucun rollback possible en l'état.
+* [ ] Créer `sqlc.yaml` et configurer sqlc, ou retirer `internal/core/adapters/postgres/queries/*.sql` tant que ce n'est pas prêt — ces fichiers ne génèrent rien actuellement.
+* [ ] Résoudre le conflit : `CreatePool` est défini deux fois (`users.sql` et `pools.sql`) avec des signatures incompatibles. sqlc refusera de générer tant que ce n'est pas réglé.
+* [ ] Décider si `internal/core/adapters/postgres/user_repository.go` (SQL à la main) migre vers sqlc une fois configuré, ou si les deux approches coexistent délibérément — actuellement c'est un flottement non documenté.
+
+#### Code mort & duplication
+
+* [ ] Supprimer `internal/pkg/telemetry/tracer.go` (implémentation OTEL stdout orpheline, jamais appelée — `pkg/observability/otel.go` est la seule utilisée par `main.go`) ou fusionner s'il y a une intention derrière (ex. mode debug local).
+
+#### Architecture Decision Records
+
+* [ ] Renuméroter l'un des deux `ADR-006` (`ADR-006-observability-opentelemetry.md` vs `ADR-006-telemetry-and-health-obligations.md`) — collision de numérotation, contenus qui se chevauchent partiellement.
+* [ ] Rédiger un ADR pour l'adoption de `huma` (routing + génération OpenAPI), qui remplace l'approche `chi` brut + `swaggo/swag` initialement documentée — changement structurant non tracé.
+* [ ] Mettre à jour `docs/ARCHITECTURE.md` pour refléter `huma` (encore rédigé autour de `swaggo/swag`).
+
+#### Outillage & CI
+
+* [ ] Trancher entre `dependabot.yml` et `renovate.json` — les deux sont configurés sur les mêmes écosystèmes (Go, npm, Docker, GitHub Actions), ce qui va générer des PRs en double. Garder un seul outil.
+* [ ] Corriger `renovate.json` : la clé `matchMatchers` n'existe pas dans le schéma Renovate (c'est `matchManagers`) — le groupement par écosystème ne fonctionne pas tel quel.
+
+#### Question de priorisation (pas un bug)
+
+* [ ] Statuer sur l'ordre d'investissement : des manifests Kubernetes complets (`deployments/kubernetes/kind/`) et un `otel-collector` existent déjà, alors que les schémas `tournament`, `scheduling`, `finance`, `evaluation` n'ont pas démarré et que Redis n'est référencé nulle part dans le code Go. À valider consciemment plutôt que de laisser l'infra continuer à devancer le domaine métier.
+
+---
+
+* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (Anglais strict, UUID `gen_random_uuid()`) — voir 1.1.B pour le `.down.sql` manquant
   * [x] Table `core.sports` (Multi-sport abstraction via JSONB rules).
   * [x] Tables `core.users`, `core.parents_children`, `core.player_profiles`.
   * [x] Table `core.pools` (Bassins d'âges / Catégories).
@@ -66,11 +97,13 @@
 
 * [x] Mettre en place la structure Hexagonale du dépôt Go (`/cmd/backend`, `/internal/core`, etc.).
 * [x] Implémenter le Port `UserRepository` et l'Adaptateur PostgreSQL pour le module Core.
-* [x] Implémenter le contrôleur HTTP (Chi Handler) pour l'API `/api/v1/core/users`.
+* [x] Implémenter le contrôleur HTTP pour l'API `/api/v1/core/users`, migré vers `huma` (génération OpenAPI automatique, validation de schéma).
+* [x] Exposer les sondes `/livez`, `/readyz`, `/healthz` et les métriques Prometheus (`/metrics`).
 * [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/backend/main.go`.
-* [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`).
+* [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`), migrée vers `huma`.
 * [x] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
-* [x] Configurer l'exportation OpenTelemetry (`otelslog`, `otelchi`, `otelpgx`) dans le backend.
+* [x] Configurer l'exportation OpenTelemetry (OTLP/gRPC) dans le backend (`pkg/observability/otel.go`).
+* [ ] Nettoyer le doublon `internal/pkg/telemetry/tracer.go` (voir 1.1.B).
 * [ ] Augmenter la couverture de tests.
 
 ---
@@ -92,8 +125,16 @@
 ### Z — Tooling
 
 * [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
+* [x] Scaffolder les manifests Kubernetes (Kind) — voir 1.1.B pour la question de priorisation.
+* [ ] Corriger `dependabot.yml` / trancher entre Dependabot et Renovate — voir 1.1.B.
 * [ ] Ajouter les outils [Score](https://docs.score.dev/docs/score-implementation/).
-* [ ] Implémenter le déploiement sur kubernetes
+
+### Z.2 — Gouvernance de dépôt
+
+* [x] Rédiger `README.md` (anglais).
+* [ ] Pousser `CONTRIBUTING.md` (rédigé, anglais — voir 1.1.B).
+* [ ] Pousser `SECURITY.md` (rédigé, anglais — voir 1.1.B).
+* [ ] Corriger `LICENSE` (coquille + date de conversion — voir 1.1.B).
 
 ---
 
@@ -132,3 +173,5 @@
 4. **Évolutivité :** Préparer le projet pour une future migration vers une architecture microservices si nécessaire (`ADR-003`).
 5. **Multi-Sports :** Définir la stratégie d'ajout de nouveaux sports (soccer, basketball, volleyball) et l'impact sur le modèle JSONB (`ADR-004`).
 6. **SDLC & CI/CD :** Définir les pipelines GitHub Actions pour la validation des PRs, les tests automatiques et les builds d'images distroless OCI.
+7. Comment nommer le rôle "Parent" pouur qu'il représente autant un tuteur, un grand parent ou un grand frère/soeurs
+8.
