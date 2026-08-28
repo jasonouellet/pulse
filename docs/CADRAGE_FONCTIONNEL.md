@@ -136,6 +136,18 @@ Note sur la terminologie : Afin de couvrir toutes les réalités familiaux, l'ap
 * US-5.1.1 (v2.0) : En tant que Représentant Familial, je veux confirmer/infirmer la présence de mon enfant à un match en 1 clic, afin d'aviser l'entraîneur.
 * US-5.1.2 (v2.0) : En tant qu'Entraîneur, je veux recevoir des alertes Push en cas de désistement de dernière minute.
 
+### EPIC-6 : Fonctionnalités & Copilotes IA (Module AI Copilot — Phase 2)
+
+* FEAT-6.1 : Optimisation Automatique des Alignements (Roster Optimization AI)**
+  * US-6.1.1 : En tant que DT, je veux demander au copilote IA de me proposer une répartition équilibrée de 60 joueuses en 4 équipes selon leur calibre et postes, afin d'éviter de passer 3 heures sur Excel.
+  * US-6.1.2 : En tant que DT, je veux ajuster en Drag & Drop la proposition de l'IA avant de la valider définitivement en base de données.
+* FEAT-6.2 : Saisie d'Évaluation Vocale (Voice-to-Evaluation AI)**
+  * US-6.2.1 : En tant qu'Entraîneur sur le terrain, je veux dicter une note vocale de 30 secondes pour une joueuse, afin que l'IA l'analyse et mette à jour la fiche d'évaluation en critères structurés (JSON).
+* FEAT-6.3 : Replanification Intelligente des Terrains (Scheduling Conflict AI)**
+  * US-6.3.1 : En tant qu'Admin, lors d'une fermeture de terrain pour météo, je veux que l'IA me suggère la meilleure grille de reprise des matchs en minimisant les annulations.
+* FEAT-6.4 : Assistant Virtuel Famille (RAG Family Assistant)**
+  * US-6.4.1 : En tant que Représentant Familial, je veux poser des questions en langage naturel à l'assistant (ex: "Où se joue le match de samedi ?"), afin d'obtenir une réponse immédiate basée sur le calendrier officiel.
+
 ## 5. Matrice de Traçabilité (BABOK®)
 
 | RF    | Module     | Description                                              | Référence |
@@ -145,3 +157,30 @@ Note sur la terminologie : Afin de couvrir toutes les réalités familiaux, l'ap
 | RF-03 | tournament | Contrainte CHECK (end_date >= start_date) sur événements | US-1.3.1  |
 | RF-04 | scheduling | Sous-découpage relationnel scheduling.sub_fields         | US-2.1.1  |
 | RF-05 | evaluation | Note globale & calibre sans dépendance FK dure sur core  | US-3.1.1  |
+
+## 6. Exigences Non Fonctionnelles (NFR — Non-Functional Requirements)
+
+### NFR-1 : Conformité Légale & Gestion du Consentement (Loi 25 Québec / LPIEC)
+
+* **NFR-1.1 (Validation d'âge & Autorité Parentale) :** Pour tout joueur de moins de 14 ans, le système doit bloquer la création et la collecte de renseignements personnels jusqu'à l'obtention de la validation explicite du consentement par un *Family Guardian* majeur.
+* **NFR-1.2 (Consentement IA / Données Vocales) :** Le module d'évaluation vocale doit imposer une case à cocher distincte (*Opt-In*) dans le profil du tuteur autorisant spécifiquement la numérisation et la transcription des notes vocales à des fins de suivi sportif.
+* **NFR-1.3 (Droit à l'Oubli) :** L'API `core` doit fournir un endpoint permettant la suppression définitive (`Purge/Hard-Delete`) ou l'anonymisation irréversible de l'historique d'un joueur sous 30 jours après demande du titulaire.
+* **NFR-1.4 (Portabilité des Données) :** Le système doit permettre au *Family Guardian* de télécharger l'ensemble du dossier de l'enfant dans un format ouvert et structuré (JSON ou CSV).
+
+### NFR-2 : Sécurité & Anonymisation des Flux IA
+
+* **NFR-2.1 (Masquage PII / Data Masking) :** L'adaptateur Go du module `ai` doit obligatoirement anonymiser ou pseudonymiser tout renseignement personnel identifiable (PII) avant sa transmission vers l'API de Groq/OpenAI. Seuls des identifiants opaques (`player_uuid`) et du contexte technique neutre peuvent être envoyés.
+* **NFR-2.2 (Zéro Rétention des Tiers / Zero Data Retention) :** Les clés d'API et comptes fournisseurs (Groq/OpenAI) doivent être souscrits avec l'option explicite de non-conservation des prompts/transcriptions pour l'entraînement des modèles (*Zero Data Retention Policy*).
+* **NFR-2.3 (Traitement Audio Temporaire) :** Les fichiers audio reçus pour le Speech-to-Text doivent être conservés exclusivement en mémoire vive (RAM / `io.Reader`) durant l'exécution de la requête de transcription et détruits immédiatement après. Aucun fichier audio brut ne doit résider sur disque.
+
+### NFR-3 : Sécurité des Données & Chiffrement (Data Protection)
+
+* **NFR-3.1 (Données en Transit) :** Toutes les communications entre le client Web (React), l'API Go (Huma v2) et les services externes (Groq, AWS) doivent être chiffrées via TLS 1.3 (HTTPS).
+* **NFR-3.2 (Données au Repos) :** La base de données PostgreSQL doit être chiffrée au repos (*Encryption at rest*) en utilisant AES-256 (TDE ou chiffrement au niveau du volume de stockage).
+* **NFR-3.3 (Isolation Multi-Tenant) :** L'isolation des schémas (`core`, `tournament`, `scheduling`, `evaluation`) et la vérification du `sport_id` / `club_id` doivent garantir qu'aucune requête ne puisse fuiter entre deux clubs ou catégories d'âge distincts.
+
+### NFR-4 : Résilience & Dégradation Contrôlée (AI Fallback)
+
+* **NFR-4.1 (Découplage de la Disponibilité API) :** Une panne ou une indisponibilité du fournisseur IA (Groq/OpenAI) ne doit à aucun moment impacter le fonctionnement de l'application principale. En cas de panne IA, les formulaires de saisie manuelle restent 100 % opérationnels.
+* **NFR-4.2 (Timeout Strict) :** Les appels sortants vers les API IA doivent être encapsulés dans un `context.WithTimeout` Go de maximum 5 secondes pour le texte/JSON et 10 secondes pour l'audio, sous peine d'interruption automatique.
+*

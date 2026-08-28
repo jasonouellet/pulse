@@ -109,7 +109,19 @@
 * [ ] Implémenter le composant de sélection des joueurs par Drag & Drop.
 * [ ] Créer la vue d'affichage du calendrier unifié.
 
----
+## 2. Conformité Légale & Sécurité (Loi 25 Québec / PIPEDA Canada)
+
+### 2.1 Consentements & Gestion des Données Mineurs (< 14 ans)
+
+* [ ] **[Loi 25]** Implémenter le flux d'onboarding avec opt-in explicite du *Family Guardian* pour la collecte de données des mineurs de moins de 14 ans.
+* [ ] **[Loi 25]** Créer un consentement séparé et explicite pour le traitement des notes vocales et l'analyse sportive par IA.
+* [ ] **[Loi 25]** Rédiger la politique de confidentialité en langage clair et afficher les coordonnées du Responsable de la protection des données.
+
+### 2.2 Droits des Utilisateurs & Anonymisation IA
+
+* [ ] **[Loi 25]** Développer l'endpoint de droit à l'oubli (`DELETE /api/v1/core/me`) et d'exportation structurée des données (portabilité JSON/CSV).
+* [ ] **[Loi 25]** Implémenter la couche d'anonymisation dans l'adaptateur IA Go (masquage des noms/prénoms avant envoi aux LLMs tiers comme Groq/OpenAI).
+* [ ] **[Loi 25]** Configurer un job de purge/archivage automatique des données pour les comptes inactifs.
 
 ## 🔮 PHASES SUIVANTES & FEUILLE DE ROUTE PRODUIT
 
