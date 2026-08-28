@@ -1,7 +1,7 @@
 version: 2
 updates:
   # 1. Écosystème Go (Backend)
-  - package-ecosystem: "gofmt" # "gomod"
+  - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"

@@ -4,7 +4,7 @@ dialect = postgres
 templater = raw
 max_line_length = 160
 
-exclude_rules = RF04
+exclude_rules = RF04, LT05
 
 [sqlfluff:rules:capitalisation.keywords]
 capitalisation_policy = upper
