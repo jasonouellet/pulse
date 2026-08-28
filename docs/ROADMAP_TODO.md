@@ -1,177 +1,137 @@
 # ROADMAP ET SUIVI DES TÂCHES — PROJECT PULSE
 
 **Nom de code projet :** Project PULSE
-**Architecture :** Monolithe Modulaire Go (Clean Architecture / Ports & Adapters), PostgreSQL 16+ (Isolation par schémas SQL), Redis, React.js (TypeScript, Tailwind, Radix UI).
-**Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Gratuit pour auto-hébergement des clubs à but non lucratif.
-**Périmètre :** Multi-sports collectifs (Focus Phase 1 : Soccer).
+**Architecture :** Monolithe Modulaire Go (Clean Architecture / Ports & Adapters / Huma v2 / Chi), PostgreSQL 16+ (Isolation par schémas SQL - ADR-003), Redis, React.js (TypeScript, Tailwind, Radix UI).
+**Licence & Propriété :** Source-Available Non-Commercial (ADR-005, CLA.md) — Auto-hébergement gratuit pour les clubs à but non lucratif.
+**Périmètre :** Multi-sports collectifs (Focus Phase 1 : Soccer mineur, catégories U9-U10F à U18).
 
 ---
 
 ## 📊 Tableau de Bord de l'Avancement (Phase 1)
 
-| Domaine / Module                                            |    Statut    | Progression |
-| :---------------------------------------------------------- | :----------: | :---------: |
-| **Ingénierie & Context Engineering**                        | **TERMINÉ**  |    100%     |
-| **Architecture C4 & ADRs (001 à 006 + CLA)**                | **EN COURS** |     90%     |
-| **Analyse Comparative & Validation des Fichiers Tournois**  | **TERMINÉ**  |    100%     |
-| **Backend Go & Architecture Hexagonale (Core Module)**      | **EN COURS** |     85%     |
-| **Schéma de Données SQL (`core` révisé, `tournament`, etc.) | **EN COURS** |     30%     |
-| **Environnement DevContainer & Observabilité OTEL**         | **EN COURS** |     90%     |
-| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark)**  | **EN COURS** |     40%     |
-| **Gouvernance de dépôt (Licence, CONTRIBUTING, SECURITY)**  | **EN COURS** |     60%     |
+| Domaine / Module                                                                     |    Statut    | Progression |
+| :----------------------------------------------------------------------------------- | :----------: | :---------: |
+| **Ingénierie & Context Engineering & Cadrage Fonctionnel**                           | **TERMINÉ**  |    100%     |
+| **Architecture C4 & ADRs (001 à 007 + CLA)**                                         | **TERMINÉ**  |    100%     |
+| **Backend Go & Architecture Hexagonale (Core Module & Huma)**                        | **EN COURS** |     85%     |
+| **Schémas de Données SQL (`core` révisé, `tournament`, `scheduling`, `evaluation`)** | **EN COURS** |     50%     |
+| **Environnement DevContainer, Tooling CI & Observabilité (Prometheus/OTEL)**         | **EN COURS** |     90%     |
+| **Frontend React (Setup Vite, Tailwind & Theme Day/Dark, WCAG)**                     | **EN COURS** |     40%     |
+| **Gouvernance de dépôt (Licence, CONTRIBUTING, SECURITY)**                           | **EN COURS** |     70%     |
+
+---
+
+## 📌 Décision Terminologique : Rôle "Représentant Familial" (*Family Guardian*)
+
+> **Décision validée :** Pour représenter fidèlement la réalité des familles (parents, tuteurs légaux, beaux-parents, grands-parents, grands frères/sœurs), le système abandonne le terme exclusif de "Parent" au profit de **`Représentant Familial`** (en anglais : **`Family Guardian`**).
+>
+> * **En base de données (`core`) :** Table `core.family_guardians` avec colonne `relationship_type` (Enum: `PARENT`, `LEGAL_GUARDIAN`, `GRANDPARENT`, `SIBLING`, `OTHER`).
+> * **Dans l'interface UX/UI :** Libellés affichés sous la forme **"Espace Famille / Représentant"**.
 
 ---
 
 ## 🚀 PHASE 1 : Fondations Techniques & Data Model (EN COURS)
 
-### 1.1 — Context Engineering, Architecture & Licence (✅ Livré)
+### 1.1 — Context Engineering, Architecture, Cadrage & Licence (✅ Livré)
 
-* [x] Définir les principes d'architecture et le découpage fonctionnel des 3 vues (Admin, Parent, Sportif).
-* [x] Concevoir la stratégie des Bassins d'âges (Pools) et Rosters Éphémères.
-* [x] Définir le modèle de sous-inscriptions à la carte (Tournois #1, #3, #4).
-* [x] Définir le moteur d'organisation d'événements (découpage terrains 11v11 ➔ 7v7, 3 matchs min. garantis).
-* [x] Rédiger le registre d'ADRs complet :
+* [x] Définir les principes d'architecture et le découpage fonctionnel des 3 vues (Admin/DT, Staff/Entraîneur, Représentant Familial & Sportif).
+* [x] Établir le **Dossier de Cadrage Fonctionnel (BIZBOK® / BABOK® / Strategyzer / VSM)** (`docs/CADRAGE_FONCTIONNEL.md`) minimal pour le compléter itérativement.
+* [x] Rédiger le registre d'ADRs complet (à date) :
   * [x] `ADR-001` : Frontend React, TypeScript, Tailwind, Radix UI, WCAG 2.1 AA.
   * [x] `ADR-002-B` : Backend Go compilé, PostgreSQL 16+ et cache Redis.
   * [x] `ADR-003` : Monolithe Modulaire avec migration microservices sans refactoring (Ports & Adapters).
   * [x] `ADR-004` : Abstraction Multi-Sports (`sport_id`) avec focus initial Soccer.
-  * [x] `ADR-005` : Modèle de Licence Source-Available Non-Commercial (Auto-hébergement gratuit pour les clubs).
-  * [x] `ADR-006` : Stratégie d'Observabilité globale via OpenTelemetry (Traces, Metrics, Logs pour Go, React, Postgres, Redis).
+  * [x] `ADR-005` : Modèle de Licence Source-Available Non-Commercial.
+  * [x] `ADR-006` : Stratégie d'Observabilité globale (Prometheus `/metrics` + OpenTelemetry).
+  * [x] `ADR-007` : Adéquation du framework **Huma v2** pour la couche API OpenAPI/Swagger UI.
 * [x] Rédiger l'accord de licence de contributeur (`CLA.md`).
-* [x] Générer la documentation d'architecture C4 complète (Diagrammes Mermaidjs Niveaux 1 à 3).
+* [x] Générer la documentation d'architecture C4 complète (Diagrammes Niveaux 1 à 3).
 * [x] Établir le comparatif de marché et la validation légale des marques.
-* [x] Valider l'adéquation de l'architecture avec les fichiers réels de tournois (_Rimouski Juin/Juillet/Août 2026_).
+* [x] Valider l'adéquation de l'architecture avec les fichiers réels de tournois (*Rimouski Juin/Juillet/Août 2026*).
 * [x] Fixer le nom de code projet : **Project PULSE**.
 
 ---
 
-### 1.1.B — Dette technique identifiée à l'audit du 28 août 2026 (🔴 À résorber avant de poursuivre)
-
-Un audit complet du dépôt sur `feature/core` a révélé plusieurs écarts entre ce que ce ROADMAP déclarait "fait" et l'état réel du code. Cette section documente ce qui doit être réglé **avant** d'attaquer les schémas `tournament`/`scheduling`/`finance`, pour éviter d'empiler de la dette sur de la dette.
+### 1.1.B — Résorption de la Dette Technique & Qualité CI (🔄 En cours)
 
 #### Migrations & données
 
-* [ ] Écrire `migrations/core/000001_create_core_schema.down.sql` — actuellement absent malgré la case cochée ; aucun rollback possible en l'état.
-* [ ] Créer `sqlc.yaml` et configurer sqlc, ou retirer `internal/core/adapters/postgres/queries/*.sql` tant que ce n'est pas prêt — ces fichiers ne génèrent rien actuellement.
-* [ ] Résoudre le conflit : `CreatePool` est défini deux fois (`users.sql` et `pools.sql`) avec des signatures incompatibles. sqlc refusera de générer tant que ce n'est pas réglé.
-* [ ] Décider si `internal/core/adapters/postgres/user_repository.go` (SQL à la main) migre vers sqlc une fois configuré, ou si les deux approches coexistent délibérément — actuellement c'est un flottement non documenté.
+* [ ] Écrire `migrations/core/000001_create_core_schema.down.sql` pour permettre les rollbacks.
+* [ ] Configurer `sqlc.yaml` à la racine pour cibler l'isolation par schéma.
+* [ ] Résoudre le conflit de double définition `CreatePool` entre `users.sql` et `pools.sql`.
+* [ ] Aligner l'adaptateur `user_repository.go` sur les requêtes générées par `sqlc`.
 
-#### Code mort & duplication
+#### Code mort & observabilité
 
-* [ ] Supprimer `internal/pkg/telemetry/tracer.go` (implémentation OTEL stdout orpheline, jamais appelée — `pkg/observability/otel.go` est la seule utilisée par `main.go`) ou fusionner s'il y a une intention derrière (ex. mode debug local).
+* [x] Nettoyer le doublon d'initialisation OTEL : suppression de `internal/pkg/telemetry/tracer.go` au profit du package officiel `pulse/pkg/observability`.
+* [x] Exposer le handler `/metrics` Prometheus (`prometheus/promhttp`) sur le routeur Chi central dans `cmd/backend/main.go`.
 
-#### Architecture Decision Records
+#### Outillage & CI/CD
 
-* [ ] Renuméroter l'un des deux `ADR-006` (`ADR-006-observability-opentelemetry.md` vs `ADR-006-telemetry-and-health-obligations.md`) — collision de numérotation, contenus qui se chevauchent partiellement.
-* [ ] Rédiger un ADR pour l'adoption de `huma` (routing + génération OpenAPI), qui remplace l'approche `chi` brut + `swaggo/swag` initialement documentée — changement structurant non tracé.
-* [ ] Mettre à jour `docs/ARCHITECTURE.md` pour refléter `huma` (encore rédigé autour de `swaggo/swag`).
-
-#### Outillage & CI
-
-* [ ] Trancher entre `dependabot.yml` et `renovate.json` — les deux sont configurés sur les mêmes écosystèmes (Go, npm, Docker, GitHub Actions), ce qui va générer des PRs en double. Garder un seul outil.
-* [ ] Corriger `renovate.json` : la clé `matchMatchers` n'existe pas dans le schéma Renovate (c'est `matchManagers`) — le groupement par écosystème ne fonctionne pas tel quel.
-
-#### Question de priorisation (pas un bug)
-
-* [ ] Statuer sur l'ordre d'investissement : des manifests Kubernetes complets (`deployments/kubernetes/kind/`) et un `otel-collector` existent déjà, alors que les schémas `tournament`, `scheduling`, `finance`, `evaluation` n'ont pas démarré et que Redis n'est référencé nulle part dans le code Go. À valider consciemment plutôt que de laisser l'infra continuer à devancer le domaine métier.
+* [x] Corriger le tag d'image de base Go dans `deployments/docker/backend.Dockerfile` (`golang:1.23-alpine`).
+* [x] Régler les erreurs du linter Markdown `markdownlint-cli2`.
+* [x] Intégrer le hook `markdownlint-cli2` dans `.pre-commit-config.yaml` et corriger l'avertissement de chemin Hadolint `(.*/)?Dockerfile.*`.
+* [x] Résoudre les erreurs de formatage SQLFluff sur les migrations (respect de la limite de longueur de ligne de 160 caractères).
+* [ ] Trancher entre `dependabot.yml` et `renovate.json` (supprimer l'un des deux pour éviter les PRs en double).
+* [ ] Corriger la clé `matchMatchers` ➔ `matchManagers` dans `renovate.json`.
+* [ ] Évaluer l'intégration du Modèle Score (`score-compose`) pour la génération des manifests de dev local.
 
 ---
 
-* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (Anglais strict, UUID `gen_random_uuid()`) — voir 1.1.B pour le `.down.sql` manquant
-  * [x] Table `core.sports` (Multi-sport abstraction via JSONB rules).
-  * [x] Tables `core.users`, `core.parents_children`, `core.player_profiles`.
-  * [x] Table `core.pools` (Bassins d'âges / Catégories).
-  * [x] Ajouter les instructions `COMMENT ON` pour la documentation automatique.
-* [x] Écrire les requêtes préparées `sqlc` (`internal/core/adapters/postgres/queries/users.sql`).
-* [ ] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql`
-  * [ ] Tables `tournament.rosters`, `tournament.event_sub_registrations`, `tournament.brackets`.
-* [ ] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql`
-  * [ ] Tables `scheduling.fields`, `scheduling.sub_fields`, `scheduling.matches`, `scheduling.attendances`.
-* [ ] Écrire `migrations/finance/000001_create_finance_schema.up.sql`
-  * [ ] Tables `finance.event_expenses`, `finance.referee_payments`.
-* [ ] Configurer `sqlc.yaml` pour l'isolation stricte des requêtes SQL par module Go.
+### 1.2 — Modélisation des Données & Schémas SQL (🔄 En cours)
+
+* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (`core.sports`, `core.users`, `core.family_guardians`, `core.player_profiles`, `core.pools`).
+* [x] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql` (`roster_type`, `events`, `rosters`, `roster_pools`, `roster_players` avec contrainte d'unicité).
+* [ ] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql` (`fields`, `sub_fields`, `matches`, `practices`, `attendances`).
+* [ ] Écrire `migrations/evaluation/000001_create_evaluation_schema.up.sql` (`player_ratings`).
+* [ ] Réserver la structure `migrations/finance/` pour la phase v2.0 (Out-of-Scope v1.0).
 
 ---
 
-### 1.3 — Socle Backend Go (🔄 En cours)
+### 1.3 — Socle Backend Go & API Huma v2 (🔄 En cours)
 
-* [x] Mettre en place la structure Hexagonale du dépôt Go (`/cmd/backend`, `/internal/core`, etc.).
+* [x] Mettre en place la structure Hexagonale du dépôt Go.
 * [x] Implémenter le Port `UserRepository` et l'Adaptateur PostgreSQL pour le module Core.
-* [x] Implémenter le contrôleur HTTP pour l'API `/api/v1/core/users`, migré vers `huma` (génération OpenAPI automatique, validation de schéma).
-* [x] Exposer les sondes `/livez`, `/readyz`, `/healthz` et les métriques Prometheus (`/metrics`).
-* [x] Configurer le serveur HTTP Chi avec Graceful Shutdown dans `cmd/backend/main.go`.
-* [x] Mettre en place la suite de tests unitaires HTTP avec Mocks (`internal/core/adapters/http/user_handler_test.go`), migrée vers `huma`.
-* [x] Intégrer `golang-migrate` pour l'exécution automatique des migrations SQL au démarrage.
-* [x] Configurer l'exportation OpenTelemetry (OTLP/gRPC) dans le backend (`pkg/observability/otel.go`).
-* [ ] Nettoyer le doublon `internal/pkg/telemetry/tracer.go` (voir 1.1.B).
-* [ ] Augmenter la couverture de tests.
+* [x] Configurer le routeur Chi avec Huma v2 (`/docs` Swagger UI, `/openapi` spec JSON).
+* [x] Exposer les sondes `/livez`, `/readyz`, `/healthz` et `/metrics` Prometheus.
+* [x] Mettre en place le Graceful Shutdown et l'exécution automatique des migrations via `golang-migrate`.
+* [x] Implémenter les handlers Huma pour `core` (`/api/v1/core/users`).
+* [ ] Implémenter les handlers Huma pour `tournament`.
 
 ---
 
 ### 1.4 — Socle Frontend React (🔄 En cours)
 
 * [x] Initialiser le projet Vite + React + TypeScript dans `frontend/`.
-* [x] Configurer Tailwind CSS, Radix UI et le système de thèmes (Dark/Day mode).
-* [x] Intégrer les packages d'instrumentation web OpenTelemetry (`@opentelemetry/sdk-trace-web`).
-* [x] Créer les composants de base accessibles WCAG (Button, Modal, Dynamic Data Table, Card).
-* [x] Mettre en place le dictionnaire de termes par sport (Lexique Soccer).
-* [x] Configurer l'exportation OpenTelemetry.
-* [ ] Augmenter la couverture de tests.
+* [x] Configurer Tailwind CSS, Radix UI et le système de thèmes.
+* [x] Créer les composants de base accessibles WCAG 2.1 AA.
+* [x] Intégrer l'instrumentation web OpenTelemetry.
+* [ ] Implémenter le composant de sélection des joueurs par Drag & Drop.
+* [ ] Créer la vue d'affichage du calendrier unifié.
 
 ---
 
-## Amélioration continue SLDC (🔄 En cours)
+## 🔮 PHASES SUIVANTES & FEUILLE DE ROUTE PRODUIT
 
-### Z — Tooling
+### PHASE 2 : Gestion d'Équipes Avancée, Horaires & Évaluation Light (Priorité Cible)
 
-* [x] Configurer la stack d'environnement DevContainer (`.devcontainer/devcontainer.json`, `Dockerfile`).
-* [x] Scaffolder les manifests Kubernetes (Kind) — voir 1.1.B pour la question de priorisation.
-* [ ] Corriger `dependabot.yml` / trancher entre Dependabot et Renovate — voir 1.1.B.
-* [ ] Ajouter les outils [Score](https://docs.score.dev/docs/score-implementation/).
-
-### Z.2 — Gouvernance de dépôt
-
-* [x] Rédiger `README.md` (anglais).
-* [ ] Pousser `CONTRIBUTING.md` (rédigé, anglais — voir 1.1.B).
-* [ ] Pousser `SECURITY.md` (rédigé, anglais — voir 1.1.B).
-* [ ] Corriger `LICENSE` (coquille + date de conversion — voir 1.1.B).
+* [ ] **EPIC-1 :** Finalisation de la gestion des bassins, équipes de saison et alignements de tournoi.
+* [ ] **EPIC-2 :** Gestion des terrains (découpage 11v11 en 7v7) et calendrier officiel des pratiques/matchs.
+* [ ] **EPIC-3 :** Saisie des fiches d'évaluation simplifiées par l'entraîneur.
+* [ ] **Espace Représentant Familial :** Consultation des équipes, des calendriers et confirmation de présence.
 
 ---
 
-## 🔮 PHASES SUIVANTES (Aperçu)
+### PHASE 3 : Portail Financier & Interactivité Temps Réel (v2.0 — Out-of-Scope v1.0)
 
-### PHASE 2 : Core Domain & Portail Parent
-
-* [ ] Authentification & Gestion Granulaire des Rôles (RBAC).
-* [ ] Espace Parent : Fiche Enfant, Inscription au Bassin U9-U10.
-* [ ] Tunnel de Sous-Inscriptions aux tournois optionnels.
-
-### PHASE 3 : Équipes Éphémères & Calendrier Dynamique
-
-* [ ] Outil d'administration : Répartition des jeunes (Draft / Team Builder).
-* [ ] Moteur API de consolidation du calendrier familial (Pratiques du bassin + Matchs du roster).
-* [ ] Module RSVP Express (Confirmation de présence 1-click).
-
-### PHASE 4 : Logistique Terrains, Brackets & Finances
-
-* [ ] Algorithme d'affectation et de découpage des terrains (11v11 ➔ 2x 9v9 / 4x 7v7).
-* [ ] Générateur d'arbres de tournois avec repêchage (Consolidation 3 matchs min. garantis).
-* [ ] Dashboard financier par événement (Postes de dépenses vs Sous-inscriptions).
-
-### PHASE 5 : Évaluations & Real-Time
-
-* [ ] Grilles d'évaluation de compétences par calibre (Technique, Tactique, Physique, Mental).
-* [ ] Gateway WebSocket Go + Redis Pub/Sub pour la diffusion des scores en direct sur le terrain.
+* [ ] **EPIC-4 (Finance) :** Module de facturation et sous-inscriptions aux tournois via Stripe.
+* [ ] **EPIC-5 (Scheduling Extended) :** RSVP Express 1-click et notifications Push/SMS d'urgence.
+* [ ] **EPIC-6 (Evaluation Extended) :** Grilles d'évaluation personnalisables avec schémas JSONB.
 
 ---
 
-## 💡 Reste à Réfléchir / Décisions à Prendre
+### PHASE 4 : Logistique Complexe & Moteur de Tournoi (v3.0+)
 
-1. **Paiements :** Choix entre Stripe Connect (ventilation automatique par club) ou Stripe Checkout standard.
-2. **Notifications Urgentes :** Priorité aux WebPush ou intégration Twilio SMS pour les annulations de terrain sur le coup (ex: orages).
-3. **Identité Finale :** Choix définitif de la marque commerciale avant la mise en production.
-4. **Évolutivité :** Préparer le projet pour une future migration vers une architecture microservices si nécessaire (`ADR-003`).
-5. **Multi-Sports :** Définir la stratégie d'ajout de nouveaux sports (soccer, basketball, volleyball) et l'impact sur le modèle JSONB (`ADR-004`).
-6. **SDLC & CI/CD :** Définir les pipelines GitHub Actions pour la validation des PRs, les tests automatiques et les builds d'images distroless OCI.
-7. Comment nommer le rôle "Parent" pouur qu'il représente autant un tuteur, un grand parent ou un grand frère/soeurs
-8.
+* [ ] **EPIC-7 (Tournament Extended) :** Générateur automatique d'arbres de tournoi et diffusion des scores en direct via WebSockets + Redis.
+* [ ] **EPIC-8 (Arbitrage) :** Module de désignation des trios d'arbitres et calcul des paies.
+* [ ] **PWA Offline-First :** Prise de présence et saisie des évaluations sur le terrain sans réseau.
