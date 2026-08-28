@@ -32,6 +32,26 @@ CREATE TYPE core.relationship_type AS ENUM (
     'OTHER'
 );
 
+CREATE TYPE core.registration_status AS ENUM (
+    'PENDING',
+    'ASSIGNED'
+);
+
+-- ----------------------------------------------------------------------------
+-- TABLE: core.clubs
+-- The platform is multi-club (and multi-sport within each club). Sports
+-- (below) stay global reference data — clubs don't redefine "soccer" — but
+-- pools, rosters, and role grants are all club-scoped.
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.clubs (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name varchar(150) NOT NULL,
+    slug varchar(150) NOT NULL UNIQUE,
+    is_active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
+);
+
 -- ----------------------------------------------------------------------------
 -- TABLE: core.sports
 -- ----------------------------------------------------------------------------
@@ -58,12 +78,47 @@ CREATE TABLE core.users (
     first_name varchar(100) NOT NULL,
     last_name varchar(100) NOT NULL,
     phone varchar(30),
-    role core.user_role NOT NULL DEFAULT 'GUARDIAN',
     is_active boolean NOT NULL DEFAULT true,
     last_login_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
     updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
 );
+
+-- ----------------------------------------------------------------------------
+-- TABLE: core.user_roles
+-- A person can hold several roles at once (e.g., a GUARDIAN who is also a
+-- COACH). is_primary picks the default context shown at login; the UI role
+-- switcher lets them move between all granted roles. Authorization checks
+-- must always test against the full granted set, never just is_primary.
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.user_roles (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL REFERENCES core.users (id) ON DELETE CASCADE,
+    club_id uuid REFERENCES core.clubs (id) ON DELETE CASCADE,
+    role core.user_role NOT NULL,
+    is_primary boolean NOT NULL DEFAULT false,
+    granted_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    granted_by uuid REFERENCES core.users (id) ON DELETE SET NULL,
+    CONSTRAINT ck_super_admin_is_platform_scoped CHECK (
+        (role = 'SUPER_ADMIN' AND club_id IS null)
+        OR (role <> 'SUPER_ADMIN' AND club_id IS NOT null)
+    )
+);
+
+-- A club-scoped role can only be granted once per (user, role, club).
+CREATE UNIQUE INDEX uk_user_role_club
+ON core.user_roles (user_id, role, club_id)
+WHERE club_id IS NOT null;
+
+-- SUPER_ADMIN has no club_id to include in a composite unique key, so it
+-- needs its own partial index to stay a one-time grant per user.
+CREATE UNIQUE INDEX uk_user_super_admin
+ON core.user_roles (user_id, role)
+WHERE club_id IS null;
+
+CREATE UNIQUE INDEX uk_one_primary_role_per_user
+ON core.user_roles (user_id)
+WHERE is_primary;
 
 -- ----------------------------------------------------------------------------
 -- TABLE: core.player_profiles
@@ -145,6 +200,7 @@ CREATE TABLE core.parents_children (
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.pools (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    club_id uuid NOT NULL REFERENCES core.clubs (id) ON DELETE CASCADE,
     sport_id uuid NOT NULL REFERENCES core.sports (id) ON DELETE RESTRICT,
     name varchar(100) NOT NULL,
     code varchar(50) NOT NULL,
@@ -155,7 +211,7 @@ CREATE TABLE core.pools (
     is_active boolean NOT NULL DEFAULT true,
     created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
     updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
-    CONSTRAINT uk_pool_sport_season UNIQUE (sport_id, code, season_year)
+    CONSTRAINT uk_pool_club_sport_season UNIQUE (club_id, sport_id, code, season_year)
 );
 
 -- ----------------------------------------------------------------------------
@@ -174,15 +230,36 @@ CREATE TABLE core.pool_divisions (
 );
 
 -- ----------------------------------------------------------------------------
+-- TABLE: core.pool_registrations
+-- Explicit registration of a player into a pool for a given season — not
+-- derived automatically from date_of_birth/gender, since age shifts every
+-- year and registration is a deliberate per-season action.
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.pool_registrations (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid NOT NULL REFERENCES core.player_profiles (id) ON DELETE CASCADE,
+    pool_id uuid NOT NULL REFERENCES core.pools (id) ON DELETE RESTRICT,
+    division_id uuid REFERENCES core.pool_divisions (id) ON DELETE SET NULL,
+    status core.registration_status NOT NULL DEFAULT 'PENDING',
+    registered_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    is_active boolean NOT NULL DEFAULT true,
+    CONSTRAINT uk_player_pool_season UNIQUE (player_id, pool_id)
+);
+
+-- ----------------------------------------------------------------------------
 -- INDEXES
 -- ----------------------------------------------------------------------------
 CREATE INDEX idx_sports_code ON core.sports (code);
+CREATE INDEX idx_clubs_slug ON core.clubs (slug);
 CREATE INDEX idx_users_email ON core.users (email);
-CREATE INDEX idx_users_role ON core.users (role);
+CREATE INDEX idx_user_roles_club ON core.user_roles (club_id);
+CREATE INDEX idx_user_roles_role ON core.user_roles (role);
 CREATE INDEX idx_player_profiles_dob ON core.player_profiles (date_of_birth);
 CREATE INDEX idx_parents_children_child ON core.parents_children (child_id);
-CREATE INDEX idx_pools_sport_season ON core.pools (sport_id, season_year);
+CREATE INDEX idx_pools_club_sport_season ON core.pools (club_id, sport_id, season_year);
 CREATE INDEX idx_pool_divisions_pool ON core.pool_divisions (pool_id);
+CREATE INDEX idx_pool_registrations_pool ON core.pool_registrations (pool_id);
+CREATE INDEX idx_pool_registrations_player ON core.pool_registrations (player_id);
 CREATE INDEX idx_positions_sport ON core.positions (sport_id);
 CREATE INDEX idx_player_position_prefs_player ON core.player_position_preferences (player_id);
 CREATE INDEX idx_player_ratings_sport ON core.player_ratings (sport_id);
@@ -197,8 +274,11 @@ COMMENT ON COLUMN core.sports.id IS 'Primary key UUID generated via gen_random_u
 COMMENT ON COLUMN core.sports.code IS 'Short code identifier for the sport (e.g., SOCCER, HOCKEY).';
 COMMENT ON COLUMN core.sports.rules_config IS 'Flexible JSONB storing sport-specific configurations such as roster size rules or match periods.';
 
-COMMENT ON TABLE core.users IS 'Platform accounts including administrators, technical directors, coaches, parents, and players.';
-COMMENT ON COLUMN core.users.role IS 'Global RBAC role of the user.';
+COMMENT ON TABLE core.clubs IS 'A club/organization. Platform is multi-club — most other data (pools, rosters, role grants) is scoped to one club.';
+
+COMMENT ON TABLE core.users IS 'Platform accounts including administrators, technical directors, coaches, parents, and players. A single account can hold roles across multiple clubs — see core.user_roles.';
+COMMENT ON TABLE core.user_roles IS 'Multi-role grants per user. A user can be GUARDIAN and COACH simultaneously; authorization checks the full set, not a single value.';
+COMMENT ON COLUMN core.user_roles.is_primary IS 'Default role context shown at login/UI — not an authorization boundary by itself.';
 
 COMMENT ON TABLE core.player_profiles IS 'Identity records for individual players.';
 COMMENT ON COLUMN core.player_profiles.user_id IS 'Optional link to a dedicated user account if the player logs into the platform directly.';
@@ -206,8 +286,11 @@ COMMENT ON COLUMN core.player_profiles.user_id IS 'Optional link to a dedicated 
 COMMENT ON TABLE core.parents_children IS 'Junction table mapping parental links and primary contact designations.';
 COMMENT ON COLUMN core.parents_children.is_primary_contact IS 'Flag indicating if this parent should receive primary communications for the child.';
 
-COMMENT ON TABLE core.pools IS 'Age group pools and categories for player registration (e.g., U10F, U12M).';
+COMMENT ON TABLE core.pools IS 'Age group pools and categories for player registration (e.g., U10F, U12M), scoped to one club.';
 COMMENT ON COLUMN core.pools.code IS 'Division short code (e.g., U10F_D1, U12M_LOCAL).';
 
 COMMENT ON TABLE core.pool_divisions IS 'Named skill/competitive levels within a pool (e.g., Division 1, Recreational). A roster is formed within one division.';
 COMMENT ON COLUMN core.pool_divisions.display_order IS 'Controls the order divisions are listed in (e.g., Division 1 before Division 2).';
+
+COMMENT ON TABLE core.pool_registrations IS 'Explicit, per-season registration of a player into a pool (and optionally a specific division).';
+COMMENT ON COLUMN core.pool_registrations.status IS 'PENDING at registration; the application sets it to ASSIGNED when the player is added to an active TRAINING_GROUP roster in tournament.roster_players. No DB trigger — this is an application-layer responsibility across schemas.';
