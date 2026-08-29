@@ -33,7 +33,7 @@ Activate this skill whenever requested to document an architectural choice (e.g.
 
 ## Execution Rules
 
-* **Target Directory:** `docs/adr/`
+* **Target Directory:** `docs/refs/adr/`
 * **File Naming:** `ADR-00X-short-kebab-case-title.md` (ADR- + 3-digit padded prefix, e.g., `ADR-007-adoption-of-huma-v2-for-openapi-rest-api.md`).
 * **Language:** Write the ADR exclusively in **English**.
 * **Template Compliance:** Read, parse, and populate every section defined in the template asset without skipping or altering required headers.
