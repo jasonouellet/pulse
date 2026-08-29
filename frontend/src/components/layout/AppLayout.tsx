@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { DropdownMenu } from "radix-ui";
 import {
   Sun,
   Moon,
@@ -9,7 +10,12 @@ import {
   Users,
   Trophy,
   Settings,
+  ChevronDown,
+  Check,
+  Building2,
+  UsersRound,
 } from "lucide-react";
+import { ROLE_LABELS, useSession, type UserRole } from "../../context/session";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -25,6 +31,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   });
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  const {
+    userName,
+    userInitials,
+    grants,
+    clubs,
+    activeGrant,
+    setActiveRole,
+    setActiveClub,
+  } = useSession();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -47,6 +63,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     { label: "Schedule", href: "#", icon: Calendar },
     { label: "Settings", href: "#", icon: Settings },
   ];
+
+  const rolesForActiveClub = grants
+    .filter((g) => g.club.id === activeGrant.club.id)
+    .map((g) => g.role);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-900 dark:text-slate-100">
@@ -83,7 +103,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             })}
           </nav>
 
-          {/* Right Actions (Theme Switcher + Mobile Toggle) */}
+          {/* Right Actions (Theme Switcher + Avatar Menu + Mobile Toggle) */}
           <div className="flex items-center gap-2">
             {/* Theme Toggle Button */}
             <button
@@ -100,6 +120,100 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <Moon className="h-5 w-5 text-slate-600" />
               )}
             </button>
+
+            {/* Avatar + role/club submenu — the ONLY place club/role switching
+                happens. The name/subtitle next to the avatar is passive
+                display text, not a separate control. */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-medium text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                    {userInitials}
+                  </div>
+                  <div className="hidden text-left sm:block">
+                    <p className="text-sm font-medium leading-tight text-slate-900 dark:text-white">
+                      {userName}
+                    </p>
+                    <p className="text-xs leading-tight text-slate-500 dark:text-slate-400">
+                      {ROLE_LABELS[activeGrant.role]} · {activeGrant.club.name}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className="hidden h-4 w-4 text-slate-400 sm:block"
+                    aria-hidden="true"
+                  />
+                </button>
+              </DropdownMenu.Trigger>
+
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  align="end"
+                  sideOffset={8}
+                  className="z-50 w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-800"
+                >
+                  <DropdownMenu.Label className="px-2 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
+                    Rôle actif · {activeGrant.club.name}
+                  </DropdownMenu.Label>
+                  {rolesForActiveClub.map((role: UserRole) => (
+                    <DropdownMenu.Item
+                      key={role}
+                      onSelect={() => setActiveRole(role)}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm text-slate-700 outline-none data-[highlighted]:bg-slate-100 dark:text-slate-200 dark:data-[highlighted]:bg-slate-700"
+                    >
+                      <UsersRound
+                        className="h-4 w-4 text-slate-400"
+                        aria-hidden="true"
+                      />
+                      <span className="flex-1">{ROLE_LABELS[role]}</span>
+                      {role === activeGrant.role && (
+                        <Check
+                          className="h-4 w-4 text-brand-500"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </DropdownMenu.Item>
+                  ))}
+
+                  <DropdownMenu.Separator className="my-1.5 h-px bg-slate-200 dark:bg-slate-700" />
+
+                  <DropdownMenu.Label className="px-2 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
+                    Club actif
+                  </DropdownMenu.Label>
+                  {clubs.map((club) => (
+                    <DropdownMenu.Item
+                      key={club.id}
+                      onSelect={() => setActiveClub(club.id)}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm text-slate-700 outline-none data-[highlighted]:bg-slate-100 dark:text-slate-200 dark:data-[highlighted]:bg-slate-700"
+                    >
+                      <Building2
+                        className="h-4 w-4 text-slate-400"
+                        aria-hidden="true"
+                      />
+                      <span className="flex-1">{club.name}</span>
+                      {club.id === activeGrant.club.id && (
+                        <Check
+                          className="h-4 w-4 text-brand-500"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </DropdownMenu.Item>
+                  ))}
+
+                  <DropdownMenu.Separator className="my-1.5 h-px bg-slate-200 dark:bg-slate-700" />
+
+                  <DropdownMenu.Item className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm text-slate-700 outline-none data-[highlighted]:bg-slate-100 dark:text-slate-200 dark:data-[highlighted]:bg-slate-700">
+                    <Settings
+                      className="h-4 w-4 text-slate-400"
+                      aria-hidden="true"
+                    />
+                    Paramètres du compte
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
 
             {/* Mobile Menu Button */}
             <button
