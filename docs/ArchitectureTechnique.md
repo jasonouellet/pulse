@@ -52,3 +52,4 @@ En mode Microservice (futur), l'adaptateur bascule en gRPC sans modifier la logi
 
 1. **Paiements :** Stripe Connect pour ventiler les paiements directement aux clubs ou compte marchand unique ?
 2. **Notifications :** Préférer les notifications web push ou l'intégration Twilio SMS pour les urgences du terrain (ex: annulation pour orage) ?
+3. **Intelligence Artificielle :** Utiliser quel service, à quel niveau, local ou SaaS
