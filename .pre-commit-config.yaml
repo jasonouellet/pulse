@@ -11,10 +11,10 @@ repos:
       - id: check-json
         exclude: ^frontend/tsconfig.*\.json$
       - id: check-added-large-files
-        args: ['--maxkb=2000']
+        args: ["--maxkb=2000"]
       - id: check-merge-conflict
 
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Documentation Markdown
   # ---------------------------------------------------------------------------
   - repo: https://github.com/DavidAnson/markdownlint-cli2
@@ -25,7 +25,18 @@ repos:
         files: \.md$
 
   # ---------------------------------------------------------------------------
-  # 2. Hooks Backend Go
+  # 2. Prettier Global (Tout le Monorepo)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.9.6
+    hooks:
+      - id: prettier
+        name: Prettier Global
+        types_or: [javascript, jsx, ts, tsx, css, scss, json, yaml]
+        exclude: ^frontend/tsconfig.*\.json$
+
+  # ---------------------------------------------------------------------------
+  # 3. Hooks Backend Go
   # ---------------------------------------------------------------------------
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
@@ -34,42 +45,33 @@ repos:
       - id: go-imports
       - id: go-unit-tests
 
-  # golangci-lint via le repo officiel : la version est pinnée et téléchargée
-  # par pre-commit lui-même (contrairement au hook golangci-lint de
-  # dnephin/pre-commit-golang, qui appelle le binaire déjà présent sur le
-  # PATH — non déterministe d'une machine à l'autre). Garder ce numéro
-  # aligné avec `version:` dans le workflow GitHub Actions.
   - repo: https://github.com/golangci/golangci-lint
-    rev: v2.13.1
+    rev: v2.13.2
     hooks:
       - id: golangci-lint
 
   # ---------------------------------------------------------------------------
-  # 3. Hooks Frontend React / TypeScript
+  # 4. Hooks Frontend React / TypeScript (Contexte Local)
   # ---------------------------------------------------------------------------
-  # pre-commit/mirrors-prettier est archivé et ne référence plus que des
-  # versions alpha depuis prettier v3.1.0. rbubley/mirrors-prettier est le
-  # fork communautaire maintenu qui ne mirrore que les versions stables.
-  - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.9.6
-    hooks:
-      - id: prettier
-        types_or: [javascript, jsx, ts, tsx, css, scss, json]
-
-  # pre-commit/mirrors-eslint casse avec la flat config d'ESLint 9+
-  # (environnement isolé du hook, résolution de module en échec sur
-  # eslint.config.mjs). La solution recommandée par l'équipe ESLint est de
-  # faire tourner eslint via le node_modules réel du projet.
   - repo: local
     hooks:
+      # ESLint 9+ exécuté à l'intérieur du dossier frontend
       - id: eslint
-        name: ESLint
-        entry: frontend/node_modules/.bin/eslint --config frontend/eslint.config.js
+        name: ESLint (Frontend)
+        entry: bash -c "cd frontend && npx eslint --fix"
         language: system
         files: ^frontend/.*\.(js|jsx|ts|tsx)$
 
+      # Vérification globale des types TypeScript
+      - id: type-check
+        name: TypeScript Type Check
+        entry: bash -c "cd frontend && npm run type-check"
+        language: system
+        types: [ts, tsx]
+        pass_filenames: false
+
   # ---------------------------------------------------------------------------
-  # 4. Hooks SQL & Docker
+  # 5. Hooks SQL & Docker
   # ---------------------------------------------------------------------------
   - repo: https://github.com/sqlfluff/sqlfluff
     rev: 4.3.0
@@ -88,7 +90,7 @@ repos:
         files: (.*/)?Dockerfile.*
 
   # ---------------------------------------------------------------------------
-  # 5. Contrôle d'Architecture & Sécurité (Règles PULSE)
+  # 6. Contrôle d'Architecture & Sécurité (Règles PULSE)
   # ---------------------------------------------------------------------------
   - repo: local
     hooks:

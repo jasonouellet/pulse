@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Namespace
-metadata: {name: pulse}
+metadata: { name: pulse }
 ---
 apiVersion: v1
 kind: ConfigMap
-metadata: {name: otel-collector-config, namespace: pulse}
+metadata: { name: otel-collector-config, namespace: pulse }
 data:
   config.yaml: |
     receivers:
@@ -14,112 +14,169 @@ data:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: otel-collector, namespace: pulse}
+metadata: { name: otel-collector, namespace: pulse }
 spec:
   replicas: 1
-  selector: {matchLabels: {app: otel-collector}}
+  selector: { matchLabels: { app: otel-collector } }
   template:
-    metadata: {labels: {app: otel-collector}}
+    metadata: { labels: { app: otel-collector } }
     spec:
       containers:
         - name: collector
           image: otel/opentelemetry-collector:0.158.0
           args: ["--config=/etc/otelcol/config.yaml"]
-          ports: [{containerPort: 4317}, {containerPort: 4318}]
-          volumeMounts: [{name: config, mountPath: /etc/otelcol}]
-      volumes: [{name: config, configMap: {name: otel-collector-config}}]
+          ports: [{ containerPort: 4317 }, { containerPort: 4318 }]
+          volumeMounts: [{ name: config, mountPath: /etc/otelcol }]
+      volumes: [{ name: config, configMap: { name: otel-collector-config } }]
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: otel-collector, namespace: pulse}
-spec: {selector: {app: otel-collector}, ports: [{name: grpc, port: 4317}, {name: http, port: 4318}]}
+metadata: { name: otel-collector, namespace: pulse }
+spec:
+  {
+    selector: { app: otel-collector },
+    ports: [{ name: grpc, port: 4317 }, { name: http, port: 4318 }],
+  }
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: postgres, namespace: pulse}
+metadata: { name: postgres, namespace: pulse }
 spec:
-  selector: {matchLabels: {app: postgres}}
+  selector: { matchLabels: { app: postgres } }
   template:
-    metadata: {labels: {app: postgres}}
+    metadata: { labels: { app: postgres } }
     spec:
       containers:
         - name: postgres
           image: postgres:16-alpine
-          env: [{name: POSTGRES_DB, value: pulse_db}, {name: POSTGRES_USER, value: postgres}, {name: POSTGRES_PASSWORD, value: postgres_secret}]
-          ports: [{containerPort: 5432}]
-          readinessProbe: {exec: {command: [pg_isready, -U, postgres, -d, pulse_db]}}
+          env:
+            [
+              { name: POSTGRES_DB, value: pulse_db },
+              { name: POSTGRES_USER, value: postgres },
+              { name: POSTGRES_PASSWORD, value: postgres_secret },
+            ]
+          ports: [{ containerPort: 5432 }]
+          readinessProbe:
+            { exec: { command: [pg_isready, -U, postgres, -d, pulse_db] } }
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: postgres, namespace: pulse}
-spec: {selector: {app: postgres}, ports: [{port: 5432}]}
+metadata: { name: postgres, namespace: pulse }
+spec: { selector: { app: postgres }, ports: [{ port: 5432 }] }
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: redis, namespace: pulse}
+metadata: { name: redis, namespace: pulse }
 spec:
-  selector: {matchLabels: {app: redis}}
+  selector: { matchLabels: { app: redis } }
   template:
-    metadata: {labels: {app: redis}}
-    spec: {containers: [{name: redis, image: redis:7-alpine, ports: [{containerPort: 6379}], readinessProbe: {exec: {command: [redis-cli, ping]}}}]}
+    metadata: { labels: { app: redis } }
+    spec:
+      {
+        containers:
+          [
+            {
+              name: redis,
+              image: redis:7-alpine,
+              ports: [{ containerPort: 6379 }],
+              readinessProbe: { exec: { command: [redis-cli, ping] } },
+            },
+          ],
+      }
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: redis, namespace: pulse}
-spec: {selector: {app: redis}, ports: [{port: 6379}]}
+metadata: { name: redis, namespace: pulse }
+spec: { selector: { app: redis }, ports: [{ port: 6379 }] }
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: pulse-backend, namespace: pulse}
+metadata: { name: pulse-backend, namespace: pulse }
 spec:
   replicas: 2
-  selector: {matchLabels: {app: pulse-backend}}
+  selector: { matchLabels: { app: pulse-backend } }
   template:
-    metadata: {labels: {app: pulse-backend}}
+    metadata: { labels: { app: pulse-backend } }
     spec:
       containers:
         - name: backend
           image: pulse-backend:dev
           imagePullPolicy: IfNotPresent
-          ports: [{name: http, containerPort: 8080}]
+          ports: [{ name: http, containerPort: 8080 }]
           env:
-            - {name: DB_HOST, value: postgres}
-            - {name: DB_PORT, value: "5432"}
-            - {name: DB_USER, value: postgres}
-            - {name: DB_PASSWORD, value: postgres_secret}
-            - {name: DB_NAME, value: pulse_db}
-            - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: otel-collector:4317}
-          startupProbe: {httpGet: {path: /livez, port: http}, failureThreshold: 30, periodSeconds: 2}
-          livenessProbe: {httpGet: {path: /livez, port: http}, periodSeconds: 10}
-          readinessProbe: {httpGet: {path: /readyz, port: http}, periodSeconds: 5}
-          resources: {requests: {cpu: 100m, memory: 128Mi}, limits: {cpu: 500m, memory: 256Mi}}
-          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+            - { name: DB_HOST, value: postgres }
+            - { name: DB_PORT, value: "5432" }
+            - { name: DB_USER, value: postgres }
+            - { name: DB_PASSWORD, value: postgres_secret }
+            - { name: DB_NAME, value: pulse_db }
+            - { name: OTEL_EXPORTER_OTLP_ENDPOINT, value: otel-collector:4317 }
+          startupProbe:
+            {
+              httpGet: { path: /livez, port: http },
+              failureThreshold: 30,
+              periodSeconds: 2,
+            }
+          livenessProbe:
+            { httpGet: { path: /livez, port: http }, periodSeconds: 10 }
+          readinessProbe:
+            { httpGet: { path: /readyz, port: http }, periodSeconds: 5 }
+          resources:
+            {
+              requests: { cpu: 100m, memory: 128Mi },
+              limits: { cpu: 500m, memory: 256Mi },
+            }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: pulse-backend, namespace: pulse}
-spec: {selector: {app: pulse-backend}, ports: [{name: http, port: 8080, targetPort: http}]}
+metadata: { name: pulse-backend, namespace: pulse }
+spec:
+  {
+    selector: { app: pulse-backend },
+    ports: [{ name: http, port: 8080, targetPort: http }],
+  }
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: pulse-frontend, namespace: pulse}
+metadata: { name: pulse-frontend, namespace: pulse }
 spec:
   replicas: 2
-  selector: {matchLabels: {app: pulse-frontend}}
+  selector: { matchLabels: { app: pulse-frontend } }
   template:
-    metadata: {labels: {app: pulse-frontend}}
+    metadata: { labels: { app: pulse-frontend } }
     spec:
       containers:
         - name: frontend
           image: pulse-frontend:dev
           imagePullPolicy: IfNotPresent
-          ports: [{name: http, containerPort: 8080}]
-          livenessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 10}
-          readinessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 5}
-          resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 250m, memory: 128Mi}}
-          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          ports: [{ name: http, containerPort: 8080 }]
+          livenessProbe:
+            { httpGet: { path: /healthz, port: http }, periodSeconds: 10 }
+          readinessProbe:
+            { httpGet: { path: /healthz, port: http }, periodSeconds: 5 }
+          resources:
+            {
+              requests: { cpu: 50m, memory: 64Mi },
+              limits: { cpu: 250m, memory: 128Mi },
+            }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: pulse-frontend, namespace: pulse}
-spec: {type: NodePort, selector: {app: pulse-frontend}, ports: [{port: 8080, targetPort: http, nodePort: 30080}]}
+metadata: { name: pulse-frontend, namespace: pulse }
+spec:
+  {
+    type: NodePort,
+    selector: { app: pulse-frontend },
+    ports: [{ port: 8080, targetPort: http, nodePort: 30080 }],
+  }

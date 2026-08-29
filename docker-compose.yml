@@ -14,7 +14,11 @@ services:
     networks:
       - pulse_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-pulse_db}" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-pulse_db}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -30,7 +34,7 @@ services:
     networks:
       - pulse_network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5

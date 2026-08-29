@@ -2,9 +2,9 @@ name: CI & Code Quality
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -21,13 +21,13 @@ jobs:
       - name: Markdown Lint
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
-          globs: '**/*.md'
+          globs: "**/*.md"
 
       # --- Go Lint ---
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: "1.26"
 
       - name: Go Linter (golangci-lint)
         uses: golangci/golangci-lint-action@v9
@@ -38,8 +38,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: "24"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Frontend Linter (ESLint & TSC)
@@ -79,7 +79,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: "1.26"
 
       - name: Run Go Unit Tests
         run: |
@@ -89,8 +89,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: "24"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Run Frontend Unit Tests
@@ -126,12 +126,12 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: "1.26"
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
 
       # NOTE: snyk/actions ne publie pas de tags versionnés (v1, v2, ...),
       # seulement @master. C'est un choix des mainteneurs, pas un oubli
