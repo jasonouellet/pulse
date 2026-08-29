@@ -73,7 +73,8 @@
 * [x] Intégrer le hook `markdownlint-cli2` dans `.pre-commit-config.yaml` et corriger l'avertissement de chemin Hadolint `(.*/)?Dockerfile.*`.
 * [x] Résoudre les erreurs de formatage SQLFluff sur les migrations (respect de la limite de longueur de ligne de 160 caractères).
 * [ ] Trancher entre `dependabot.yml` et `renovate.json` (supprimer l'un des deux pour éviter les PRs en double).
-* [ ] Corriger la clé `matchMatchers` ➔ `matchManagers` dans `renovate.json`.
+  * dependabot, c'est pour la gestion active, du repo, renovate c'est pour updater localement ou sur demande.
+* [x] Corriger la clé `matchMatchers` ➔ `matchManagers` dans `renovate.json`.
 * [ ] Évaluer l'intégration du Modèle Score (`score-compose`) pour la génération des manifests de dev local.
 
 ---
