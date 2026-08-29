@@ -1,24 +1,25 @@
+import { Routes, Route } from "react-router";
 import { AppLayout } from "./components/layout/AppLayout";
 import { SessionProvider } from "./context/SessionProvider";
 import { HomePage } from "./pages/HomePage";
+import { PoolsListPage } from "./pages/PoolsListPage";
+import { RosterBuilderPage } from "./pages/RosterBuilderPage";
+import { PlayerProfilePage } from "./pages/PlayerProfilePage";
+import { GuardianChildrenPage } from "./pages/GuardianChildrenPage";
+import { RegistrationPage } from "./pages/RegistrationPage";
 
 export function App() {
   return (
     <SessionProvider>
       <AppLayout>
-        <div className="space-y-6">
-          <header>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              Tournament Dashboard
-            </h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">
-              Manage multi-sport youth pools, rosters, and dynamic match
-              scheduling.
-            </p>
-          </header>
-
-          <HomePage />
-        </div>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/pools" element={<PoolsListPage />} />
+          <Route path="/rosters" element={<RosterBuilderPage />} />
+          <Route path="/players/:playerId" element={<PlayerProfilePage />} />
+          <Route path="/children" element={<GuardianChildrenPage />} />
+          <Route path="/register" element={<RegistrationPage />} />
+        </Routes>
       </AppLayout>
     </SessionProvider>
   );

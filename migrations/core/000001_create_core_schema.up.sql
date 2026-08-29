@@ -167,19 +167,24 @@ CREATE TABLE core.player_position_preferences (
 
 -- ----------------------------------------------------------------------------
 -- TABLE: core.player_ratings
--- A manually-set balance score per player, per sport (a player's soccer
--- rating is meaningless for hockey). 0-100 scale is an assumption — flag
--- for confirmation. May later be superseded/fed by the `evaluation` schema
--- once it exists; kept lightweight and directly editable for now so roster
--- balancing isn't blocked on the full evaluation module.
+-- A manually-set balance score per player, per sport, per season — scoped
+-- by season_year because a player's rating evolves year over year and
+-- overwriting it would lose that history (same principle as
+-- pool_registrations: identity is permanent, the rating tied to it is not).
+-- 0-100 scale is an assumption — flag for confirmation. May later be
+-- superseded/fed by the `evaluation` schema once it exists; kept
+-- lightweight and directly editable for now so roster balancing isn't
+-- blocked on the full evaluation module. "Current" score = the row for the
+-- active season_year, not just the latest by updated_at.
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.player_ratings (
     player_id uuid NOT NULL REFERENCES core.player_profiles (id) ON DELETE CASCADE,
     sport_id uuid NOT NULL REFERENCES core.sports (id) ON DELETE CASCADE,
+    season_year int NOT NULL,
     score smallint NOT NULL,
     updated_by uuid REFERENCES core.users (id) ON DELETE SET NULL,
     updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
-    PRIMARY KEY (player_id, sport_id),
+    PRIMARY KEY (player_id, sport_id, season_year),
     CONSTRAINT ck_score_range CHECK (score BETWEEN 0 AND 100)
 );
 
@@ -262,7 +267,7 @@ CREATE INDEX idx_pool_registrations_pool ON core.pool_registrations (pool_id);
 CREATE INDEX idx_pool_registrations_player ON core.pool_registrations (player_id);
 CREATE INDEX idx_positions_sport ON core.positions (sport_id);
 CREATE INDEX idx_player_position_prefs_player ON core.player_position_preferences (player_id);
-CREATE INDEX idx_player_ratings_sport ON core.player_ratings (sport_id);
+CREATE INDEX idx_player_ratings_sport_season ON core.player_ratings (sport_id, season_year);
 
 -- ----------------------------------------------------------------------------
 -- DOCUMENTATION (COMMENT ON)

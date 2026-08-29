@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { DropdownMenu } from "radix-ui";
+import { NavLink } from "react-router";
 import {
   Sun,
   Moon,
   Menu,
   X,
-  Shield,
-  Calendar,
-  Users,
-  Trophy,
   Settings,
   ChevronDown,
   Check,
@@ -16,6 +13,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { ROLE_LABELS, useSession, type UserRole } from "../../context/session";
+import { NAV_BY_ROLE } from "../../data/mock";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -56,13 +54,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setIsDarkMode((prev) => !prev);
   };
 
-  const navItems = [
-    { label: "Dashboard", href: "#", icon: Shield },
-    { label: "Pools & Rosters", href: "#", icon: Users },
-    { label: "Tournaments", href: "#", icon: Trophy },
-    { label: "Schedule", href: "#", icon: Calendar },
-    { label: "Settings", href: "#", icon: Settings },
-  ];
+  const navItems = NAV_BY_ROLE[activeGrant.role];
 
   const rolesForActiveClub = grants
     .filter((g) => g.club.id === activeGrant.club.id)
@@ -88,19 +80,22 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             className="hidden md:flex md:items-center md:gap-1"
             aria-label="Main Navigation"
           >
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-                >
-                  <Icon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                  {item.label}
-                </a>
-              );
-            })}
+            {navItems.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                    isActive
+                      ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
 
           {/* Right Actions (Theme Switcher + Avatar Menu + Mobile Toggle) */}
@@ -236,20 +231,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {isMobileMenuOpen && (
           <div className="border-b border-slate-200 bg-white px-4 pt-2 pb-4 dark:border-slate-800 dark:bg-slate-900 md:hidden">
             <nav className="flex flex-col gap-1" aria-label="Mobile Navigation">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
-                  >
-                    <Icon className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                    {item.label}
-                  </a>
-                );
-              })}
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.to}
+                  end={item.to === "/"}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
+                      isActive
+                        ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
             </nav>
           </div>
         )}
