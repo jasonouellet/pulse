@@ -83,21 +83,24 @@
 ### 1.2 — Modélisation des Données & Schémas SQL (🔄 En cours)
 
 * [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (`core.sports`, `core.users`, `core.parents_children`, `core.player_profiles`, `core.pools`).
-* [x] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql` — **à restructurer, voir 1.2.B (`ADR-008`)**.
-* [ ] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql` (`fields`, `sub_fields`, `matches`, `practices`, `attendances`) — **priorité revue : voir 1.2.B**.
+* [x] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql` — restructuré selon `ADR-008`, voir 1.2.B.
+* [x] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql` (`date_windows`, `fields`, `sub_fields`, `activities`, `attendances`).
 * [ ] Écrire `migrations/evaluation/000001_create_evaluation_schema.up.sql` (`player_ratings`).
 * [ ] Réserver la structure `migrations/finance/` pour la phase v2.0 (Out-of-Scope v1.0).
 
-#### 1.2.B — Restructuration selon `ADR-008` (🆕 À faire avant d'aller plus loin sur `tournament`)
+#### 1.2.B — Restructuration selon `ADR-008` (✅ Migrations faites — reste le câblage applicatif)
 
-* [ ] Déplacer `TRAINING_GROUP`/`SEASON_TEAM` de `tournament.roster_type` vers `core` (structure de club persistante, indépendante de tout événement).
-* [ ] `tournament.roster_type` ne garde que `EVENT_ROSTER` (ou l'enum est retiré si un seul type reste).
-* [ ] Ajouter `tournament.event_eligibility` (une ou plusieurs plages âge/genre par événement).
-* [ ] Ajouter `tournament.team_entries` (club + événement + bassin source) — distinct de l'alignement.
-* [ ] Créer `migrations/scheduling/000001_create_scheduling_schema.up.sql` comme **second noyau partagé** : propriétaire de toutes les fenêtres temporelles (saisons, bassins, événements) en plus du détail fin (créneaux, terrains).
-* [ ] Retirer `start_date`/`end_date` de `core.pools` et `tournament.events`, référencer `scheduling` à la place.
-* [ ] Ajouter `parent_club_id` (auto-référencé) et `org_type` (`CLUB`/`ASSOCIATION`/`FEDERATION`) sur `core.clubs`.
-* [ ] Renommer `roster` → `alignement` dans le code/UI en français ; garder `roster` en anglais/code (voir `ADR-008 §3`).
+* [x] Déplacer `TRAINING_GROUP`/`SEASON_TEAM` de `tournament.roster_type` vers `core` (`core.teams`, `core.team_pools`, `core.team_players`).
+* [x] `tournament.roster_type` retiré — un seul type restait (`EVENT_ROSTER`), l'enum n'avait plus de raison d'être.
+* [x] Ajouter `tournament.event_eligibility` (une ou plusieurs plages âge/genre par événement).
+* [x] Ajouter `tournament.team_entries` (club + événement + bassin source) — distinct de l'alignement (`tournament.rosters`, maintenant 1:1 avec `team_entries`).
+* [x] Créer `migrations/scheduling/000001_create_scheduling_schema.up.sql` comme second noyau partagé, sans dépendance sortante.
+* [x] Retirer `start_date`/`end_date` de `core.pools` et `tournament.events`, référencer `scheduling.date_windows` à la place (`window_id`).
+* [x] Ajouter `parent_club_id` (auto-référencé) et `org_type` (`CLUB`/`ASSOCIATION`/`FEDERATION`) sur `core.clubs`.
+* [ ] Renommer `roster` → `alignement` dans le code/UI en français ; garder `roster` en anglais/code — **pas encore fait côté frontend** (`RosterBuilderPage`, `NAV_BY_ROLE`, etc. disent encore "roster"/"Rosters").
+* [ ] **🆕 Bloquant :** `pkg/database/migrate.go`/`main.go` doivent appeler les migrations dans l'ordre `scheduling` → `core` → `tournament`, avec une table de suivi (`x-migrations-table`) distincte par schéma — sinon `golang-migrate` croit que tout est déjà appliqué après le premier appel.
+* [ ] Écrire les Ports/Repositories Go pour `core.clubs` (hiérarchie), `core.teams`, `scheduling.*`, `tournament.*` — aucun n'existe encore.
+* [ ] Semer des données de base (`scheduling.date_windows` pour la saison en cours, positions par sport) — les tables existent mais sont vides.
 
 ---
 

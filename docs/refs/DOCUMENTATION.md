@@ -26,7 +26,7 @@ L'objectif est d'automatiser 90 % de la documentation technique pour qu'elle res
 ### C. Architecture & Décisions Structurantes
 
 * **Diagrammes C4 :** Documentés et maintenus dans `ARCHITECTURE_C4.md` (Niveaux 1 à 3 : Contexte, Conteneurs, Composants Backend/Persistance).
-* **Registres de Décision (ADR) :** Chaque choix technique majeur fait l'objet d'un fichier Markdown sous `/docs/refs/adr/` suivant le format **MADR 3.0.0**.
+* **Registres de Décision (ADR) :** Chaque choix technique majeur fait l'objet d'un fichier Markdown sous `/docs/refs/adr/` suivant le format **MADR 4.0.0**.
 
 ### D. Design System & Frontend (React)
 

@@ -1,6 +1,6 @@
 # Déploiement Kubernetes local (Kind)
 
-Prérequis : Docker, `kind`, `kubectl`, Go 1.26 et Node 24.
+Prérequis : Docker, `kind`, `kubectl`, Go 1.25 et Node 24.
 
 ```bash
 kind create cluster --name pulse --config deployments/kind/cluster.yaml
