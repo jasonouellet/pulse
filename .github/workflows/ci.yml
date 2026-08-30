@@ -27,7 +27,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26"
+          go-version: "1.25"
 
       - name: Go Linter (golangci-lint)
         uses: golangci/golangci-lint-action@v9
@@ -79,7 +79,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26"
+          go-version: "1.25"
 
       - name: Run Go Unit Tests
         run: |
@@ -126,7 +126,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26"
+          go-version: "1.25"
 
       - name: Setup Node.js
         uses: actions/setup-node@v7

@@ -68,8 +68,8 @@ func main() {
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		dbCfg.User, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.DBName, dbCfg.SSLMode)
 
-	if err := database.RunMigrations("migrations/core", dbURL); err != nil {
-		slog.Error("Failed to apply core migrations", "error", err)
+	if err := database.RunAllMigrations(dbURL); err != nil {
+		slog.Error("Failed to apply migrations", "error", err)
 	}
 
 	dbPool, err := database.NewPostgresPool(ctx, dbCfg)
