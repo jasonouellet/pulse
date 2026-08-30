@@ -1,9 +1,14 @@
+DROP INDEX IF EXISTS core.idx_team_players_player;
+DROP INDEX IF EXISTS core.idx_team_pools_pool;
+DROP INDEX IF EXISTS core.idx_teams_window;
+DROP INDEX IF EXISTS core.idx_teams_club_sport;
 DROP INDEX IF EXISTS core.idx_pool_registrations_player;
 DROP INDEX IF EXISTS core.idx_pool_registrations_pool;
 DROP INDEX IF EXISTS core.idx_player_ratings_sport_season;
 DROP INDEX IF EXISTS core.idx_player_position_prefs_player;
 DROP INDEX IF EXISTS core.idx_positions_sport;
 DROP INDEX IF EXISTS core.idx_pool_divisions_pool;
+DROP INDEX IF EXISTS core.idx_pools_window;
 DROP INDEX IF EXISTS core.idx_pools_club_sport_season;
 DROP INDEX IF EXISTS core.idx_parents_children_child;
 DROP INDEX IF EXISTS core.idx_player_profiles_dob;
@@ -15,7 +20,11 @@ DROP INDEX IF EXISTS core.idx_user_roles_role;
 DROP INDEX IF EXISTS core.idx_users_email;
 DROP INDEX IF EXISTS core.idx_sports_code;
 DROP INDEX IF EXISTS core.idx_clubs_slug;
+DROP INDEX IF EXISTS core.idx_clubs_parent;
 
+DROP TABLE IF EXISTS core.team_players;
+DROP TABLE IF EXISTS core.team_pools;
+DROP TABLE IF EXISTS core.teams;
 DROP TABLE IF EXISTS core.pool_registrations;
 DROP TABLE IF EXISTS core.pool_divisions;
 DROP TABLE IF EXISTS core.pools;
@@ -29,6 +38,8 @@ DROP TABLE IF EXISTS core.users;
 DROP TABLE IF EXISTS core.sports;
 DROP TABLE IF EXISTS core.clubs;
 
+DROP TYPE IF EXISTS core.team_type;
+DROP TYPE IF EXISTS core.organization_type;
 DROP TYPE IF EXISTS core.registration_status;
 DROP TYPE IF EXISTS core.relationship_type;
 DROP TYPE IF EXISTS core.gender_category;

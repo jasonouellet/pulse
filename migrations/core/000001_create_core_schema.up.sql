@@ -2,7 +2,11 @@
 -- PROJECT PULSE — Migration UP: Core Schema
 -- Version: 000001
 -- Description: Creates core schema, enum types, multi-sport reference,
---              users, player profiles, parent-child links, and age pools.
+--              users, player profiles, parent-child links, age pools, and
+--              persistent teams (training groups / season teams).
+--
+-- Depends on: scheduling (core.pools.window_id references
+-- scheduling.date_windows) — the scheduling migration must run first.
 -- ============================================================================
 
 CREATE SCHEMA IF NOT EXISTS core;
@@ -37,6 +41,22 @@ CREATE TYPE core.registration_status AS ENUM (
     'ASSIGNED'
 );
 
+-- ADR-008 §6: a club can be a standalone club, or belong to a regional
+-- association or a federation. org_type distinguishes the level; nesting
+-- depth itself is unconstrained (see core.clubs.parent_club_id).
+CREATE TYPE core.organization_type AS ENUM (
+    'CLUB',
+    'ASSOCIATION',
+    'FEDERATION'
+);
+
+-- ADR-008 §1: TRAINING_GROUP and SEASON_TEAM are persistent club structure,
+-- independent of any tournament/event — they live in core, not tournament.
+CREATE TYPE core.team_type AS ENUM (
+    'TRAINING_GROUP',
+    'SEASON_TEAM'
+);
+
 -- ----------------------------------------------------------------------------
 -- TABLE: core.clubs
 -- The platform is multi-club (and multi-sport within each club). Sports
@@ -45,6 +65,8 @@ CREATE TYPE core.registration_status AS ENUM (
 -- ----------------------------------------------------------------------------
 CREATE TABLE core.clubs (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    parent_club_id uuid REFERENCES core.clubs (id) ON DELETE SET NULL,
+    org_type core.organization_type NOT NULL DEFAULT 'CLUB',
     name varchar(150) NOT NULL,
     slug varchar(150) NOT NULL UNIQUE,
     is_active boolean NOT NULL DEFAULT true,
@@ -207,6 +229,7 @@ CREATE TABLE core.pools (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     club_id uuid NOT NULL REFERENCES core.clubs (id) ON DELETE CASCADE,
     sport_id uuid NOT NULL REFERENCES core.sports (id) ON DELETE RESTRICT,
+    window_id uuid NOT NULL REFERENCES scheduling.date_windows (id) ON DELETE RESTRICT,
     name varchar(100) NOT NULL,
     code varchar(50) NOT NULL,
     min_age int NOT NULL,
@@ -252,22 +275,69 @@ CREATE TABLE core.pool_registrations (
 );
 
 -- ----------------------------------------------------------------------------
+-- TABLE: core.teams
+-- Persistent club structure, independent of any event (ADR-008 §1):
+--   TRAINING_GROUP — 1:1 with a single pool, organizes practices
+--   SEASON_TEAM    — can span multiple pools (e.g., U9 + U10)
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.teams (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    club_id uuid NOT NULL REFERENCES core.clubs (id) ON DELETE CASCADE,
+    sport_id uuid NOT NULL REFERENCES core.sports (id) ON DELETE RESTRICT,
+    window_id uuid NOT NULL REFERENCES scheduling.date_windows (id) ON DELETE RESTRICT,
+    type core.team_type NOT NULL,
+    name varchar(150) NOT NULL,
+    season_year int NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
+);
+
+-- ----------------------------------------------------------------------------
+-- TABLE: core.team_pools
+-- Which pool(s) a team draws players from. TRAINING_GROUP has exactly one
+-- row (1:1 with its pool); SEASON_TEAM can have several (combining ages).
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.team_pools (
+    team_id uuid NOT NULL REFERENCES core.teams (id) ON DELETE CASCADE,
+    pool_id uuid NOT NULL REFERENCES core.pools (id) ON DELETE RESTRICT,
+    PRIMARY KEY (team_id, pool_id)
+);
+
+-- ----------------------------------------------------------------------------
+-- TABLE: core.team_players
+-- Team membership. No event scoping here — that only applies to
+-- tournament.roster_players (event-specific alignments).
+-- ----------------------------------------------------------------------------
+CREATE TABLE core.team_players (
+    team_id uuid NOT NULL REFERENCES core.teams (id) ON DELETE CASCADE,
+    player_id uuid NOT NULL REFERENCES core.player_profiles (id) ON DELETE CASCADE,
+    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (team_id, player_id)
+);
+
+-- ----------------------------------------------------------------------------
 -- INDEXES
 -- ----------------------------------------------------------------------------
 CREATE INDEX idx_sports_code ON core.sports (code);
 CREATE INDEX idx_clubs_slug ON core.clubs (slug);
+CREATE INDEX idx_clubs_parent ON core.clubs (parent_club_id);
 CREATE INDEX idx_users_email ON core.users (email);
 CREATE INDEX idx_user_roles_club ON core.user_roles (club_id);
 CREATE INDEX idx_user_roles_role ON core.user_roles (role);
 CREATE INDEX idx_player_profiles_dob ON core.player_profiles (date_of_birth);
 CREATE INDEX idx_parents_children_child ON core.parents_children (child_id);
 CREATE INDEX idx_pools_club_sport_season ON core.pools (club_id, sport_id, season_year);
+CREATE INDEX idx_pools_window ON core.pools (window_id);
 CREATE INDEX idx_pool_divisions_pool ON core.pool_divisions (pool_id);
 CREATE INDEX idx_pool_registrations_pool ON core.pool_registrations (pool_id);
 CREATE INDEX idx_pool_registrations_player ON core.pool_registrations (player_id);
 CREATE INDEX idx_positions_sport ON core.positions (sport_id);
 CREATE INDEX idx_player_position_prefs_player ON core.player_position_preferences (player_id);
 CREATE INDEX idx_player_ratings_sport_season ON core.player_ratings (sport_id, season_year);
+CREATE INDEX idx_teams_club_sport ON core.teams (club_id, sport_id);
+CREATE INDEX idx_teams_window ON core.teams (window_id);
+CREATE INDEX idx_team_pools_pool ON core.team_pools (pool_id);
+CREATE INDEX idx_team_players_player ON core.team_players (player_id);
 
 -- ----------------------------------------------------------------------------
 -- DOCUMENTATION (COMMENT ON)
@@ -291,11 +361,19 @@ COMMENT ON COLUMN core.player_profiles.user_id IS 'Optional link to a dedicated 
 COMMENT ON TABLE core.parents_children IS 'Junction table mapping parental links and primary contact designations.';
 COMMENT ON COLUMN core.parents_children.is_primary_contact IS 'Flag indicating if this parent should receive primary communications for the child.';
 
-COMMENT ON TABLE core.pools IS 'Age group pools and categories for player registration (e.g., U10F, U12M), scoped to one club.';
+COMMENT ON TABLE core.pools IS 'Age group pools and categories for player registration (e.g., U10F, U12M), scoped to one club. window_id references scheduling.date_windows for actual dates; season_year stays a human label.';
 COMMENT ON COLUMN core.pools.code IS 'Division short code (e.g., U10F_D1, U12M_LOCAL).';
 
 COMMENT ON TABLE core.pool_divisions IS 'Named skill/competitive levels within a pool (e.g., Division 1, Recreational). A roster is formed within one division.';
 COMMENT ON COLUMN core.pool_divisions.display_order IS 'Controls the order divisions are listed in (e.g., Division 1 before Division 2).';
 
 COMMENT ON TABLE core.pool_registrations IS 'Explicit, per-season registration of a player into a pool (and optionally a specific division).';
-COMMENT ON COLUMN core.pool_registrations.status IS 'PENDING at registration; the application sets it to ASSIGNED when the player is added to an active TRAINING_GROUP roster in tournament.roster_players. No DB trigger — this is an application-layer responsibility across schemas.';
+COMMENT ON COLUMN core.pool_registrations.status IS 'PENDING at registration; the application sets it to ASSIGNED when the player is added to an active TRAINING_GROUP team in core.team_players. No DB trigger — this is an application-layer responsibility.';
+
+COMMENT ON TABLE core.clubs IS 'A club, association, or federation — see org_type and parent_club_id for the nesting hierarchy (ADR-008 §6).';
+COMMENT ON COLUMN core.clubs.parent_club_id IS 'Nullable, self-referencing. A club can belong directly to a federation, or through an intermediate association — nesting depth is unconstrained.';
+
+COMMENT ON TABLE core.teams IS 'Persistent club structure (training group or season team), independent of any tournament/event (ADR-008 §1).';
+COMMENT ON COLUMN core.teams.window_id IS 'References scheduling.date_windows — teams no longer store their own start_date/end_date (ADR-008 §4).';
+COMMENT ON TABLE core.team_pools IS 'Pool(s) a team draws players from. Multiple rows is how a season team combines age groups (e.g., U9 + U10).';
+COMMENT ON TABLE core.team_players IS 'Team membership — no event scoping (that is tournament.roster_players).';
