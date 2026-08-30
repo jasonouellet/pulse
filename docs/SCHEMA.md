@@ -6,17 +6,18 @@ Le système utilise une architecture multi-tenant et multi-sports au sein d'une 
 
 | Schéma | Domaine | Responsabilité Principale | Statut de Dépendance |
 | :--- | :--- | :--- | :--- |
-| `core` | Noyau & Entités | Clubs, utilisateurs, rôles, profils joueurs, sports, positions, évaluations de base et bassins d'âge (`pools`). | **Kernel Shared** (Référencé par les autres schémas). |
-| `tournament` | Compétition | Événements, tournois, groupes d'entraînement, équipes de saison et alignements (*rosters*). | Référence `core` via clés étrangères explicites (FK). |
-| `scheduling` | Logistique | Terrains, sous-découpage de surfaces, calendriers de matchs/pratiques, présences. | Module pair (Pas de FK/JOIN directs avec `tournament`/`finance`). |
-| `finance` | Comptabilité | Budgets d'événements, frais d'inscription, dépenses, rétribution des arbitres. | Module pair (Pas de FK/JOIN directs avec `tournament`/`scheduling`). |
-| `evaluation` | Performance | Évaluations détaillées, grilles de compétences, saisie vocale IA (*Voice-to-Eval*). | Module pair (Pas de FK/JOIN directs avec `tournament`/`scheduling`). |
+| `core` | Noyau & Entités | Clubs (avec hiérarchie club/association/fédération), utilisateurs, rôles, profils joueurs, sports, positions, bassins d'âge (`pools`), groupes d'entraînement et équipes de saison. | **Kernel Shared** (Référencé par les autres schémas). |
+| `tournament` | Compétition | Événements, éligibilité par âge/genre, équipes engagées par un club, alignements (*event rosters*) ponctuels. | Référence `core` et `scheduling` via clés étrangères explicites (FK). |
+| `scheduling` | Temporel & Logistique | **Propriétaire unique de toutes les fenêtres temporelles** (saisons, bassins, événements) et du détail fin (terrains, sous-découpage de surfaces, calendriers de matchs/pratiques, présences). | **Kernel Shared** (comme `core`, mais pour le temporel — voir `ADR-008`). |
+| `finance` | Comptabilité | Budgets d'événements, frais d'inscription, dépenses, rétribution des arbitres. | Module pair (Pas de FK/JOIN directs avec `tournament`). |
+| `evaluation` | Performance | Évaluations détaillées, grilles de compétences, saisie vocale IA (*Voice-to-Eval*). | Module pair (Pas de FK/JOIN directs avec `tournament`). |
 
 ## 2. Règles d'Or d'Architecture (ADR-003 & ADR-004)
 
-1. **Relation Core / Modules Pairs (ADR-003 §2.B) :** `core` agit comme noyau partagé. Les schémas satellites (`tournament`, `scheduling`, etc.) peuvent et doivent utiliser des clés étrangères (FK) directes vers `core` (`core.sports`, `core.pools`, `core.player_profiles`).
-2. **Isolation entre Modules Pairs (ADR-003) :** Aucune clé étrangère ni `JOIN` SQL direct n'est autorisé entre deux modules pairs (ex: `tournament` vers `scheduling`). L'intégrité et la communication entre ces domaines s'effectuent exclusivement dans la couche applicative Backend Go via des UUIDs.
-3. **Abstraction Multi-Sport (ADR-004) :** Les sports, positions et règles d'alignement sont configurés dynamiquement (`core.sports`, `core.positions`). Aucune modification de schéma SQL n'est requise lors de l'ajout d'un nouveau sport (Soccer, Hockey, Baseball, etc.).
+1. **Relation Core / Modules Pairs (ADR-003 §2.B) :** `core` agit comme noyau partagé. Les schémas satellites (`tournament`, `finance`, `evaluation`) peuvent et doivent utiliser des clés étrangères (FK) directes vers `core` (`core.sports`, `core.pools`, `core.player_profiles`).
+2. **`scheduling` : second noyau partagé, pour le temporel (`ADR-008`) :** `scheduling` porte toutes les fenêtres temporelles de la plateforme (saisons, bassins, événements, créneaux). Les modules qui ont besoin d'une date le référencent par FK, plutôt que de dupliquer `start_date`/`end_date` localement.
+3. **Isolation entre Modules Pairs (ADR-003) :** Aucune clé étrangère ni `JOIN` SQL direct n'est autorisé entre deux modules métiers pairs (ex: `tournament` vers `finance`). L'intégrité et la communication entre ces domaines s'effectuent exclusivement dans la couche applicative Backend Go via des UUIDs.
+4. **Abstraction Multi-Sport (ADR-004) :** Les sports, positions et règles d'alignement sont configurés dynamiquement (`core.sports`, `core.positions`). Aucune modification de schéma SQL n'est requise lors de l'ajout d'un nouveau sport (Soccer, Hockey, Baseball, etc.).
 
 ## 3. Structure Détaillée du Schéma `core`
 

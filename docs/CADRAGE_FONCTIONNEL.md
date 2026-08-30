@@ -107,10 +107,17 @@ Note sur la terminologie : Afin de couvrir toutes les réalités familiaux, l'ap
   * US-1.2.1 : En tant que DT, je veux créer un groupe d'entraînement (TRAINING_GROUP, 1:1 avec un bassin), afin d'organiser les séances d'entraînement régulières.
   * US-1.2.2 : En tant que DT, je veux créer une équipe de saison (SEASON_TEAM) pouvant combiner plusieurs bassins (ex: U9 + U10), afin d'inscrire le club en ligue régionale.
 * FEAT-1.3 : Alignements d'Événements & Tournois (Event Rosters)
-  * US-1.3.1 : En tant que Gérant d'équipe, je veux composer un alignement (EVENT_ROSTER) pour un tournoi spécifique, afin de soumettre la liste officielle des * joueurs.
+  * US-1.3.1 : En tant que DT, je veux composer un alignement (EVENT_ROSTER) pour un tournoi spécifique, afin de soumettre la liste officielle des joueurs.
   * US-1.3.2 : En tant que Système, je dois bloquer l'ajout d'un joueur dans deux alignements distincts pour un même événement (uk_one_roster_per_player_per_event), afin d'éviter les litiges d'éligibilité.
+* FEAT-1.4 : Inscription à un Événement (Club & Représentant Familial) — voir `ADR-008`
+  * US-1.4.1 : En tant qu'organisateur, je veux définir l'éligibilité d'un événement (une ou plusieurs plages âge/genre), afin de contrôler qui peut s'y inscrire.
+  * US-1.4.2 : En tant que DT d'un club participant, je veux engager une équipe pour une catégorie éligible d'un événement, afin de réserver la place de mon club sans encore connaître les joueurs précis.
+  * US-1.4.3 : En tant que Représentant Familial, je veux inscrire mon enfant à un événement (indépendamment de l'engagement d'équipe du club), afin de confirmer sa participation.
+  * US-1.4.4 : En tant que DT, je veux assigner un entraîneur ponctuel à un alignement d'événement, afin de couvrir les cas où le coach habituel n'est pas disponible.
 
 ### EPIC-2 : Planification des Activités & Terrains (Module Scheduling)
+
+> `scheduling` est le propriétaire unique de toutes les fenêtres temporelles (saisons, bassins, événements) en plus du détail fin — voir `ADR-008 §4`.
 
 * FEAT-2.1 : Gestion des Terrains & Sous-découpages
   * US-2.1.1 : En tant qu'Admin, je veux enregistrer les terrains du club et leurs sous-découpages (ex: terrain 11v11 divisé en deux 9v9 ou quatre 7v7), afin d'optimiser l'occupation des surfaces.

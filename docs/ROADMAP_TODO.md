@@ -21,12 +21,13 @@
 
 ---
 
-## 📌 Décision Terminologique : Rôle "Représentant Familial" (*Family Guardian*)
+## 📌 Décision Terminologique : Rôle "Guardian" (Représentant Familial)
 
-> **Décision validée :** Pour représenter fidèlement la réalité des familles (parents, tuteurs légaux, beaux-parents, grands-parents, grands frères/sœurs), le système abandonne le terme exclusif de "Parent" au profit de **`Représentant Familial`** (en anglais : **`Family Guardian`**).
+> **Décision validée, mise à jour 2026-08-29 pour refléter l'implémentation réelle** (la version précédente de cette note décrivait un plan qui a dérivé pendant la migration `core`) :
 >
-> * **En base de données (`core`) :** Table `core.family_guardians` avec colonne `relationship_type` (Enum: `PARENT`, `LEGAL_GUARDIAN`, `GRANDPARENT`, `SIBLING`, `OTHER`).
-> * **Dans l'interface UX/UI :** Libellés affichés sous la forme **"Espace Famille / Représentant"**.
+> * **En base de données (`core`) :** rôle `GUARDIAN` dans `core.user_role` ; table de jonction `core.parents_children` avec `relationship_type` (Enum: `MOTHER`, `FATHER`, `LEGAL_GUARDIAN`, `OTHER`).
+> * **Dans l'interface UX/UI :** libellé affiché **"Représentant"** / **"Mes enfants"**.
+> * **[ ] À trancher :** `GRANDPARENT`/`SIBLING` avaient été envisagés dans la version précédente de cette décision — à ajouter à `relationship_type` si un club en a besoin, ou à laisser dans `OTHER` pour l'instant.
 
 ---
 
@@ -81,11 +82,22 @@
 
 ### 1.2 — Modélisation des Données & Schémas SQL (🔄 En cours)
 
-* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (`core.sports`, `core.users`, `core.family_guardians`, `core.player_profiles`, `core.pools`).
-* [x] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql` (`roster_type`, `events`, `rosters`, `roster_pools`, `roster_players` avec contrainte d'unicité).
-* [ ] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql` (`fields`, `sub_fields`, `matches`, `practices`, `attendances`).
+* [x] Écrire `migrations/core/000001_create_core_schema.up.sql` (`core.sports`, `core.users`, `core.parents_children`, `core.player_profiles`, `core.pools`).
+* [x] Écrire `migrations/tournament/000001_create_tournament_schema.up.sql` — **à restructurer, voir 1.2.B (`ADR-008`)**.
+* [ ] Écrire `migrations/scheduling/000001_create_scheduling_schema.up.sql` (`fields`, `sub_fields`, `matches`, `practices`, `attendances`) — **priorité revue : voir 1.2.B**.
 * [ ] Écrire `migrations/evaluation/000001_create_evaluation_schema.up.sql` (`player_ratings`).
 * [ ] Réserver la structure `migrations/finance/` pour la phase v2.0 (Out-of-Scope v1.0).
+
+#### 1.2.B — Restructuration selon `ADR-008` (🆕 À faire avant d'aller plus loin sur `tournament`)
+
+* [ ] Déplacer `TRAINING_GROUP`/`SEASON_TEAM` de `tournament.roster_type` vers `core` (structure de club persistante, indépendante de tout événement).
+* [ ] `tournament.roster_type` ne garde que `EVENT_ROSTER` (ou l'enum est retiré si un seul type reste).
+* [ ] Ajouter `tournament.event_eligibility` (une ou plusieurs plages âge/genre par événement).
+* [ ] Ajouter `tournament.team_entries` (club + événement + bassin source) — distinct de l'alignement.
+* [ ] Créer `migrations/scheduling/000001_create_scheduling_schema.up.sql` comme **second noyau partagé** : propriétaire de toutes les fenêtres temporelles (saisons, bassins, événements) en plus du détail fin (créneaux, terrains).
+* [ ] Retirer `start_date`/`end_date` de `core.pools` et `tournament.events`, référencer `scheduling` à la place.
+* [ ] Ajouter `parent_club_id` (auto-référencé) et `org_type` (`CLUB`/`ASSOCIATION`/`FEDERATION`) sur `core.clubs`.
+* [ ] Renommer `roster` → `alignement` dans le code/UI en français ; garder `roster` en anglais/code (voir `ADR-008 §3`).
 
 ---
 
@@ -128,8 +140,11 @@
 
 ### PHASE 2 : Gestion d'Équipes Avancée, Horaires & Évaluation Light (Priorité Cible)
 
-* [ ] **EPIC-1 :** Finalisation de la gestion des bassins, équipes de saison et alignements de tournoi.
-* [ ] **EPIC-2 :** Gestion des terrains (découpage 11v11 en 7v7) et calendrier officiel des pratiques/matchs.
+> Ordre de priorité confirmé : **1) saisons & entraînements → 2) tournois locaux → 3) tournois régionaux/provinciaux.** Chaque étape s'appuie sur la précédente ; ne pas paralléliser au-delà de ce qui est nécessaire.
+
+* [ ] **Priorité 1 — Saisons & Entraînements :** Finalisation de `core` (bassins, groupes d'entraînement, équipes de saison — voir 1.2.B) et du calendrier de pratiques (`scheduling`, EPIC-2).
+* [ ] **Priorité 2 — Tournois Locaux :** `EPIC-1` (éligibilité, équipes engagées, alignements) et `EPIC-2` (terrains, calendrier de matchs) pour des événements à un seul club/une seule région.
+* [ ] **Priorité 3 — Tournois Régionaux/Provinciaux :** Extension multi-clubs de `EPIC-1` (plusieurs clubs engagent des équipes dans un même événement) — dépend de la hiérarchie organisationnelle (`ADR-008 §6`) si la fédération/association doit superviser.
 * [ ] **EPIC-3 :** Saisie des fiches d'évaluation simplifiées par l'entraîneur.
 * [ ] **Espace Représentant Familial :** Consultation des équipes, des calendriers et confirmation de présence.
 

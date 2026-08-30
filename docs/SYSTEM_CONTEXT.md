@@ -17,19 +17,33 @@ Elle permet d'inscrire des enfants à des bassins d'âge, de composer des équip
   * Suivi des effectifs,
   * fiches d'évaluations (Technique, Tactique, Physique, Mental),
   * logistique terrain.
-* **Parent / Tuteur :** Inscription des enfants,
+* **Représentant Familial :** Inscription des enfants,
   * sélection des sous-événements (tournois à la carte),
   * suivi du calendrier familial consolidé,
+  * Inscriptions (Bassin, événements, etc.)
   * RSVP.
 * **Sportif (Joueur) :**
+  * Si Majeur (18+ ans)
+    * Inscriptions (Bassin, événements, etc.)
   * Consultation de son alignement,
   * accès à son fichier de performance et ses objectifs.
-
+  * suivi de son calendrier
+  
 ## 3. Modèle Opérationnel Clé
 
-* **Bassins d'âges (Pools) :** Groupe global d'inscrits (ex: U9-U10).
-* **Rosters Éphémères :** Sous-groupes d'équipes formés de manière dynamique pour 1 tournoi ou 1 saison.
+* **Bassins d'âges (Pools) :** Groupe global d'inscrits (ex: U9-U10, Senior).
+* **Groupes d'entraînement & Équipes de saison :** Structures de club persistantes à l'année (indépendantes de tout événement) — voir `ADR-008`.
+* **Alignements :** Sous-groupes ponctuels formés pour un événement précis, à partir des sportifs inscrits.
 * **Sous-Inscriptions :** Inscription principale à la saison + options à la carte (Tournois #1, #3, #4).
+* **Organisations :** Un club peut être rattaché à une association régionale ou une fédération (imbrication arbitraire) — voir `ADR-008 §6`.
+
+### 3.1 Flux d'un Événement (Tournoi)
+
+1. **Un club organise** un événement — modalités (format, classement) et éligibilité (plages âge/genre, potentiellement plusieurs par événement, ex: U4-U8 et U13-M et plus).
+2. **Des clubs s'inscrivent** à l'événement en y engageant une ou plusieurs équipes par catégorie éligible (l'organisateur ou d'autres clubs).
+3. **Les Représentants inscrivent leurs enfants** à l'événement — une sous-inscription distincte de l'engagement du club.
+4. **Le Directeur Technique construit les alignements** à partir des inscrits, un par équipe engagée, et assigne les entraîneurs pour l'occasion.
+5. **Le club organisateur planifie** les matchs, terrains et arbitres (module `scheduling`).
 
 ## [TODO AMÉLIORATION AFFAIRES]
 
