@@ -1,8 +1,8 @@
-# ADR 002-B : Choix de la Pile Backend Compilée et Stratégie de Données Hybride
+# [ADR-002]: Choix de la Pile Backend Compilée et Stratégie de Données Hybride
 
 ## Statut
 
-Accepté (Remplace l'ADR 002 initial)
+Accepté
 
 ## Contexte
 

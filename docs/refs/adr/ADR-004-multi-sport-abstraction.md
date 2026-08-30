@@ -1,4 +1,4 @@
-# ADR 004 : Modèle d'Abstraction Multi-Sports avec Focus Initial Soccer
+# [ADR-004]: Modèle d'Abstraction Multi-Sports avec Focus Initial Soccer
 
 ## Statut
 

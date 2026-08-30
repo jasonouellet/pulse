@@ -1,4 +1,4 @@
-# ADR 003 : Monolithe Modulaire avec Migration Microservices sans Refactoring
+# [ADR-003]: Monolithe Modulaire avec Migration Microservices sans Refactoring
 
 ## Statut
 

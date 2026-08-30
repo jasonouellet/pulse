@@ -1,4 +1,4 @@
-# ADR 005 : Modèle de Licence Source-Available avec Restriction Commerciale
+# [ADR-005]: Modèle de Licence Source-Available avec Restriction Commerciale
 
 ## Statut
 

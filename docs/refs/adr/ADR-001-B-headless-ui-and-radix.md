@@ -1,4 +1,4 @@
-# ADR 001-B : Adoption des Primitives Headless (Radix UI) et Tailwind CSS pour le Design System
+# [ADR 001-B]: Adoption des Primitives Headless (Radix UI) et Tailwind CSS pour le Design System
 
 ## Statut
 

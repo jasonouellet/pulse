@@ -1,4 +1,4 @@
-# ADR 006: Observability Architecture Strategy via OpenTelemetry (OTEL)
+# [ADR-006]: Observability Architecture Strategy via OpenTelemetry (OTEL)
 
 ## Status
 

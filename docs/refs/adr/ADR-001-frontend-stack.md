@@ -1,4 +1,4 @@
-# ADR 001 : Choix de la Pile Technologique UI/UX & Support Multi-Plateforme
+# [ADR-001]: Choix de la Pile Technologique UI/UX & Support Multi-Plateforme
 
 ## Statut
 

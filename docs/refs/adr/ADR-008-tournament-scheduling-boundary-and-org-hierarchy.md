@@ -1,4 +1,4 @@
-# ADR-008 : Frontière Core / Tournament / Scheduling & Hiérarchie Organisationnelle
+# ADR-008: Frontière Core / Tournament / Scheduling & Hiérarchie Organisationnelle
 
 ## Statut
 

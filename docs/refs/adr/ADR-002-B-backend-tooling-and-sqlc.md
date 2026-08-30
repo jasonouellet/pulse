@@ -1,8 +1,8 @@
-# ADR 002-C : Choix des Outils Backend Go (sqlc et golang-migrate)
+# [ADR-002-B]: Choix des Outils Backend Go (sqlc et golang-migrate)
 
 ## Statut
 
-Accepté (Précise et amende l'ADR 002-B)
+Accepté (Précise et amende l'[ADR-002])
 
 ## Contexte
 

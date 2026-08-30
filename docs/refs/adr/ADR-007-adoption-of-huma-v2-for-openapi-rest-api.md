@@ -1,10 +1,8 @@
-# Adoption of Huma v2 for OpenAPI v3 REST API, Request Validation, and Documentation
+# [ADR-007]: Adoption of Huma v2 for OpenAPI v3 REST API, Request Validation, and Documentation
 
 * Status: accepted
 * Deciders: PULSE Core Engineering Team
 * Date: 2026-08-28
-
-Technical Story: [PULSE-ADR-007] Transition from raw Chi with swaggo annotations to a type-safe, schema-driven REST framework.
 
 ## Context and Problem Statement
 
