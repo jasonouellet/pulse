@@ -11,16 +11,18 @@ import { RegistrationPage } from "./pages/RegistrationPage";
 export function App() {
   return (
     <SessionProvider>
-      <AppLayout>
-        <Routes>
+      <Routes>
+        <Route path="/register" element={<RegistrationPage />} />
+
+        {/* Layout parent avec Outlet */}
+        <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/pools" element={<PoolsListPage />} />
           <Route path="/rosters" element={<RosterBuilderPage />} />
           <Route path="/players/:playerId" element={<PlayerProfilePage />} />
           <Route path="/children" element={<GuardianChildrenPage />} />
-          <Route path="/register" element={<RegistrationPage />} />
-        </Routes>
-      </AppLayout>
+        </Route>
+      </Routes>
     </SessionProvider>
   );
 }

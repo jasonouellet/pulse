@@ -179,30 +179,32 @@ export const MY_CHILDREN_IDS = ["player-leo", "player-zoe"];
 
 // Nav items differ by active role — extend as real screens land per role.
 export interface NavItem {
-  label: string;
+  key: string;
+  label?: string;
   to: string;
+  icon?: string;
 }
 
 export const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   GUARDIAN: [
-    { label: "Accueil", to: "/" },
-    { label: "Mes enfants", to: "/children" },
-    { label: "Inscription", to: "/register" },
+    { key: "home", to: "/" },
+    { key: "children", to: "/children" },
+    { key: "register", to: "/register" },
   ],
-  PLAYER: [{ label: "Accueil", to: "/" }],
+  PLAYER: [{ key: "home", to: "/" }],
   COACH: [
-    { label: "Accueil", to: "/" },
-    { label: "Bassins", to: "/pools" },
-    { label: "Rosters", to: "/rosters" },
+    { key: "home", to: "/" },
+    { key: "pools", to: "/pools" },
+    { key: "rosters", to: "/rosters" },
   ],
   CLUB_ADMIN: [
-    { label: "Accueil", to: "/" },
-    { label: "Bassins", to: "/pools" },
-    { label: "Rosters", to: "/rosters" },
+    { key: "home", to: "/" },
+    { key: "pools", to: "/pools" },
+    { key: "rosters", to: "/rosters" },
   ],
   TECHNICAL_DIRECTOR: [
-    { label: "Accueil", to: "/" },
-    { label: "Bassins", to: "/pools" },
-    { label: "Rosters", to: "/rosters" },
+    { key: "home", to: "/" },
+    { key: "pools", to: "/pools" },
+    { key: "rosters", to: "/rosters" },
   ],
 };

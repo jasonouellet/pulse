@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { DropdownMenu } from "radix-ui";
-import { NavLink } from "react-router";
+import { Outlet, NavLink } from "react-router";
+import { LanguageSwitcher } from "../LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import {
   Sun,
   Moon,
@@ -15,11 +17,8 @@ import {
 import { ROLE_LABELS, useSession, type UserRole } from "../../context/session";
 import { NAV_BY_ROLE } from "../../data/mock";
 
-interface AppLayoutProps {
-  children: React.ReactNode;
-}
-
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+export const AppLayout: React.FC = () => {
+  const { t } = useTranslation("common");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     return (
       localStorage.getItem("theme") === "dark" ||
@@ -80,27 +79,34 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             className="hidden md:flex md:items-center md:gap-1"
             aria-label="Main Navigation"
           >
-            {navItems.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.to}
-                end={item.to === "/"}
-                className={({ isActive }) =>
-                  `inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 ${
-                    isActive
-                      ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const label = item.key
+                ? t(`nav.${item.key}` as any, { defaultValue: item.label ?? "" })
+                : (item.label ?? item.key ?? "");
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === "/"}
+                  className={({ isActive }) =>
+                    `inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                      isActive
+                        ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                    }`
+                  }
+                >
+                  {label}
+                </NavLink>
+              );
+            })}
           </nav>
 
-          {/* Right Actions (Theme Switcher + Avatar Menu + Mobile Toggle) */}
+          {/* Actions (Sélecteur de langue + Thème + Profil + Mobile) */}
           <div className="flex items-center gap-2">
-            {/* Theme Toggle Button */}
+            <LanguageSwitcher />
+
             <button
               onClick={toggleTheme}
               type="button"
@@ -116,9 +122,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               )}
             </button>
 
-            {/* Avatar + role/club submenu — the ONLY place club/role switching
-                happens. The name/subtitle next to the avatar is passive
-                display text, not a separate control. */}
+            {/* Menu Utilisateur / Dropdown */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button
@@ -133,7 +137,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                       {userName}
                     </p>
                     <p className="text-xs leading-tight text-slate-500 dark:text-slate-400">
-                      {ROLE_LABELS[activeGrant.role]} · {activeGrant.club.name}
+                      {t(`roles.${activeGrant.role}` as any, { 
+                        defaultValue: ROLE_LABELS[activeGrant.role] })}
+                      · {activeGrant.club.name}
                     </p>
                   </div>
                   <ChevronDown
@@ -150,7 +156,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   className="z-50 w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-800"
                 >
                   <DropdownMenu.Label className="px-2 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
-                    Rôle actif · {activeGrant.club.name}
+                    {t("user.activeRole", { defaultValue: "Rôle actif" })} · {activeGrant.club.name}
                   </DropdownMenu.Label>
                   {rolesForActiveClub.map((role: UserRole) => (
                     <DropdownMenu.Item
@@ -162,7 +168,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                         className="h-4 w-4 text-slate-400"
                         aria-hidden="true"
                       />
-                      <span className="flex-1">{ROLE_LABELS[role]}</span>
+                      <span className="flex-1">
+                        {t(`roles.${role}` as any, { defaultValue: ROLE_LABELS[role] })}
+                      </span>
                       {role === activeGrant.role && (
                         <Check
                           className="h-4 w-4 text-brand-500"
@@ -175,7 +183,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   <DropdownMenu.Separator className="my-1.5 h-px bg-slate-200 dark:bg-slate-700" />
 
                   <DropdownMenu.Label className="px-2 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
-                    Club actif
+                    {t("user.activeClub", { defaultValue: "Club actif" })}
                   </DropdownMenu.Label>
                   {clubs.map((club) => (
                     <DropdownMenu.Item
@@ -204,7 +212,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                       className="h-4 w-4 text-slate-400"
                       aria-hidden="true"
                     />
-                    Paramètres du compte
+                    {t("user.accountSettings", { defaultValue: "Paramètres du compte" })}
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
@@ -227,35 +235,40 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Navigation Mobile Drawer */}
         {isMobileMenuOpen && (
           <div className="border-b border-slate-200 bg-white px-4 pt-2 pb-4 dark:border-slate-800 dark:bg-slate-900 md:hidden">
             <nav className="flex flex-col gap-1" aria-label="Mobile Navigation">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.label}
-                  to={item.to}
-                  end={item.to === "/"}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
-                      isActive
-                        ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
-                        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              {navItems.map((item) => {
+                const label = item.key
+                  ? t(`nav.${item.key}` as any, { defaultValue: item.label ?? "" })
+                  : (item.label ?? item.key ?? "");
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/"}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
+                        isActive
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                          : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                      }`
+                    }
+                  >
+                    {label}
+                  </NavLink>
+                );
+              })}
             </nav>
           </div>
         )}
       </header>
 
-      {/* Main Content Area */}
+      {/* Rendu des pages via React Router Outlet */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {children}
+        <Outlet />
       </main>
     </div>
   );

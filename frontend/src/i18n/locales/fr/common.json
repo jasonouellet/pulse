@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "switchLanguage": "English"
+  },
+  "labels": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue"
+  },
+  "nav": {
+    "home": "Accueil",
+    "pools": "Groupes",
+    "rosters": "Alignements",
+    "children": "Enfants",
+    "register": "Inscription"
+  },
+  "user": {
+    "activeRole": "Rôle actif",
+    "activeClub": "Club actif",
+    "accountSettings": "Paramètres du compte"
+  },
+  "roles": {
+    "CLUB_ADMIN": "Gestionnaire de club",
+    "TECHNICAL_DIRECTOR": "Directeur technique",
+    "COACH": "Entraîneur",
+    "GUARDIAN": "Parent / Tuteur",
+    "PLAYER": "Joueur"
+  }
+}
