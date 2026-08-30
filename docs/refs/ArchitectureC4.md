@@ -1,7 +1,5 @@
 # ARCHITECTURE TECHNIQUE — PROJECT PULSE.OS
 
-# ARCHITECTURE TECHNIQUE — PROJECT PULSE
-
 ## 1. Contexte Système (Niveau 1)
 
 L'application Soccer Manager ERP permet aux clubs, entraîneurs et parents de gérer la logistique sportive (bassins, rosters éphémères, tournois, terrains, finances et évaluations).
