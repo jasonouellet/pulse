@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:1.25-bookworm
+FROM mcr.microsoft.com/devcontainers/go:1.26-bookworm
 
 # 1. Activation du téléchargement automatique de la chaîne d'outils Go si une dépendance exige une version plus récente
 ENV GOTOOLCHAIN=auto

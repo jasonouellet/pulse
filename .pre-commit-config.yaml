@@ -40,13 +40,22 @@ repos:
   # ---------------------------------------------------------------------------
   - repo: local
     hooks:
+      # SQLC code generation for Go
       - id: sqlc-generate
-        name: Génération du code Go avec sqlc
+        name: Go code generation with sqlc
         entry: sqlc generate
         language: system
         files: (^pkg/database/migrations/.*\.sql$|^internal/.*/queries/.*\.sql$|^sqlc\.yaml$)
         pass_filenames: false
+      # Go vulnerabilities audit (govulncheck)
+      - id: govulncheck
+        name: govulncheck (Go CVE Audit)
+        entry: govulncheck ./...
+        language: system
+        pass_filenames: false
+        files: \.go$
 
+  # Hooks Go (Format, Imports, Tests, Lint, Vulnerabilities)
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:
@@ -54,6 +63,7 @@ repos:
       - id: go-imports
       - id: go-unit-tests
 
+  # Linting Go with golangci-lint
   - repo: https://github.com/golangci/golangci-lint
     rev: v2.13.2
     hooks:
@@ -64,19 +74,28 @@ repos:
   # ---------------------------------------------------------------------------
   - repo: local
     hooks:
-      # ESLint 9+ exécuté à l'intérieur du dossier frontend
+      # Linting and type checking for the frontend React/TypeScript code
       - id: eslint
         name: ESLint (Frontend)
         entry: bash -c "cd frontend && npx eslint --fix"
         language: system
         files: ^frontend/.*\.(js|jsx|ts|tsx)$
+        pass_filenames: false
 
-      # Vérification globale des types TypeScript
+      # Global TypeScript type checking
       - id: type-check
         name: TypeScript Type Check
         entry: bash -c "cd frontend && npm run type-check"
         language: system
         types: [ts, tsx]
+        pass_filenames: false
+
+      # Node.js vulnerabilities audit (npm audit)
+      - id: npm-audit
+        name: npm audit (Frontend CVE Audit)
+        entry: bash -c "cd frontend && npm audit --audit-level=high"
+        language: system
+        files: ^frontend/package(-lock)?\.json$
         pass_filenames: false
 
   # ---------------------------------------------------------------------------

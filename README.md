@@ -1,6 +1,6 @@
 # Project PULSE
 
-[![Go Version](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![React](https://img.shields.io/badge/React-19.x-61DAFB?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-4169E1?style=flat&logo=postgresql)](https://www.postgresql.org/)
@@ -17,7 +17,7 @@ The project follows **Clean Architecture (Ports & Adapters)** principles as a **
 
 ### Backend
 
-* **Language:** Go 1.25
+* **Language:** Go 1.26
 * **HTTP router:** Chi Router (RESTful API)
 * **Database:** PostgreSQL 16+ with strict schema isolation (`core`, `tournament`, `scheduling`, `finance`, `evaluation`) — no cross-schema joins allowed (see `ADR-003`)
 * **DB driver:** `pgx/v5` via `pgxpool`
@@ -93,7 +93,7 @@ The backend listens on `http://localhost:8080` (see `API_PORT`), the frontend on
 
 #### Prerequisites
 
-* Go 1.25+
+* Go 1.26+
 * Node.js 24+ & npm
 * PostgreSQL 16+ and Redis (local, or via `docker compose up -d postgres redis`)
 
