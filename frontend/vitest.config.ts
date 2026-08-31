@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import sonarReporter from 'vitest-sonar-reporter';
 
 export default defineConfig({
     plugins: [react()],
@@ -7,9 +8,9 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: './src/test/setup.ts',
-        reporters: ['default', 'junit'],
+        reporters: ['default', new sonarReporter()],
         outputFile: {
-            junit: './test-report-frontend.xml',
+            sonarReporter: './test-report-frontend.xml',
         },
         coverage: {
             provider: 'v8',
