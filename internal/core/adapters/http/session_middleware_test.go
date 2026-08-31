@@ -14,22 +14,22 @@ import (
 	"pulse/internal/platform/session"
 )
 
-// Helper de test pour initialiser miniredis et le magasin de session
+// Test helper to initialize miniredis and the session store
 func setupTestStore(t *testing.T) (*session.Store, *miniredis.Miniredis) {
 	t.Helper()
 
-	// 1. Démarrer le serveur Redis in-memory local
+	// 1. Start the local in-memory Redis server
 	mr, err := miniredis.Run()
 	if err != nil {
-		t.Fatalf("Échec du démarrage de miniredis: %v", err)
+		t.Fatalf("Failed to start miniredis: %v", err)
 	}
 
-	// 2. Créer le client go-redis lié à miniredis
+	// 2. Create the go-redis client bound to miniredis
 	rdb := redis.NewClient(&redis.Options{
 		Addr: mr.Addr(),
 	})
 
-	// Nettoyage automatique en fin de test
+	// Automatic cleanup at the end of the test
 	t.Cleanup(func() {
 		_ = rdb.Close()
 		mr.Close()
@@ -43,42 +43,42 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 	store, mr := setupTestStore(t)
 	mw := coreHTTP.NewSessionMiddleware(store)
 
-	// Handler factice protégé par le middleware pour valider le contexte
+	// Dummy handler protected by middleware to validate context
 	protectedHandler := mw.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sess, ok := coreHTTP.GetSessionFromContext(r.Context())
 		if !ok {
-			t.Error("Session manquante dans le contexte de la requête")
+			t.Error("Missing session in request context")
 			http.Error(w, "no session", http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("bienvenue " + sess.UserID))
+		_, _ = w.Write([]byte("welcome " + sess.UserID))
 	}))
 
-	t.Run("Rejet si aucun token fourni (401)", func(t *testing.T) {
+	t.Run("Reject when no token is provided (401)", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/rosters", nil)
 		rec := httptest.NewRecorder()
 
 		protectedHandler.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusUnauthorized {
-			t.Errorf("Statut attendu 401, obtenu %d", rec.Code)
+			t.Errorf("Expected status 401, got %d", rec.Code)
 		}
 	})
 
-	t.Run("Accès autorisé avec Cookie valide (200)", func(t *testing.T) {
+	t.Run("Allow access with valid Cookie (200)", func(t *testing.T) {
 		ctx := reqContext()
 		token := "sess_valid_cookie_123"
 
-		// Préparation de la session dans Redis via miniredis
+		// Prepare session in Redis via miniredis
 		err := store.Create(ctx, token, session.SessionData{
 			UserID:     "user_42",
 			ActiveRole: "COACH",
 			ActiveClub: "club_rimouski",
 		})
 		if err != nil {
-			t.Fatalf("Erreur lors de la création de la session: %v", err)
+			t.Fatalf("Error creating session: %v", err)
 		}
 
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/rosters", nil)
@@ -88,14 +88,14 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 		protectedHandler.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
-			t.Errorf("Statut attendu 200, obtenu %d", rec.Code)
+			t.Errorf("Expected status 200, got %d", rec.Code)
 		}
-		if rec.Body.String() != "bienvenue user_42" {
-			t.Errorf("Corps attendu 'bienvenue user_42', obtenu '%s'", rec.Body.String())
+		if rec.Body.String() != "welcome user_42" {
+			t.Errorf("Expected body 'welcome user_42', got '%s'", rec.Body.String())
 		}
 	})
 
-	t.Run("Accès autorisé avec En-tête Authorization Bearer (200)", func(t *testing.T) {
+	t.Run("Allow access with Bearer Authorization Header (200)", func(t *testing.T) {
 		ctx := reqContext()
 		token := "sess_valid_bearer_456"
 
@@ -111,11 +111,11 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 		protectedHandler.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
-			t.Errorf("Statut attendu 200, obtenu %d", rec.Code)
+			t.Errorf("Expected status 200, got %d", rec.Code)
 		}
 	})
 
-	t.Run("Rejet après expiration du TTL dans Redis (401)", func(t *testing.T) {
+	t.Run("Reject after TTL expiration in Redis (401)", func(t *testing.T) {
 		ctx := reqContext()
 		token := "sess_expiring_789"
 
@@ -123,7 +123,7 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 			UserID: "user_expired",
 		})
 
-		// Avancer le temps simulé de miniredis de 16 minutes (TTL configuré à 15 min)
+		// Fast forward miniredis simulated time by 16 minutes (TTL set to 15 min)
 		mr.FastForward(16 * time.Minute)
 
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/rosters", nil)
@@ -133,7 +133,7 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 		protectedHandler.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusUnauthorized {
-			t.Errorf("Statut attendu 401 après expiration du TTL, obtenu %d", rec.Code)
+			t.Errorf("Expected status 401 after TTL expiration, got %d", rec.Code)
 		}
 	})
 }

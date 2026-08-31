@@ -24,6 +24,7 @@ import (
 
 	coreHTTP "pulse/internal/core/adapters/http"
 	corePostgres "pulse/internal/core/adapters/postgres"
+	"pulse/internal/platform/session"
 	"pulse/pkg/database"
 	"pulse/pkg/observability"
 )
@@ -59,8 +60,11 @@ func main() {
 	}
 
 	// 1.b. Redis Setup
-	// rdb, cleanupRedis := initRedis()
-	// defer cleanupRedis()
+	rdb, cleanupRedis := initRedis()
+	defer cleanupRedis()
+	// 1.c. Session Store & Middleware Setup
+	sessionStore := session.NewStore(rdb, 15*time.Minute)
+	sessionMiddleware := coreHTTP.NewSessionMiddleware(sessionStore)
 
 	// 2. Database Connection & Auto-Migrations
 	dbCfg := database.Config{
@@ -98,6 +102,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
+	r.Use(sessionMiddleware.RequireAuth)
 
 	// Prometheus metrics endpoint
 	r.Handle("/metrics", promhttp.Handler())
