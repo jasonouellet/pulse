@@ -10,7 +10,7 @@
     "lint:ts": "eslint --fix",
     "lint:css": "stylelint --fix",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "format": "prettier --write"

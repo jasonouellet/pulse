@@ -88,9 +88,12 @@ jobs:
         with:
           go-version: "1.25"
 
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
       - name: Run Go Unit Tests
         run: |
-          go test -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
+          gotestsum --junitfile report-go.xml -- -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
 
       # --- Tests React (Vitest) ---
       - name: Setup Node.js
@@ -104,20 +107,24 @@ jobs:
         run: |
           cd frontend
           npm ci
-          npm run test -- --coverage
+          npm run test
 
-      # Upload des artefacts de couverture (Go + Frontend)
-      - name: Upload Go Coverage
+      # Upload des artefacts de couverture et résultats de tests (Go + Frontend)
+      - name: Upload Go Test Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-go
-          path: coverage-go.out
+          name: go-test-artifacts
+          path: |
+            coverage-go.out
+            report-go.xml
 
-      - name: Upload Frontend Coverage
+      - name: Upload Frontend Test Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-frontend
-          path: frontend/coverage/
+          name: frontend-test-artifacts
+          path: |
+            frontend/coverage/
+            frontend/test-report-frontend.xml
 
   # ---------------------------------------------------------------------------
   # 3. SCAN DE SÉCURITÉ (SNYK)
@@ -161,16 +168,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Go Coverage Artifact
+      - name: Download Go Test Artifacts
         uses: actions/download-artifact@v7
         with:
-          name: coverage-go
+          name: go-test-artifacts
 
-      - name: Download Frontend Coverage Artifact
+      - name: Download Frontend Test Artifacts
         uses: actions/download-artifact@v7
         with:
-          name: coverage-frontend
-          path: frontend/coverage/
+          name: frontend-test-artifacts
+          path: frontend/
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
