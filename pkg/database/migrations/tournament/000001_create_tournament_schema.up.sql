@@ -43,7 +43,7 @@ CREATE TABLE tournament.event_eligibility (
     max_age int,
     gender core.gender_category NOT NULL DEFAULT 'MIXED',
     label varchar(150),
-    CONSTRAINT ck_eligibility_age_range CHECK (max_age IS NULL OR max_age >= min_age)
+    CONSTRAINT ck_eligibility_age_range CHECK (max_age IS null OR max_age >= min_age)
 );
 
 -- ----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ CREATE TABLE tournament.roster_players (
 );
 
 CREATE UNIQUE INDEX uk_one_roster_per_player_per_event
-    ON tournament.roster_players (event_id, player_id);
+ON tournament.roster_players (event_id, player_id);
 
 -- ----------------------------------------------------------------------------
 -- TABLE: tournament.roster_coaches

@@ -47,7 +47,7 @@ Elle sépare strictement les contenus en 4 quadrants selon l'objectif de l'utili
 
 ## 4. Automatisation & Pipeline CI/CD
 
-Les processus d'actualisation de la documentation sont intégrés au flux GitHub Actions / pre-commit :
+Les processus d'actualisation de la documentation sont intégrés au flux GitHub Actions / pre-commit:
 
 1. **Pre-commit :** Validation de la syntaxe des fichiers Markdown via `markdownlint-cli2`.
 2. **Commit / Build Backend :** Exécution automatique de la génération du schéma OpenAPI 3.1.

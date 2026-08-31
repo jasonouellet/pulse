@@ -28,7 +28,7 @@ Elle permet d'inscrire des enfants à des bassins d'âge, de composer des équip
   * Consultation de son alignement,
   * accès à son fichier de performance et ses objectifs.
   * suivi de son calendrier
-  
+
 ## 3. Modèle Opérationnel Clé
 
 * **Bassins d'âges (Pools) :** Groupe global d'inscrits (ex: U9-U10, Senior).

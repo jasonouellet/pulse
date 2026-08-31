@@ -3,6 +3,7 @@
 dialect = postgres
 templater = raw
 max_line_length = 160
+large_file_skip_byte_limit = 0
 
 exclude_rules = RF04, LT05
 
@@ -13,4 +14,7 @@ capitalisation_policy = upper
 capitalisation_policy = lower
 
 [sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
 capitalisation_policy = lower

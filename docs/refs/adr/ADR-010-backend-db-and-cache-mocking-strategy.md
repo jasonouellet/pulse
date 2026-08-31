@@ -59,7 +59,8 @@ Option choisie : **Option 1**, car elle supprime toute dépendance à l'environn
 
 ## Validation de la décision
 
-La décision est validée si :
+La décision est validée si:
+
 1. Les tests unitaires de la couche repository/service s'exécutent avec la commande `go test ./...` sans erreur en l'absence de conteneur Docker.
 2. `miniredis` intercepte et valide correctement les opérations d'invalidation de cache Redis.
 3. Le temps total d'exécution de la suite de tests unitaires reste sous le seuil des 2 secondes.

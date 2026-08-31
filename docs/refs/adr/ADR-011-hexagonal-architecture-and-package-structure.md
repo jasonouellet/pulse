@@ -28,16 +28,17 @@ Option choisie : **Option 1**, car elle garantit l'étanchéité du domaine mét
 ### Conséquences positives
 
 * **Invariabilité du Domaine :** Remplacer un framework Web (ex: passer de Chi à Fiber) ou un moteur de stockage (ex: passer de PostgreSQL à MongoDB) n'impacte aucunement la logique métier ni les ports.
-* **Découpage strict :** Tous les handlers et middlewares HTTP sont regroupés sous les adaptateurs HTTP (`adapters/http/`), éliminant la confusion des dossiers d'entrée multiples[cite: 1].
-* **Facilité de refactorisation :** L'usage d'interfaces explicites (`ports/`) facilite la simulation via des mocks (`pgxmock`[cite: 1], `miniredis`[cite: 1]).
+* **Découpage strict :** Tous les handlers et middlewares HTTP sont regroupés sous les adaptateurs HTTP (`adapters/http/`), éliminant la confusion des dossiers d'entrée multiples.
+* **Facilité de refactorisation :** L'usage d'interfaces explicites (`ports/`) facilite la simulation via des mocks (`pgxmock`, `miniredis`).
 
 ### Conséquences négatives
 
-* **Légère verbosité initiale :** Nécessite de définir explicitement des interfaces Go (ports)[cite: 1] et des structures DTO de transfert[cite: 1] au lieu de réutiliser directement les structs de base de données.
+* **Légère verbosité initiale :** Nécessite de définir explicitement des interfaces Go (ports) et des structures DTO de transfert au lieu de réutiliser directement les structs de base de données.
 
 ## Validation de la décision
 
-La décision est validée si :
-1. Aucun fichier sous `internal/<module>/ports/`[cite: 1] n'importe de dépendance HTTP (Huma, Chi)[cite: 1] ou SQL (`pgx`, `sql`)[cite: 1].
-2. Tous les handlers et middlewares HTTP sont situés sous `internal/<module>/adapters/http/`[cite: 1].
-3. La suite de tests s'exécute de manière isolée via la commande `go test ./...`[cite: 1].
+La décision est validée si:
+
+1. Aucun fichier sous `internal/<module>/ports/` n'importe de dépendance HTTP (Huma, Chi) ou SQL (`pgx`, `sql`).
+2. Tous les handlers et middlewares HTTP sont situés sous `internal/<module>/adapters/http/`.
+3. La suite de tests s'exécute de manière isolée via la commande `go test ./...`.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -58,8 +59,8 @@ func main() {
 	}
 
 	// 1.b. Redis Setup
-	rdb, cleanupRedis := initRedis()
-	defer cleanupRedis()
+	// rdb, cleanupRedis := initRedis()
+	// defer cleanupRedis()
 
 	// 2. Database Connection & Auto-Migrations
 	dbCfg := database.Config{

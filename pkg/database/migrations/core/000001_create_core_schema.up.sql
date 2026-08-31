@@ -16,7 +16,7 @@ CREATE SCHEMA IF NOT EXISTS core;
 -- ENUM TYPES
 -- ----------------------------------------------------------------------------
 CREATE TYPE core.user_role AS ENUM (
-    'SYSTEM_ADMIN', 
+    'SYSTEM_ADMIN',
     'SUPER_ADMIN',
     'CLUB_ADMIN',
     'TECHNICAL_DIRECTOR',
@@ -96,17 +96,17 @@ CREATE TABLE core.sports (
 -- TABLE: core.users
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS core.users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(50),
-    role core.user_role NOT NULL DEFAULT 'GUARDIAN', -- <-- Remplacer VARCHAR(50) par core.user_role
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    last_login_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email varchar(255) NOT NULL UNIQUE,
+    password_hash varchar(255) NOT NULL,
+    first_name varchar(100) NOT NULL,
+    last_name varchar(100) NOT NULL,
+    phone varchar(50),
+    role core.user_role NOT NULL DEFAULT 'GUARDIAN',
+    is_active boolean NOT NULL DEFAULT true,
+    last_login_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    schema: 
+    schema:
       - "pkg/database/migrations/scheduling/000001_create_scheduling_schema.up.sql"
       - "pkg/database/migrations/core/000001_create_core_schema.up.sql"
     queries: "internal/core/adapters/postgres/queries"

@@ -41,8 +41,8 @@ type CreateTeamParams struct {
 type TeamRepository interface {
 	CreateTeam(ctx context.Context, params CreateTeamParams) (*TeamDTO, error)
 	GetTeamByID(ctx context.Context, id uuid.UUID) (*TeamDTO, error)
-	ListTeams(ctx context.Context, clubID uuid.UUID, limit, offset int32) ([]TeamDTO, error)
-	AddPlayer(ctx context.Context, teamID, playerID uuid.UUID) error
-	RemovePlayer(ctx context.Context, teamID, playerID uuid.UUID) error
+	ListTeamsByClub(ctx context.Context, clubID uuid.UUID, limit, offset int32) ([]TeamDTO, error)
+	AddPlayerToTeam(ctx context.Context, teamID, playerID uuid.UUID) error
+	RemovePlayerFromTeam(ctx context.Context, teamID, playerID uuid.UUID) error
 	ListTeamPlayerIDs(ctx context.Context, teamID uuid.UUID) ([]uuid.UUID, error)
 }

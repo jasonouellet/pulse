@@ -13,6 +13,7 @@ import (
 	coreHTTP "pulse/internal/core/adapters/http"
 	"pulse/internal/platform/session"
 )
+
 // Helper de test pour initialiser miniredis et le magasin de session
 func setupTestStore(t *testing.T) (*session.Store, *miniredis.Miniredis) {
 	t.Helper()
@@ -69,7 +70,7 @@ func TestSessionMiddleware_RequireAuth(t *testing.T) {
 	t.Run("Accès autorisé avec Cookie valide (200)", func(t *testing.T) {
 		ctx := reqContext()
 		token := "sess_valid_cookie_123"
-		
+
 		// Préparation de la session dans Redis via miniredis
 		err := store.Create(ctx, token, session.SessionData{
 			UserID:     "user_42",

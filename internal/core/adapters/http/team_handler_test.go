@@ -54,7 +54,7 @@ func (m *MockTeamRepository) GetTeamByID(ctx context.Context, id uuid.UUID) (*po
 	return &t, nil
 }
 
-func (m *MockTeamRepository) ListTeams(ctx context.Context, clubID uuid.UUID, limit, offset int32) ([]ports.TeamDTO, error) {
+func (m *MockTeamRepository) ListTeamsByClub(ctx context.Context, clubID uuid.UUID, limit, offset int32) ([]ports.TeamDTO, error) {
 	var list []ports.TeamDTO
 	for _, t := range m.teams {
 		if t.ClubID == clubID {
@@ -64,12 +64,12 @@ func (m *MockTeamRepository) ListTeams(ctx context.Context, clubID uuid.UUID, li
 	return list, nil
 }
 
-func (m *MockTeamRepository) AddPlayer(ctx context.Context, teamID, playerID uuid.UUID) error {
+func (m *MockTeamRepository) AddPlayerToTeam(ctx context.Context, teamID, playerID uuid.UUID) error {
 	m.players[teamID] = append(m.players[teamID], playerID)
 	return nil
 }
 
-func (m *MockTeamRepository) RemovePlayer(ctx context.Context, teamID, playerID uuid.UUID) error {
+func (m *MockTeamRepository) RemovePlayerFromTeam(ctx context.Context, teamID, playerID uuid.UUID) error {
 	ids := m.players[teamID]
 	for i, id := range ids {
 		if id == playerID {
@@ -149,7 +149,7 @@ func TestCreateTeam_InvalidClubID(t *testing.T) {
 	r.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusUnprocessableEntity {
-    	t.Fatalf("expected status %d, got %d: %s", http.StatusUnprocessableEntity, rec.Code, rec.Body.String())
+		t.Fatalf("expected status %d, got %d: %s", http.StatusUnprocessableEntity, rec.Code, rec.Body.String())
 	}
 }
 
@@ -221,7 +221,7 @@ func TestGetTeamByID_InvalidUUID(t *testing.T) {
 	}
 }
 
-func TestListTeams_Success(t *testing.T) {
+func TestListTeamsByClub_Success(t *testing.T) {
 	repo := NewMockTeamRepository()
 	clubID := uuid.New()
 	repo.teams[uuid.New()] = ports.TeamDTO{ID: uuid.New(), ClubID: clubID, Name: "Team A"}
@@ -237,7 +237,7 @@ func TestListTeams_Success(t *testing.T) {
 	}
 }
 
-func TestAddPlayer_Success(t *testing.T) {
+func TestAddPlayerToTeam_Success(t *testing.T) {
 	repo := NewMockTeamRepository()
 	teamID := uuid.New()
 	playerID := uuid.New()
@@ -260,7 +260,7 @@ func TestAddPlayer_Success(t *testing.T) {
 	}
 }
 
-func TestRemovePlayer_Success(t *testing.T) {
+func TestRemovePlayerFromTeam_Success(t *testing.T) {
 	repo := NewMockTeamRepository()
 	teamID := uuid.New()
 	playerID := uuid.New()

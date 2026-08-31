@@ -81,7 +81,9 @@ export const AppLayout: React.FC = () => {
           >
             {navItems.map((item) => {
               const label = item.key
-                ? t(`nav.${item.key}` as never, { defaultValue: item.label ?? "" })
+                ? t(`nav.${item.key}` as never, {
+                    defaultValue: item.label ?? "",
+                  })
                 : (item.label ?? item.key ?? "");
 
               return (
@@ -90,9 +92,10 @@ export const AppLayout: React.FC = () => {
                   to={item.to}
                   end={item.to === "/"}
                   className={({ isActive }) =>
-                    `inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 ${isActive
-                      ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                    `inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 ${
+                      isActive
+                        ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                     }`
                   }
                 >
@@ -137,7 +140,7 @@ export const AppLayout: React.FC = () => {
                     </p>
                     <p className="text-xs leading-tight text-slate-500 dark:text-slate-400">
                       {t(`roles.${activeGrant.role}` as never, {
-                        defaultValue: ROLE_LABELS[activeGrant.role]
+                        defaultValue: ROLE_LABELS[activeGrant.role],
                       })}
                       · {activeGrant.club.name}
                     </p>
@@ -156,7 +159,8 @@ export const AppLayout: React.FC = () => {
                   className="z-50 w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-800"
                 >
                   <DropdownMenu.Label className="px-2 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500">
-                    {t("user.activeRole", { defaultValue: "Rôle actif" })} · {activeGrant.club.name}
+                    {t("user.activeRole", { defaultValue: "Rôle actif" })} ·{" "}
+                    {activeGrant.club.name}
                   </DropdownMenu.Label>
                   {rolesForActiveClub.map((role: UserRole) => (
                     <DropdownMenu.Item
@@ -169,7 +173,9 @@ export const AppLayout: React.FC = () => {
                         aria-hidden="true"
                       />
                       <span className="flex-1">
-                        {t(`roles.${role}` as never, { defaultValue: ROLE_LABELS[role] })}
+                        {t(`roles.${role}` as never, {
+                          defaultValue: ROLE_LABELS[role],
+                        })}
                       </span>
                       {role === activeGrant.role && (
                         <Check
@@ -212,7 +218,9 @@ export const AppLayout: React.FC = () => {
                       className="h-4 w-4 text-slate-400"
                       aria-hidden="true"
                     />
-                    {t("user.accountSettings", { defaultValue: "Paramètres du compte" })}
+                    {t("user.accountSettings", {
+                      defaultValue: "Paramètres du compte",
+                    })}
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
@@ -241,7 +249,9 @@ export const AppLayout: React.FC = () => {
             <nav className="flex flex-col gap-1" aria-label="Mobile Navigation">
               {navItems.map((item) => {
                 const label = item.key
-                  ? t(`nav.${item.key}` as never, { defaultValue: item.label ?? "" })
+                  ? t(`nav.${item.key}` as never, {
+                      defaultValue: item.label ?? "",
+                    })
                   : (item.label ?? item.key ?? "");
                 return (
                   <NavLink
@@ -250,9 +260,10 @@ export const AppLayout: React.FC = () => {
                     end={item.to === "/"}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={({ isActive }) =>
-                      `inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${isActive
-                        ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
-                        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                      `inline-flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
+                        isActive
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                          : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       }`
                     }
                   >

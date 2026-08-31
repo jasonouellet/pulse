@@ -16,7 +16,7 @@ $$\text{Adapters} \longrightarrow \text{Ports} \longleftarrow \text{Domain}$$
 
 Afin d'éviter la fragmentation du code HTTP et la création de répertoires parallèles incohérents :
 
-* **Emplacement exclusif :** Tous les handlers REST/OpenAPI, les types de requête/réponse HTTP (transport DTOs) et les middlewares HTTP doivent obligatoirement résider sous :  
+* **Emplacement exclusif :** Tous les handlers REST/OpenAPI, les types de requête/réponse HTTP (transport DTOs) et les middlewares HTTP doivent obligatoirement résider sous :
   `internal/<module>/adapters/http/`[cite: 1]
 * **Interdiction :** Il est strictement interdit de créer des dossiers racines ou secondaires comme `internal/api/`, `internal/routes/` ou `internal/controllers/`[cite: 1].
 

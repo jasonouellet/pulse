@@ -30,7 +30,7 @@ type GetTeamInput struct {
 	ID string `path:"id" format:"uuid" doc:"Team UUID"`
 }
 
-type ListTeamsInput struct {
+type ListTeamsByClubInput struct {
 	ClubID string `query:"club_id" format:"uuid" doc:"Club UUID to list teams for"`
 	Limit  int    `query:"limit" default:"20" minimum:"1" maximum:"100"`
 	Offset int    `query:"offset" default:"0" minimum:"0"`
@@ -99,13 +99,13 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 	}, h.GetTeamByID)
 
 	huma.Register(api, huma.Operation{
-		OperationID: "list-core-teams",
+		OperationID: "list-core-teams-by-club",
 		Method:      http.MethodGet,
 		Path:        "/api/v1/core/teams/",
 		Summary:     "List teams for a club",
 		Tags:        []string{"Core teams"},
 		Errors:      []int{http.StatusBadRequest, http.StatusInternalServerError},
-	}, h.ListTeams)
+	}, h.ListTeamsByClub)
 
 	huma.Register(api, huma.Operation{
 		OperationID:   "add-core-team-player",
@@ -115,7 +115,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Tags:          []string{"Core teams"},
 		DefaultStatus: http.StatusNoContent,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
-	}, h.AddPlayer)
+	}, h.AddPlayerToTeam)
 
 	huma.Register(api, huma.Operation{
 		OperationID:   "remove-core-team-player",
@@ -125,7 +125,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Tags:          []string{"Core teams"},
 		DefaultStatus: http.StatusNoContent,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
-	}, h.RemovePlayer)
+	}, h.RemovePlayerFromTeam)
 
 	huma.Register(api, huma.Operation{
 		OperationID: "list-core-team-players",
@@ -198,13 +198,13 @@ func (h *TeamHandler) GetTeamByID(ctx context.Context, input *GetTeamInput) (*Te
 	return &TeamOutput{Body: *team}, nil
 }
 
-func (h *TeamHandler) ListTeams(ctx context.Context, input *ListTeamsInput) (*TeamsOutput, error) {
+func (h *TeamHandler) ListTeamsByClub(ctx context.Context, input *ListTeamsByClubInput) (*TeamsOutput, error) {
 	clubID, err := uuid.Parse(input.ClubID)
 	if err != nil {
 		return nil, huma.Error400BadRequest("Invalid club_id")
 	}
 
-	teams, err := h.repo.ListTeams(ctx, clubID, int32(input.Limit), int32(input.Offset))
+	teams, err := h.repo.ListTeamsByClub(ctx, clubID, int32(input.Limit), int32(input.Offset))
 	if err != nil {
 		slog.Error("Failed to list teams", "error", err)
 		return nil, huma.Error500InternalServerError("Internal server error")
@@ -213,7 +213,7 @@ func (h *TeamHandler) ListTeams(ctx context.Context, input *ListTeamsInput) (*Te
 	return &TeamsOutput{Body: teams}, nil
 }
 
-func (h *TeamHandler) AddPlayer(ctx context.Context, input *AddPlayerInput) (*EmptyOutput, error) {
+func (h *TeamHandler) AddPlayerToTeam(ctx context.Context, input *AddPlayerInput) (*EmptyOutput, error) {
 	teamID, err := uuid.Parse(input.ID)
 	if err != nil {
 		return nil, huma.Error400BadRequest("Invalid team id")
@@ -223,7 +223,7 @@ func (h *TeamHandler) AddPlayer(ctx context.Context, input *AddPlayerInput) (*Em
 		return nil, huma.Error400BadRequest("Invalid player_id")
 	}
 
-	if err := h.repo.AddPlayer(ctx, teamID, playerID); err != nil {
+	if err := h.repo.AddPlayerToTeam(ctx, teamID, playerID); err != nil {
 		slog.Error("Failed to add player to team", "error", err)
 		return nil, huma.Error500InternalServerError("Internal server error")
 	}
@@ -231,7 +231,7 @@ func (h *TeamHandler) AddPlayer(ctx context.Context, input *AddPlayerInput) (*Em
 	return &EmptyOutput{}, nil
 }
 
-func (h *TeamHandler) RemovePlayer(ctx context.Context, input *RemovePlayerInput) (*EmptyOutput, error) {
+func (h *TeamHandler) RemovePlayerFromTeam(ctx context.Context, input *RemovePlayerInput) (*EmptyOutput, error) {
 	teamID, err := uuid.Parse(input.ID)
 	if err != nil {
 		return nil, huma.Error400BadRequest("Invalid team id")
@@ -241,7 +241,7 @@ func (h *TeamHandler) RemovePlayer(ctx context.Context, input *RemovePlayerInput
 		return nil, huma.Error400BadRequest("Invalid player id")
 	}
 
-	if err := h.repo.RemovePlayer(ctx, teamID, playerID); err != nil {
+	if err := h.repo.RemovePlayerFromTeam(ctx, teamID, playerID); err != nil {
 		slog.Error("Failed to remove player from team", "error", err)
 		return nil, huma.Error500InternalServerError("Internal server error")
 	}

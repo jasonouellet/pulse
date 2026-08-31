@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 import "./index.css";
 import { initFrontendObservability } from "./lib/observability.ts";
-import './i18n/config'; // <-- Initialise i18next at startup
+import "./i18n/config"; // <-- Initialise i18next at startup
 
 // Initialise OTEL tracing if activated
 if (import.meta.env.VITE_ENABLE_OTEL === "true") {

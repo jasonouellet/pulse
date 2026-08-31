@@ -36,8 +36,17 @@ repos:
         exclude: ^frontend/tsconfig.*\.json$
 
   # ---------------------------------------------------------------------------
-  # 3. Hooks Backend Go
+  # 3. Hooks Backend Go & SQLC
   # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: sqlc-generate
+        name: Génération du code Go avec sqlc
+        entry: sqlc generate
+        language: system
+        files: (^pkg/database/migrations/.*\.sql$|^internal/.*/queries/.*\.sql$|^sqlc\.yaml$)
+        pass_filenames: false
+
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:
@@ -78,7 +87,7 @@ repos:
     hooks:
       - id: sqlfluff-lint
         args: [--dialect, postgres]
-        files: ^migrations/
+        files: ^pkg/database/migrations/
 
   - repo: https://github.com/hadolint/hadolint
     rev: v2.15.1
@@ -100,4 +109,4 @@ repos:
         entry: 'JOIN\s+(core|tournament|scheduling|finance|evaluation)\.'
         language: pygrep
         types: [sql]
-        files: ^migrations/
+        files: ^pkg/database/migrations/
