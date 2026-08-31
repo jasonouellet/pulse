@@ -8,10 +8,15 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: './src/test/setup.ts',
-        reporters: ['default', new sonarReporter()],
-        outputFile: {
-            sonarReporter: './test-report-frontend.xml',
-        },
+        reporters: [
+            'default',
+            [
+                'vitest-sonar-reporter',
+                {
+                    outputFile: 'test-report-frontend.xml',
+                },
+            ],
+        ],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'lcov', 'clover'],
