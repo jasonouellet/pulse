@@ -8,7 +8,7 @@ package db
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createPool = `-- name: CreatePool :one
@@ -18,9 +18,9 @@ RETURNING id, club_id, sport_id, window_id, name, code, min_age, max_age, gender
 `
 
 type CreatePoolParams struct {
-	SportID pgtype.UUID `json:"sport_id"`
-	Code    string      `json:"code"`
-	Name    string      `json:"name"`
+	SportID uuid.UUID `json:"sport_id"`
+	Code    string    `json:"code"`
+	Name    string    `json:"name"`
 }
 
 // CreatePool inserts a new age pool into the club structure.
@@ -51,7 +51,7 @@ WHERE id = $1
 `
 
 // GetPoolByID retrieves the details of an age pool by its UUID.
-func (q *Queries) GetPoolByID(ctx context.Context, id pgtype.UUID) (CorePools, error) {
+func (q *Queries) GetPoolByID(ctx context.Context, id uuid.UUID) (CorePools, error) {
 	row := q.db.QueryRow(ctx, getPoolByID, id)
 	var i CorePools
 	err := row.Scan(

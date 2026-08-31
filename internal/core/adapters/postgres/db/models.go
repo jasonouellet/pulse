@@ -8,6 +8,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -401,7 +402,7 @@ func (ns NullSchedulingWindowType) Value() (driver.Value, error) {
 
 // A club, association, or federation — see org_type and parent_club_id for the nesting hierarchy (ADR-008 §6).
 type CoreClubs struct {
-	ID pgtype.UUID `json:"id"`
+	ID uuid.UUID `json:"id"`
 	// Nullable, self-referencing. A club can belong directly to a federation, or through an intermediate association — nesting depth is unconstrained.
 	ParentClubID pgtype.UUID          `json:"parent_club_id"`
 	OrgType      CoreOrganizationType `json:"org_type"`
@@ -414,8 +415,8 @@ type CoreClubs struct {
 
 // Junction table mapping parental links and primary contact designations.
 type CoreParentsChildren struct {
-	ParentID     pgtype.UUID          `json:"parent_id"`
-	ChildID      pgtype.UUID          `json:"child_id"`
+	ParentID     uuid.UUID            `json:"parent_id"`
+	ChildID      uuid.UUID            `json:"child_id"`
 	Relationship CoreRelationshipType `json:"relationship"`
 	// Flag indicating if this parent should receive primary communications for the child.
 	IsPrimaryContact bool               `json:"is_primary_contact"`
@@ -423,14 +424,14 @@ type CoreParentsChildren struct {
 }
 
 type CorePlayerPositionPreferences struct {
-	PlayerID       pgtype.UUID `json:"player_id"`
-	PositionID     pgtype.UUID `json:"position_id"`
-	PreferenceRank int32       `json:"preference_rank"`
+	PlayerID       uuid.UUID `json:"player_id"`
+	PositionID     uuid.UUID `json:"position_id"`
+	PreferenceRank int32     `json:"preference_rank"`
 }
 
 // Identity records for individual players.
 type CorePlayerProfiles struct {
-	ID pgtype.UUID `json:"id"`
+	ID uuid.UUID `json:"id"`
 	// Optional link to a dedicated user account if the player logs into the platform directly.
 	UserID                pgtype.UUID        `json:"user_id"`
 	FirstName             string             `json:"first_name"`
@@ -439,14 +440,14 @@ type CorePlayerProfiles struct {
 	Gender                CoreGenderCategory `json:"gender"`
 	MedicalNotes          pgtype.Text        `json:"medical_notes"`
 	EmergencyContactName  pgtype.Text        `json:"emergency_contact_name"`
-	EmergencyContactPhone pgtype.Text        `json:"emergency_contact_phone"`
+	EmergencyContactPhone *string            `json:"emergency_contact_phone"`
 	CreatedAt             pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt             pgtype.Timestamptz `json:"updated_at"`
 }
 
 type CorePlayerRatings struct {
-	PlayerID   pgtype.UUID        `json:"player_id"`
-	SportID    pgtype.UUID        `json:"sport_id"`
+	PlayerID   uuid.UUID          `json:"player_id"`
+	SportID    uuid.UUID          `json:"sport_id"`
 	SeasonYear int32              `json:"season_year"`
 	Score      int16              `json:"score"`
 	UpdatedBy  pgtype.UUID        `json:"updated_by"`
@@ -455,10 +456,10 @@ type CorePlayerRatings struct {
 
 // Named skill/competitive levels within a pool (e.g., Division 1, Recreational). A roster is formed within one division.
 type CorePoolDivisions struct {
-	ID     pgtype.UUID `json:"id"`
-	PoolID pgtype.UUID `json:"pool_id"`
-	Name   string      `json:"name"`
-	Code   string      `json:"code"`
+	ID     uuid.UUID `json:"id"`
+	PoolID uuid.UUID `json:"pool_id"`
+	Name   string    `json:"name"`
+	Code   string    `json:"code"`
 	// Controls the order divisions are listed in (e.g., Division 1 before Division 2).
 	DisplayOrder int32              `json:"display_order"`
 	IsActive     bool               `json:"is_active"`
@@ -468,9 +469,9 @@ type CorePoolDivisions struct {
 
 // Explicit, per-season registration of a player into a pool (and optionally a specific division).
 type CorePoolRegistrations struct {
-	ID         pgtype.UUID `json:"id"`
-	PlayerID   pgtype.UUID `json:"player_id"`
-	PoolID     pgtype.UUID `json:"pool_id"`
+	ID         uuid.UUID   `json:"id"`
+	PlayerID   uuid.UUID   `json:"player_id"`
+	PoolID     uuid.UUID   `json:"pool_id"`
 	DivisionID pgtype.UUID `json:"division_id"`
 	// PENDING at registration; the application sets it to ASSIGNED when the player is added to an active TRAINING_GROUP team in core.team_players. No DB trigger — this is an application-layer responsibility.
 	Status       CoreRegistrationStatus `json:"status"`
@@ -480,11 +481,11 @@ type CorePoolRegistrations struct {
 
 // Age group pools and categories for player registration (e.g., U10F, U12M), scoped to one club. window_id references scheduling.date_windows for actual dates; season_year stays a human label.
 type CorePools struct {
-	ID       pgtype.UUID `json:"id"`
-	ClubID   pgtype.UUID `json:"club_id"`
-	SportID  pgtype.UUID `json:"sport_id"`
-	WindowID pgtype.UUID `json:"window_id"`
-	Name     string      `json:"name"`
+	ID       uuid.UUID `json:"id"`
+	ClubID   uuid.UUID `json:"club_id"`
+	SportID  uuid.UUID `json:"sport_id"`
+	WindowID uuid.UUID `json:"window_id"`
+	Name     string    `json:"name"`
 	// Division short code (e.g., U10F_D1, U12M_LOCAL).
 	Code       string             `json:"code"`
 	MinAge     int32              `json:"min_age"`
@@ -497,8 +498,8 @@ type CorePools struct {
 }
 
 type CorePositions struct {
-	ID           pgtype.UUID        `json:"id"`
-	SportID      pgtype.UUID        `json:"sport_id"`
+	ID           uuid.UUID          `json:"id"`
+	SportID      uuid.UUID          `json:"sport_id"`
 	Code         string             `json:"code"`
 	Name         string             `json:"name"`
 	DisplayOrder int32              `json:"display_order"`
@@ -509,7 +510,7 @@ type CorePositions struct {
 // Reference table for multi-sport support abstraction (ADR-004).
 type CoreSports struct {
 	// Primary key UUID generated via gen_random_uuid().
-	ID pgtype.UUID `json:"id"`
+	ID uuid.UUID `json:"id"`
 	// Short code identifier for the sport (e.g., SOCCER, HOCKEY).
 	Code                         string `json:"code"`
 	Name                         string `json:"name"`
@@ -525,24 +526,24 @@ type CoreSports struct {
 
 // Team membership — no event scoping (that is tournament.roster_players).
 type CoreTeamPlayers struct {
-	TeamID    pgtype.UUID        `json:"team_id"`
-	PlayerID  pgtype.UUID        `json:"player_id"`
+	TeamID    uuid.UUID          `json:"team_id"`
+	PlayerID  uuid.UUID          `json:"player_id"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 // Pool(s) a team draws players from. Multiple rows is how a season team combines age groups (e.g., U9 + U10).
 type CoreTeamPools struct {
-	TeamID pgtype.UUID `json:"team_id"`
-	PoolID pgtype.UUID `json:"pool_id"`
+	TeamID uuid.UUID `json:"team_id"`
+	PoolID uuid.UUID `json:"pool_id"`
 }
 
 // Persistent club structure (training group or season team), independent of any tournament/event (ADR-008 §1).
 type CoreTeams struct {
-	ID      pgtype.UUID `json:"id"`
-	ClubID  pgtype.UUID `json:"club_id"`
-	SportID pgtype.UUID `json:"sport_id"`
+	ID      uuid.UUID `json:"id"`
+	ClubID  uuid.UUID `json:"club_id"`
+	SportID uuid.UUID `json:"sport_id"`
 	// References scheduling.date_windows — teams no longer store their own start_date/end_date (ADR-008 §4).
-	WindowID   pgtype.UUID        `json:"window_id"`
+	WindowID   uuid.UUID          `json:"window_id"`
 	Type       CoreTeamType       `json:"type"`
 	Name       string             `json:"name"`
 	SeasonYear int32              `json:"season_year"`
@@ -552,8 +553,8 @@ type CoreTeams struct {
 
 // Multi-role grants per user. A user can be GUARDIAN and COACH simultaneously; authorization checks the full set, not a single value.
 type CoreUserRoles struct {
-	ID     pgtype.UUID  `json:"id"`
-	UserID pgtype.UUID  `json:"user_id"`
+	ID     uuid.UUID    `json:"id"`
+	UserID uuid.UUID    `json:"user_id"`
 	ClubID pgtype.UUID  `json:"club_id"`
 	Role   CoreUserRole `json:"role"`
 	// Default role context shown at login/UI — not an authorization boundary by itself.
@@ -564,12 +565,12 @@ type CoreUserRoles struct {
 
 // Platform accounts including administrators, technical directors, coaches, parents, and players. A single account can hold roles across multiple clubs — see core.user_roles.
 type CoreUsers struct {
-	ID           pgtype.UUID        `json:"id"`
+	ID           uuid.UUID          `json:"id"`
 	Email        string             `json:"email"`
 	PasswordHash string             `json:"password_hash"`
 	FirstName    string             `json:"first_name"`
 	LastName     string             `json:"last_name"`
-	Phone        pgtype.Text        `json:"phone"`
+	Phone        *string            `json:"phone"`
 	Role         CoreUserRole       `json:"role"`
 	IsActive     bool               `json:"is_active"`
 	LastLoginAt  pgtype.Timestamptz `json:"last_login_at"`
@@ -579,10 +580,10 @@ type CoreUsers struct {
 
 // A single practice or match. owner_id is a loose reference (no FK) to core.teams or tournament.rosters, chosen via owner_type — kept loose so scheduling stays a dependency-free kernel.
 type SchedulingActivities struct {
-	ID         pgtype.UUID                 `json:"id"`
+	ID         uuid.UUID                   `json:"id"`
 	Type       SchedulingActivityType      `json:"type"`
 	OwnerType  SchedulingActivityOwnerType `json:"owner_type"`
-	OwnerID    pgtype.UUID                 `json:"owner_id"`
+	OwnerID    uuid.UUID                   `json:"owner_id"`
 	FieldID    pgtype.UUID                 `json:"field_id"`
 	SubFieldID pgtype.UUID                 `json:"sub_field_id"`
 	StartsAt   pgtype.Timestamptz          `json:"starts_at"`
@@ -592,15 +593,15 @@ type SchedulingActivities struct {
 }
 
 type SchedulingAttendances struct {
-	ActivityID pgtype.UUID        `json:"activity_id"`
-	PlayerID   pgtype.UUID        `json:"player_id"`
+	ActivityID uuid.UUID          `json:"activity_id"`
+	PlayerID   uuid.UUID          `json:"player_id"`
 	IsPresent  pgtype.Bool        `json:"is_present"`
 	RecordedAt pgtype.Timestamptz `json:"recorded_at"`
 }
 
 // Canonical start/end date range for a season, a pool, or an event.
 type SchedulingDateWindows struct {
-	ID        pgtype.UUID          `json:"id"`
+	ID        uuid.UUID            `json:"id"`
 	Type      SchedulingWindowType `json:"type"`
 	Label     string               `json:"label"`
 	StartDate pgtype.Date          `json:"start_date"`
@@ -610,8 +611,8 @@ type SchedulingDateWindows struct {
 }
 
 type SchedulingFields struct {
-	ID        pgtype.UUID        `json:"id"`
-	ClubID    pgtype.UUID        `json:"club_id"`
+	ID        uuid.UUID          `json:"id"`
+	ClubID    uuid.UUID          `json:"club_id"`
 	Name      string             `json:"name"`
 	Address   pgtype.Text        `json:"address"`
 	IsActive  bool               `json:"is_active"`
@@ -620,8 +621,8 @@ type SchedulingFields struct {
 }
 
 type SchedulingSubFields struct {
-	ID        pgtype.UUID        `json:"id"`
-	FieldID   pgtype.UUID        `json:"field_id"`
+	ID        uuid.UUID          `json:"id"`
+	FieldID   uuid.UUID          `json:"field_id"`
 	Name      string             `json:"name"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }

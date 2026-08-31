@@ -4,71 +4,63 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/pashagolub/pgxmock/v5"
+	"github.com/pashagolub/pgxmock/v3"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"pulse/internal/core/adapters/postgres/db"
 	"pulse/internal/core/ports"
 )
 
-func newMockUserRepo(t *testing.T) (*UserRepository, pgxmock.PgxPoolIface) {
-	t.Helper()
-	mock, err := pgxmock.NewPool()
-	if err != nil {
-		t.Fatalf("failed to create mock pool: %v", err)
-	}
-	t.Cleanup(mock.Close)
-	return NewUserRepository(mock), mock
-}
-
 func TestUserRepository_CreateUser(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	id := uuid.New()
-	phone := "418-555-0192"
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active"}).
-		AddRow(id, "coach@pulse.local", "Jean", "Dupont", &phone, "COACH", true)
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+	phone := "555-0199"
+	now := time.Now()
 
-	mock.ExpectQuery("INSERT INTO core.users").
-		WithArgs("coach@pulse.local", "hashed-secret", "Jean", "Dupont", &phone, "COACH").
-		WillReturnRows(rows)
+	mock.ExpectQuery(`(?i)INSERT INTO core\.users`).
+		WithArgs("jean.dupont@pulse.local", "hashed-secret", "Jean", "Dupont", &phone, db.CoreUserRole("COACH")).
+		WillReturnRows(
+			pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active", "last_login_at", "created_at", "updated_at"}).
+				AddRow(userID, "jean.dupont@pulse.local", "Jean", "Dupont", &phone, db.CoreUserRole("COACH"), true, nil, now, now),
+		)
 
-	got, err := repo.CreateUser(context.Background(), ports.CreateUserParams{
-		Email:        "coach@pulse.local",
+	user, err := repo.CreateUser(context.Background(), ports.CreateUserParams{
+		Email:        "jean.dupont@pulse.local",
 		PasswordHash: "hashed-secret",
 		FirstName:    "Jean",
 		LastName:     "Dupont",
 		Phone:        &phone,
 		Role:         "COACH",
 	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if got.ID != id {
-		t.Errorf("expected id %s, got %s", id, got.ID)
-	}
-	if got.Email != "coach@pulse.local" {
-		t.Errorf("expected email %q, got %q", "coach@pulse.local", got.Email)
-	}
-	if !got.IsActive {
-		t.Error("expected new user to be active")
-	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, userID, user.ID)
+	assert.Equal(t, "COACH", user.Role)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_CreateUser_DBError(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	phone := "418-555-0192"
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	mock.ExpectQuery("INSERT INTO core.users").
-		WithArgs("dup@pulse.local", "hashed-secret", "Jean", "Dupont", &phone, "COACH").
-		WillReturnError(errors.New("unique_violation: email already exists"))
+	repo := NewUserRepository(mock)
+	phone := "555-0199"
 
-	_, err := repo.CreateUser(context.Background(), ports.CreateUserParams{
+	mock.ExpectQuery(`(?i)INSERT INTO core\.users`).
+		WithArgs("dup@pulse.local", "hashed-secret", "Jean", "Dupont", &phone, db.CoreUserRole("COACH")).
+		WillReturnError(errors.New("db error"))
+
+	_, err = repo.CreateUser(context.Background(), ports.CreateUserParams{
 		Email:        "dup@pulse.local",
 		PasswordHash: "hashed-secret",
 		FirstName:    "Jean",
@@ -76,141 +68,158 @@ func TestUserRepository_CreateUser_DBError(t *testing.T) {
 		Phone:        &phone,
 		Role:         "COACH",
 	})
-	if err == nil {
-		t.Fatal("expected an error, got nil")
-	}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	assert.ErrorContains(t, err, "failed to create user")
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_GetUserByID_Found(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	id := uuid.New()
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active"}).
-		AddRow(id, "leo@pulse.local", "Léo", "Tremblay", nil, "GUARDIAN", true)
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+	phone := "555-0199"
+	now := time.Now()
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
-		WithArgs(id).
-		WillReturnRows(rows)
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash, first_name, last_name, phone, role, is_active, last_login_at, created_at, updated_at FROM core\.users`).
+		WithArgs(userID).
+		WillReturnRows(
+			pgxmock.NewRows([]string{"id", "email", "password_hash", "first_name", "last_name", "phone", "role", "is_active", "last_login_at", "created_at", "updated_at"}).
+				AddRow(userID, "jean.dupont@pulse.local", "hashed", "Jean", "Dupont", &phone, db.CoreUserRole("COACH"), true, nil, now, now),
+		)
 
-	got, err := repo.GetUserByID(context.Background(), id)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if got.FirstName != "Léo" {
-		t.Errorf("expected first name %q, got %q", "Léo", got.FirstName)
-	}
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	user, err := repo.GetUserByID(context.Background(), userID)
+	require.NoError(t, err)
+	assert.Equal(t, userID, user.ID)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_GetUserByID_NotFound(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	id := uuid.New()
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
-		WithArgs(id).
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash, first_name, last_name, phone, role, is_active, last_login_at, created_at, updated_at FROM core\.users`).
+		WithArgs(userID).
 		WillReturnError(pgx.ErrNoRows)
 
-	_, err := repo.GetUserByID(context.Background(), id)
-	if !errors.Is(err, ports.ErrUserNotFound) {
-		t.Errorf("expected ErrUserNotFound, got %v", err)
-	}
+	_, err = repo.GetUserByID(context.Background(), userID)
+	assert.ErrorIs(t, err, ports.ErrUserNotFound)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+func TestUserRepository_GetUserByID_DBError(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
+
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash`).
+		WithArgs(userID).
+		WillReturnError(errors.New("db connection lost"))
+
+	_, err = repo.GetUserByID(context.Background(), userID)
+	assert.ErrorContains(t, err, "failed to get user by id")
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_GetUserByEmail_Found(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	id := uuid.New()
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active"}).
-		AddRow(id, "zoe@pulse.local", "Zoé", "Tremblay", nil, "PLAYER", true)
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+	phone := "555-0199"
+	now := time.Now()
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
-		WithArgs("zoe@pulse.local").
-		WillReturnRows(rows)
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash, first_name, last_name, phone, role, is_active, last_login_at, created_at, updated_at FROM core\.users`).
+		WithArgs("jean.dupont@pulse.local").
+		WillReturnRows(
+			pgxmock.NewRows([]string{"id", "email", "password_hash", "first_name", "last_name", "phone", "role", "is_active", "last_login_at", "created_at", "updated_at"}).
+				AddRow(userID, "jean.dupont@pulse.local", "hashed", "Jean", "Dupont", &phone, db.CoreUserRole("COACH"), true, nil, now, now),
+		)
 
-	got, err := repo.GetUserByEmail(context.Background(), "zoe@pulse.local")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if got.ID != id {
-		t.Errorf("expected id %s, got %s", id, got.ID)
-	}
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	user, err := repo.GetUserByEmail(context.Background(), "jean.dupont@pulse.local")
+	require.NoError(t, err)
+	assert.Equal(t, userID, user.ID)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_GetUserByEmail_NotFound(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
+	repo := NewUserRepository(mock)
+
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash, first_name, last_name, phone, role, is_active, last_login_at, created_at, updated_at FROM core\.users`).
 		WithArgs("ghost@pulse.local").
 		WillReturnError(pgx.ErrNoRows)
 
-	_, err := repo.GetUserByEmail(context.Background(), "ghost@pulse.local")
-	if !errors.Is(err, ports.ErrUserNotFound) {
-		t.Errorf("expected ErrUserNotFound, got %v", err)
-	}
+	_, err = repo.GetUserByEmail(context.Background(), "ghost@pulse.local")
+	assert.ErrorIs(t, err, ports.ErrUserNotFound)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+func TestUserRepository_GetUserByEmail_DBError(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
+
+	repo := NewUserRepository(mock)
+
+	mock.ExpectQuery(`(?i)SELECT id, email, password_hash`).
+		WithArgs("test@pulse.local").
+		WillReturnError(errors.New("db connection lost"))
+
+	_, err = repo.GetUserByEmail(context.Background(), "test@pulse.local")
+	assert.ErrorContains(t, err, "failed to get user by email")
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUserRepository_ListUsers(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
-	id1, id2 := uuid.New(), uuid.New()
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active"}).
-		AddRow(id1, "a@pulse.local", "A", "A", nil, "GUARDIAN", true).
-		AddRow(id2, "b@pulse.local", "B", "B", nil, "COACH", true)
+	repo := NewUserRepository(mock)
+	userID := uuid.New()
+	phone := "555-0199"
+	now := time.Now()
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
-		WithArgs(int32(20), int32(0)).
-		WillReturnRows(rows)
+	mock.ExpectQuery(`(?i)SELECT id, email, first_name, last_name, phone, role, is_active, created_at FROM core\.users`).
+		WithArgs(int32(10), int32(0)).
+		WillReturnRows(
+			pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active", "created_at"}).
+				AddRow(userID, "jean.dupont@pulse.local", "Jean", "Dupont", &phone, db.CoreUserRole("COACH"), true, now),
+		)
 
-	got, err := repo.ListUsers(context.Background(), 20, 0)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(got) != 2 {
-		t.Fatalf("expected 2 users, got %d", len(got))
-	}
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	users, err := repo.ListUsers(context.Background(), 10, 0)
+	require.NoError(t, err)
+	assert.Len(t, users, 1)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestUserRepository_ListUsers_Empty(t *testing.T) {
-	repo, mock := newMockUserRepo(t)
+func TestUserRepository_ListUsers_DBError(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	require.NoError(t, err)
+	defer mock.Close()
 
-	rows := pgxmock.NewRows([]string{"id", "email", "first_name", "last_name", "phone", "role", "is_active"})
+	repo := NewUserRepository(mock)
 
-	mock.ExpectQuery("SELECT id, email, first_name, last_name, phone, role").
-		WithArgs(int32(20), int32(0)).
-		WillReturnRows(rows)
+	mock.ExpectQuery(`(?i)SELECT id, email, first_name`).
+		WithArgs(int32(10), int32(0)).
+		WillReturnError(errors.New("db timeout"))
 
-	got, err := repo.ListUsers(context.Background(), 20, 0)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(got) != 0 {
-		t.Fatalf("expected 0 users, got %d", len(got))
-	}
-
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %v", err)
-	}
+	_, err = repo.ListUsers(context.Background(), 10, 0)
+	assert.ErrorContains(t, err, "failed to list users")
+	assert.NoError(t, mock.ExpectationsWereMet())
 }

@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -35,7 +36,7 @@ type CreatePlayerProfileParams struct {
 	Gender                CoreGenderCategory `json:"gender"`
 	MedicalNotes          pgtype.Text        `json:"medical_notes"`
 	EmergencyContactName  pgtype.Text        `json:"emergency_contact_name"`
-	EmergencyContactPhone pgtype.Text        `json:"emergency_contact_phone"`
+	EmergencyContactPhone *string            `json:"emergency_contact_phone"`
 }
 
 // ----------------------------------------------------------------------------
@@ -89,16 +90,16 @@ type CreateUserParams struct {
 	PasswordHash string       `json:"password_hash"`
 	FirstName    string       `json:"first_name"`
 	LastName     string       `json:"last_name"`
-	Phone        pgtype.Text  `json:"phone"`
+	Phone        *string      `json:"phone"`
 	Role         CoreUserRole `json:"role"`
 }
 
 type CreateUserRow struct {
-	ID          pgtype.UUID        `json:"id"`
+	ID          uuid.UUID          `json:"id"`
 	Email       string             `json:"email"`
 	FirstName   string             `json:"first_name"`
 	LastName    string             `json:"last_name"`
-	Phone       pgtype.Text        `json:"phone"`
+	Phone       *string            `json:"phone"`
 	Role        CoreUserRole       `json:"role"`
 	IsActive    bool               `json:"is_active"`
 	LastLoginAt pgtype.Timestamptz `json:"last_login_at"`
@@ -144,7 +145,7 @@ DELETE FROM core.users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
@@ -155,7 +156,7 @@ FROM core.player_profiles
 WHERE id = $1
 `
 
-func (q *Queries) GetPlayerProfileByID(ctx context.Context, id pgtype.UUID) (CorePlayerProfiles, error) {
+func (q *Queries) GetPlayerProfileByID(ctx context.Context, id uuid.UUID) (CorePlayerProfiles, error) {
 	row := q.db.QueryRow(ctx, getPlayerProfileByID, id)
 	var i CorePlayerProfiles
 	err := row.Scan(
@@ -205,7 +206,7 @@ FROM core.users
 WHERE id = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (CoreUsers, error) {
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (CoreUsers, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i CoreUsers
 	err := row.Scan(
@@ -239,8 +240,8 @@ SET relationship = EXCLUDED.relationship,
 `
 
 type LinkParentToChildParams struct {
-	ParentID         pgtype.UUID          `json:"parent_id"`
-	ChildID          pgtype.UUID          `json:"child_id"`
+	ParentID         uuid.UUID            `json:"parent_id"`
+	ChildID          uuid.UUID            `json:"child_id"`
 	Relationship     CoreRelationshipType `json:"relationship"`
 	IsPrimaryContact bool                 `json:"is_primary_contact"`
 }
@@ -267,7 +268,7 @@ ORDER BY p.date_of_birth DESC
 `
 
 type ListChildrenByParentIDRow struct {
-	ID               pgtype.UUID          `json:"id"`
+	ID               uuid.UUID            `json:"id"`
 	UserID           pgtype.UUID          `json:"user_id"`
 	FirstName        string               `json:"first_name"`
 	LastName         string               `json:"last_name"`
@@ -277,7 +278,7 @@ type ListChildrenByParentIDRow struct {
 	IsPrimaryContact bool                 `json:"is_primary_contact"`
 }
 
-func (q *Queries) ListChildrenByParentID(ctx context.Context, parentID pgtype.UUID) ([]ListChildrenByParentIDRow, error) {
+func (q *Queries) ListChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]ListChildrenByParentIDRow, error) {
 	rows, err := q.db.Query(ctx, listChildrenByParentID, parentID)
 	if err != nil {
 		return nil, err
@@ -315,13 +316,13 @@ ORDER BY min_age ASC, code ASC
 `
 
 type ListPoolsBySportAndSeasonParams struct {
-	SportID    pgtype.UUID `json:"sport_id"`
-	SeasonYear int32       `json:"season_year"`
+	SportID    uuid.UUID `json:"sport_id"`
+	SeasonYear int32     `json:"season_year"`
 }
 
 type ListPoolsBySportAndSeasonRow struct {
-	ID         pgtype.UUID        `json:"id"`
-	SportID    pgtype.UUID        `json:"sport_id"`
+	ID         uuid.UUID          `json:"id"`
+	SportID    uuid.UUID          `json:"sport_id"`
 	Name       string             `json:"name"`
 	Code       string             `json:"code"`
 	MinAge     int32              `json:"min_age"`
@@ -377,11 +378,11 @@ type ListUsersParams struct {
 }
 
 type ListUsersRow struct {
-	ID        pgtype.UUID        `json:"id"`
+	ID        uuid.UUID          `json:"id"`
 	Email     string             `json:"email"`
 	FirstName string             `json:"first_name"`
 	LastName  string             `json:"last_name"`
-	Phone     pgtype.Text        `json:"phone"`
+	Phone     *string            `json:"phone"`
 	Role      CoreUserRole       `json:"role"`
 	IsActive  bool               `json:"is_active"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
@@ -422,8 +423,8 @@ WHERE parent_id = $1 AND child_id = $2
 `
 
 type UnlinkParentFromChildParams struct {
-	ParentID pgtype.UUID `json:"parent_id"`
-	ChildID  pgtype.UUID `json:"child_id"`
+	ParentID uuid.UUID `json:"parent_id"`
+	ChildID  uuid.UUID `json:"child_id"`
 }
 
 func (q *Queries) UnlinkParentFromChild(ctx context.Context, arg UnlinkParentFromChildParams) error {
@@ -445,20 +446,20 @@ RETURNING id, email, first_name, last_name, phone, role, is_active, updated_at
 `
 
 type UpdateUserParams struct {
-	ID        pgtype.UUID  `json:"id"`
+	ID        uuid.UUID    `json:"id"`
 	FirstName string       `json:"first_name"`
 	LastName  string       `json:"last_name"`
-	Phone     pgtype.Text  `json:"phone"`
+	Phone     *string      `json:"phone"`
 	Column5   CoreUserRole `json:"column_5"`
 	IsActive  bool         `json:"is_active"`
 }
 
 type UpdateUserRow struct {
-	ID        pgtype.UUID        `json:"id"`
+	ID        uuid.UUID          `json:"id"`
 	Email     string             `json:"email"`
 	FirstName string             `json:"first_name"`
 	LastName  string             `json:"last_name"`
-	Phone     pgtype.Text        `json:"phone"`
+	Phone     *string            `json:"phone"`
 	Role      CoreUserRole       `json:"role"`
 	IsActive  bool               `json:"is_active"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
@@ -493,7 +494,7 @@ SET last_login_at = CURRENT_TIMESTAMP
 WHERE id = $1
 `
 
-func (q *Queries) UpdateUserLastLogin(ctx context.Context, id pgtype.UUID) error {
+func (q *Queries) UpdateUserLastLogin(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, updateUserLastLogin, id)
 	return err
 }

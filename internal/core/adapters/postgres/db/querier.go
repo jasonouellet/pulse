@@ -7,7 +7,7 @@ package db
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 type Querier interface {
@@ -26,17 +26,17 @@ type Querier interface {
 	// USERS QUERIES
 	// ----------------------------------------------------------------------------
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
-	DeleteUser(ctx context.Context, id pgtype.UUID) error
-	GetPlayerProfileByID(ctx context.Context, id pgtype.UUID) (CorePlayerProfiles, error)
+	DeleteUser(ctx context.Context, id uuid.UUID) error
+	GetPlayerProfileByID(ctx context.Context, id uuid.UUID) (CorePlayerProfiles, error)
 	// GetPoolByID retrieves the details of an age pool by its UUID.
-	GetPoolByID(ctx context.Context, id pgtype.UUID) (CorePools, error)
+	GetPoolByID(ctx context.Context, id uuid.UUID) (CorePools, error)
 	GetUserByEmail(ctx context.Context, email string) (CoreUsers, error)
-	GetUserByID(ctx context.Context, id pgtype.UUID) (CoreUsers, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (CoreUsers, error)
 	// ----------------------------------------------------------------------------
 	// PARENTS_CHILDREN RELATIONSHIP QUERIES
 	// ----------------------------------------------------------------------------
 	LinkParentToChild(ctx context.Context, arg LinkParentToChildParams) error
-	ListChildrenByParentID(ctx context.Context, parentID pgtype.UUID) ([]ListChildrenByParentIDRow, error)
+	ListChildrenByParentID(ctx context.Context, parentID uuid.UUID) ([]ListChildrenByParentIDRow, error)
 	// ----------------------------------------------------------------------------
 	// POOLS (AGE CATEGORIES) QUERIES
 	// ----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ type Querier interface {
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
 	UnlinkParentFromChild(ctx context.Context, arg UnlinkParentFromChildParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateUserRow, error)
-	UpdateUserLastLogin(ctx context.Context, id pgtype.UUID) error
+	UpdateUserLastLogin(ctx context.Context, id uuid.UUID) error
 }
 
 var _ Querier = (*Queries)(nil)
