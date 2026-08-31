@@ -30,9 +30,7 @@ const MOCK_GRANTS: RoleGrant[] = [
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [activeGrant, setActiveGrantState] = useState<RoleGrant>(
-    MOCK_GRANTS[0],
-  );
+  const [activeGrant, setActiveGrant] = useState<RoleGrant>(MOCK_GRANTS[0]);
 
   const clubs = useMemo(
     () =>
@@ -44,7 +42,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     const grant = MOCK_GRANTS.find(
       (g) => g.club.id === activeGrant.club.id && g.role === role,
     );
-    if (grant) setActiveGrantState(grant);
+    if (grant) setActiveGrant(grant);
   };
 
   const setActiveClub = (clubId: string) => {
@@ -52,18 +50,21 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     // rather than trying to preserve the previous role, since the person
     // may not hold the same role there.
     const grant = MOCK_GRANTS.find((g) => g.club.id === clubId);
-    if (grant) setActiveGrantState(grant);
+    if (grant) setActiveGrant(grant);
   };
 
-  const value: SessionContextValue = {
-    userName: "Marie Tremblay",
-    userInitials: "MT",
-    grants: MOCK_GRANTS,
-    clubs,
-    activeGrant,
-    setActiveRole,
-    setActiveClub,
-  };
+  const value = useMemo<SessionContextValue>(
+    () => ({
+      userName: "Marie Tremblay",
+      userInitials: "MT",
+      grants: MOCK_GRANTS,
+      clubs,
+      activeGrant,
+      setActiveRole,
+      setActiveClub,
+    }),
+    [activeGrant, clubs],
+  );
 
   return (
     <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

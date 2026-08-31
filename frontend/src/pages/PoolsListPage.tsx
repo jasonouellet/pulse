@@ -3,6 +3,12 @@ import { Plus, ChevronRight } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { MOCK_POOLS } from "../data/mock";
 
+function getGenderLabel(gender: "MASCULINE" | "FEMININE" | "MIXED"): string {
+  if (gender === "MIXED") return "Mixte";
+  if (gender === "MASCULINE") return "Masculin";
+  return "Féminin";
+}
+
 export const PoolsListPage: React.FC = () => {
   return (
     <div className="space-y-4">
@@ -49,11 +55,7 @@ export const PoolsListPage: React.FC = () => {
                   {pool.minAge}-{pool.maxAge}
                 </td>
                 <td className="p-3 text-slate-700 dark:text-slate-300">
-                  {pool.gender === "MIXED"
-                    ? "Mixte"
-                    : pool.gender === "MASCULINE"
-                      ? "Masculin"
-                      : "Féminin"}
+                  {getGenderLabel(pool.gender)}
                 </td>
                 <td className="p-3">
                   <span

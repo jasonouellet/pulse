@@ -12,6 +12,11 @@ import (
 	"pulse/internal/core/ports"
 )
 
+const (
+	tagCoreTeams     = "Core teams"
+	errInvalidTeamID = "Invalid team id"
+)
+
 type CreateTeamRequest struct {
 	ClubID     string   `json:"club_id" format:"uuid"`
 	SportID    string   `json:"sport_id" format:"uuid"`
@@ -84,7 +89,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Path:          "/api/v1/core/teams/",
 		Summary:       "Create a team",
 		Description:   "Creates a persistent training group or season team (ADR-008 §1) — independent of any tournament/event.",
-		Tags:          []string{"Core teams"},
+		Tags:          []string{tagCoreTeams},
 		DefaultStatus: http.StatusCreated,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
 	}, h.CreateTeam)
@@ -94,7 +99,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/core/teams/{id}",
 		Summary:     "Get a team",
-		Tags:        []string{"Core teams"},
+		Tags:        []string{tagCoreTeams},
 		Errors:      []int{http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError},
 	}, h.GetTeamByID)
 
@@ -103,7 +108,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/core/teams/",
 		Summary:     "List teams for a club",
-		Tags:        []string{"Core teams"},
+		Tags:        []string{tagCoreTeams},
 		Errors:      []int{http.StatusBadRequest, http.StatusInternalServerError},
 	}, h.ListTeamsByClub)
 
@@ -112,7 +117,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Method:        http.MethodPost,
 		Path:          "/api/v1/core/teams/{id}/players/",
 		Summary:       "Add a player to a team",
-		Tags:          []string{"Core teams"},
+		Tags:          []string{tagCoreTeams},
 		DefaultStatus: http.StatusNoContent,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
 	}, h.AddPlayerToTeam)
@@ -122,7 +127,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Method:        http.MethodDelete,
 		Path:          "/api/v1/core/teams/{id}/players/{playerId}",
 		Summary:       "Remove a player from a team",
-		Tags:          []string{"Core teams"},
+		Tags:          []string{tagCoreTeams},
 		DefaultStatus: http.StatusNoContent,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
 	}, h.RemovePlayerFromTeam)
@@ -132,7 +137,7 @@ func (h *TeamHandler) RegisterRoutes(api huma.API) {
 		Method:      http.MethodGet,
 		Path:        "/api/v1/core/teams/{id}/players/",
 		Summary:     "List a team's players",
-		Tags:        []string{"Core teams"},
+		Tags:        []string{tagCoreTeams},
 		Errors:      []int{http.StatusBadRequest, http.StatusInternalServerError},
 	}, h.ListPlayers)
 }
@@ -174,7 +179,7 @@ func (h *TeamHandler) CreateTeam(ctx context.Context, input *CreateTeamInput) (*
 	})
 	if err != nil {
 		slog.Error("Failed to create team", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &TeamOutput{Body: *team}, nil
@@ -192,7 +197,7 @@ func (h *TeamHandler) GetTeamByID(ctx context.Context, input *GetTeamInput) (*Te
 			return nil, huma.Error404NotFound("Team not found")
 		}
 		slog.Error("Failed to get team", "error", err, "team_id", id)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &TeamOutput{Body: *team}, nil
@@ -207,7 +212,7 @@ func (h *TeamHandler) ListTeamsByClub(ctx context.Context, input *ListTeamsByClu
 	teams, err := h.repo.ListTeamsByClub(ctx, clubID, int32(input.Limit), int32(input.Offset))
 	if err != nil {
 		slog.Error("Failed to list teams", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &TeamsOutput{Body: teams}, nil
@@ -216,7 +221,7 @@ func (h *TeamHandler) ListTeamsByClub(ctx context.Context, input *ListTeamsByClu
 func (h *TeamHandler) AddPlayerToTeam(ctx context.Context, input *AddPlayerInput) (*EmptyOutput, error) {
 	teamID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return nil, huma.Error400BadRequest("Invalid team id")
+		return nil, huma.Error400BadRequest(errInvalidTeamID)
 	}
 	playerID, err := uuid.Parse(input.Body.PlayerID)
 	if err != nil {
@@ -225,7 +230,7 @@ func (h *TeamHandler) AddPlayerToTeam(ctx context.Context, input *AddPlayerInput
 
 	if err := h.repo.AddPlayerToTeam(ctx, teamID, playerID); err != nil {
 		slog.Error("Failed to add player to team", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &EmptyOutput{}, nil
@@ -234,7 +239,7 @@ func (h *TeamHandler) AddPlayerToTeam(ctx context.Context, input *AddPlayerInput
 func (h *TeamHandler) RemovePlayerFromTeam(ctx context.Context, input *RemovePlayerInput) (*EmptyOutput, error) {
 	teamID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return nil, huma.Error400BadRequest("Invalid team id")
+		return nil, huma.Error400BadRequest(errInvalidTeamID)
 	}
 	playerID, err := uuid.Parse(input.PlayerID)
 	if err != nil {
@@ -243,7 +248,7 @@ func (h *TeamHandler) RemovePlayerFromTeam(ctx context.Context, input *RemovePla
 
 	if err := h.repo.RemovePlayerFromTeam(ctx, teamID, playerID); err != nil {
 		slog.Error("Failed to remove player from team", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &EmptyOutput{}, nil
@@ -252,13 +257,13 @@ func (h *TeamHandler) RemovePlayerFromTeam(ctx context.Context, input *RemovePla
 func (h *TeamHandler) ListPlayers(ctx context.Context, input *ListPlayersInput) (*PlayerIDsOutput, error) {
 	teamID, err := uuid.Parse(input.ID)
 	if err != nil {
-		return nil, huma.Error400BadRequest("Invalid team id")
+		return nil, huma.Error400BadRequest(errInvalidTeamID)
 	}
 
 	ids, err := h.repo.ListTeamPlayerIDs(ctx, teamID)
 	if err != nil {
 		slog.Error("Failed to list team players", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &PlayerIDsOutput{Body: ids}, nil

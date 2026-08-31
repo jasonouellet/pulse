@@ -30,7 +30,7 @@ export const RegistrationPage: React.FC = () => {
       <div className="mx-auto max-w-md space-y-4">
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-            Inscrire un enfant
+            Inscrire un nouvel enfant
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Saison {CURRENT_SEASON_YEAR} · Soccer
@@ -114,10 +114,14 @@ export const RegistrationPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+          <label
+            htmlFor="existing-medical-notes"
+            className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+          >
             Notes médicales — à jour ?
           </label>
           <input
+            id="existing-medical-notes"
             type="text"
             placeholder="Allergies, conditions particulières..."
             className="min-h-[44px] w-full rounded-lg border border-slate-300 px-3 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -147,7 +151,6 @@ export const RegistrationPage: React.FC = () => {
     );
   }
 
-  // mode === "new" — first-time registration, full identity capture.
   return (
     <div className="mx-auto max-w-md space-y-4">
       <div>
@@ -160,10 +163,14 @@ export const RegistrationPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="new-first-name"
+          className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+        >
           Prénom
         </label>
         <input
+          id="new-first-name"
           type="text"
           placeholder="Léo"
           className="min-h-[44px] w-full rounded-lg border border-slate-300 px-3 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -171,10 +178,14 @@ export const RegistrationPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="new-last-name"
+          className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+        >
           Nom
         </label>
         <input
+          id="new-last-name"
           type="text"
           placeholder="Tremblay"
           className="min-h-[44px] w-full rounded-lg border border-slate-300 px-3 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -182,10 +193,14 @@ export const RegistrationPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="new-birth-date"
+          className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+        >
           Date de naissance
         </label>
         <input
+          id="new-birth-date"
           type="date"
           value={newBirthDate}
           onChange={(e) => setNewBirthDate(e.target.value)}
@@ -210,10 +225,14 @@ export const RegistrationPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="new-emergency-contact"
+          className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+        >
           Contact d'urgence
         </label>
         <input
+          id="new-emergency-contact"
           type="text"
           placeholder="Nom complet"
           className="min-h-[44px] w-full rounded-lg border border-slate-300 px-3 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -221,10 +240,14 @@ export const RegistrationPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="new-medical-notes"
+          className="mb-1 block text-xs text-slate-500 dark:text-slate-400"
+        >
           Notes médicales (optionnel)
         </label>
         <input
+          id="new-medical-notes"
           type="text"
           placeholder="Allergies, conditions particulières..."
           className="min-h-[44px] w-full rounded-lg border border-slate-300 px-3 dark:border-slate-700 dark:bg-slate-800 dark:text-white"

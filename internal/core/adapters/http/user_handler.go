@@ -16,6 +16,10 @@ import (
 
 const maxCreateUserBodyBytes = 1 << 20
 
+const (
+	tagCoreUsers = "Core users"
+)
+
 // CreateUserRequest is the HTTP transport DTO for user creation.
 type CreateUserRequest struct {
 	Email     string  `json:"email" doc:"User email address"`
@@ -62,7 +66,7 @@ func (h *UserHandler) RegisterRoutes(api huma.API) {
 		Path:          "/api/v1/core/users/",
 		Summary:       "Create a user",
 		Description:   "Creates a user and stores a bcrypt hash of the supplied password.",
-		Tags:          []string{"Core users"},
+		Tags:          []string{tagCoreUsers},
 		DefaultStatus: http.StatusCreated,
 		MaxBodyBytes:  maxCreateUserBodyBytes,
 		Errors:        []int{http.StatusBadRequest, http.StatusInternalServerError},
@@ -74,7 +78,7 @@ func (h *UserHandler) RegisterRoutes(api huma.API) {
 		Path:        "/api/v1/core/users/",
 		Summary:     "List users",
 		Description: "Returns Core users using offset pagination.",
-		Tags:        []string{"Core users"},
+		Tags:        []string{tagCoreUsers},
 		Errors:      []int{http.StatusInternalServerError},
 	}, h.ListUsers)
 
@@ -84,7 +88,7 @@ func (h *UserHandler) RegisterRoutes(api huma.API) {
 		Path:        "/api/v1/core/users/{id}",
 		Summary:     "Get a user",
 		Description: "Returns a Core user for the supplied UUID.",
-		Tags:        []string{"Core users"},
+		Tags:        []string{tagCoreUsers},
 		Errors:      []int{http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError},
 	}, h.GetUserByID)
 }
@@ -101,7 +105,7 @@ func (h *UserHandler) CreateUser(ctx context.Context, input *CreateUserInput) (*
 	hash, err := bcrypt.GenerateFromPassword([]byte(input.Body.Password), bcrypt.DefaultCost)
 	if err != nil {
 		slog.Error("Failed to hash password", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	user, err := h.repo.CreateUser(ctx, ports.CreateUserParams{
@@ -114,7 +118,7 @@ func (h *UserHandler) CreateUser(ctx context.Context, input *CreateUserInput) (*
 	})
 	if err != nil {
 		slog.Error("Failed to create user", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &UserOutput{Body: *user}, nil
@@ -132,7 +136,7 @@ func (h *UserHandler) GetUserByID(ctx context.Context, input *GetUserInput) (*Us
 			return nil, huma.Error404NotFound("User not found")
 		}
 		slog.Error("Failed to get user", "error", err, "user_id", id)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &UserOutput{Body: *user}, nil
@@ -142,7 +146,7 @@ func (h *UserHandler) ListUsers(ctx context.Context, input *ListUsersInput) (*Us
 	users, err := h.repo.ListUsers(ctx, int32(input.Limit), int32(input.Offset))
 	if err != nil {
 		slog.Error("Failed to list users", "error", err)
-		return nil, huma.Error500InternalServerError("Internal server error")
+		return nil, huma.Error500InternalServerError(errInternalServerError)
 	}
 
 	return &UsersOutput{Body: users}, nil
