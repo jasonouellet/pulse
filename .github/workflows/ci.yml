@@ -23,6 +23,13 @@ jobs:
         with:
           globs: "**/*.md"
 
+      # --- SQLC Lint / Diff Check ---
+      - name: Verify sqlc Generated Code is Up-to-Date
+        uses: sqlc-dev/action-sqlc@v4
+        with:
+          sqlc-version: "1.27.0"
+          args: "diff"
+
       # --- Go Lint ---
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -133,10 +140,6 @@ jobs:
         with:
           node-version: "24"
 
-      # NOTE: snyk/actions ne publie pas de tags versionnés (v1, v2, ...),
-      # seulement @master. C'est un choix des mainteneurs, pas un oubli
-      # de notre part. Si tu veux éliminer le risque d'un tag/branche
-      # mouvant, épingle un SHA de commit précis à la place de @master.
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
 
@@ -169,8 +172,6 @@ jobs:
           name: coverage-frontend
           path: frontend/coverage/
 
-      # sonarcloud-github-action est dépréciée; remplacée par
-      # sonarqube-scan-action, qui couvre SonarCloud et SonarQube Server.
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
