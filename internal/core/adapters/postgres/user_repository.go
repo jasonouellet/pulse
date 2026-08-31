@@ -7,24 +7,24 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"pulse/internal/core/ports"
+	"pulse/pkg/database"
 )
 
 type UserRepository struct {
-	db *pgxpool.Pool
+	db database.PgxPool
 }
 
-func NewUserRepository(db *pgxpool.Pool) *UserRepository {
+func NewUserRepository(db database.PgxPool) *UserRepository {
 	return &UserRepository{db: db}
 }
 
 func (r *UserRepository) CreateUser(ctx context.Context, p ports.CreateUserParams) (*ports.UserDTO, error) {
 	query := `
 		INSERT INTO core.users (email, password_hash, first_name, last_name, phone, role)
-		VALUES ($1, $2, $3, $4, $5, $6::core.user_role)
-		RETURNING id, email, first_name, last_name, phone, role::text, is_active;
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id, email, first_name, last_name, phone, role, is_active;
 	`
 	var u ports.UserDTO
 	err := r.db.QueryRow(ctx, query, p.Email, p.PasswordHash, p.FirstName, p.LastName, p.Phone, p.Role).Scan(
@@ -38,7 +38,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, p ports.CreateUserParam
 
 func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*ports.UserDTO, error) {
 	query := `
-		SELECT id, email, first_name, last_name, phone, role::text, is_active
+		SELECT id, email, first_name, last_name, phone, role, is_active
 		FROM core.users
 		WHERE id = $1;
 	`
@@ -57,7 +57,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*ports.
 
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*ports.UserDTO, error) {
 	query := `
-		SELECT id, email, first_name, last_name, phone, role::text, is_active
+		SELECT id, email, first_name, last_name, phone, role, is_active
 		FROM core.users
 		WHERE email = $1;
 	`
@@ -76,9 +76,9 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*por
 
 func (r *UserRepository) ListUsers(ctx context.Context, limit, offset int32) ([]ports.UserDTO, error) {
 	query := `
-		SELECT id, email, first_name, last_name, phone, role::text, is_active
+		SELECT id, email, first_name, last_name, phone, role, is_active
 		FROM core.users
-		ORDER BY created_at DESC
+		ORDER BY last_name ASC, first_name ASC
 		LIMIT $1 OFFSET $2;
 	`
 	rows, err := r.db.Query(ctx, query, limit, offset)

@@ -11,12 +11,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redis/go-redis/v9"
 	"github.com/riandyrn/otelchi"
 
 	coreHTTP "pulse/internal/core/adapters/http"
@@ -54,6 +56,10 @@ func main() {
 	} else {
 		defer func() { _ = shutdownTracer(context.Background()) }()
 	}
+
+	// 1.b. Redis Setup
+	rdb, cleanupRedis := initRedis()
+	defer cleanupRedis()
 
 	// 2. Database Connection & Auto-Migrations
 	dbCfg := database.Config{
@@ -118,6 +124,10 @@ func main() {
 	coreHandler := coreHTTP.NewUserHandler(coreRepo)
 	coreHandler.RegisterRoutes(api)
 
+	teamRepo := corePostgres.NewTeamRepository(dbPool)
+	teamHandler := coreHTTP.NewTeamHandler(teamRepo)
+	teamHandler.RegisterRoutes(api)
+
 	// 5. Graceful HTTP Shutdown Server
 	port := getEnv("PORT", "8080")
 	server := &http.Server{
@@ -177,4 +187,36 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func initRedis() (*redis.Client, func()) {
+	// Si on est en mode dev local sans Docker, on lance miniredis
+	if os.Getenv("ENV") == "development" || os.Getenv("REDIS_ADDR") == "" {
+		mr, err := miniredis.Run()
+		if err != nil {
+			log.Fatalf("Échec du démarrage de miniredis local : %v", err)
+		}
+
+		log.Printf("🚀 Miniredis (In-Memory) démarré localement sur %s", mr.Addr())
+
+		client := redis.NewClient(&redis.Options{
+			Addr: mr.Addr(),
+		})
+
+		// Cleanup function pour fermer propre au shutdown
+		cleanup := func() {
+			client.Close()
+			mr.Close()
+		}
+		return client, cleanup
+	}
+
+	// Sinon (staging/prod), on se connecte au vrai Redis
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+	})
+
+	cleanup := func() { client.Close() }
+	return client, cleanup
 }

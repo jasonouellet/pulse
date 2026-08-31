@@ -7,16 +7,16 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"pulse/internal/core/ports"
+	"pulse/pkg/database"
 )
 
 type TeamRepository struct {
-	db *pgxpool.Pool
+	db database.PgxPool
 }
 
-func NewTeamRepository(db *pgxpool.Pool) *TeamRepository {
+func NewTeamRepository(db database.PgxPool) *TeamRepository {
 	return &TeamRepository{db: db}
 }
 
