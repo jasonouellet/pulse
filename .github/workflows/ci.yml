@@ -25,11 +25,11 @@ jobs:
 
       # --- SQLC Lint / Diff Check ---
       - name: Verify sqlc Generated Code is Up-to-Date
-        uses: sqlc-dev/action-sqlc@v4
+        uses: sqlc-dev/sqlc-action@v4
         with:
           sqlc-version: "1.27.0"
           args: "diff"
-
+      
       # --- Go Lint ---
       - name: Setup Go
         uses: actions/setup-go@v5
