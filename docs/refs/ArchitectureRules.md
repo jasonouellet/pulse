@@ -53,3 +53,25 @@ internal/
 * Mocks autorisés:
   * PostgreSQL : Utilisation de pgxmock pour simuler le comportement du pool SQL
   * Redis : Utilisation de alicebob/miniredis pour simuler l'instance in-memory en pure Go.
+
+## Règle 7 : Conventions I18n & Layouts Frontend
+
+### 1. Structure des Layouts & Routage
+
+* **Route Parente Unifiée :** Toutes les vues dépendantes du cadre applicatif principal (Header, Navigation, Menu profil, Thème) doivent être déclarées comme routes enfants de `<AppLayout />` dans `App.tsx`.
+* **Utilisation d'Outlet :** Aucun layout de page ne doit utiliser la prop `children` pour le contenu principal. Le rendu des sous-pages est délégué exclusivement au composant `<Outlet />` de `react-router`.
+* **Menu de Navigation (`NAV_BY_ROLE`) :** Chaque élément du menu de navigation doit comporter une propriété `key` correspondant exactement à une sous-clé sous `nav` dans le dictionnaire `common.json`.
+
+### 2. Conventions Naming & Clés I18n
+
+* **Enumérations & Domaines Métier :** Toutes les valeurs d'enums TypeScript exposées dans l'UI (ex: `UserRole`) doivent correspondre **exactement (casse et tirets bas inclus)** aux clés de leur dictionnaire JSON respectif (`roles.CLUB_ADMIN`, `roles.TECHNICAL_DIRECTOR`, etc.).
+* **Pas de transformation arbitraire :** Il est interdit de faire des transformations de chaînes à la volée (ex: `.toLowerCase()`) dans les composants pour faire correspondre un type aux clés i18n. La clé JSON doit s'adapter au type TypeScript, et non l'inverse.
+* **Espaces de noms (`namespaces`) :**
+  * `common.json` : Contient la navigation globale (`nav`), l'état utilisateur (`user`), les rôles (`roles`), les actions transversales (`actions`) et les labels d'état (`labels`).
+  * `<domain>.json` : Chaque domaine métier spécifique (ex: `roster.json`) doit posséder son propre fichier de ressources pour éviter les dictionnaires monolithiques.
+
+### 3. Typage & Fallbacks
+
+* **Fallback Obligatoire :** Tout appel au hook `t()` sur une valeur dynamique doit fournir une valeur de secours explicite (`defaultValue`).
+* **Gestion du Nullable :** Lorsqu'une prop ou un champ d'objet peut être indéfini (`string | undefined`), l'accès à `defaultValue` doit utiliser l'opérateur de coalescence nulle : `defaultValue: item.label ?? ""`.
+* **Vérification TypeScript :** Aucune PR ne doit être fusionnée si `npx tsc --noEmit` remonte une erreur d'incompatibilité sur les signatures de `t()`.
