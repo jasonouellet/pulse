@@ -42,7 +42,7 @@ SET
     first_name = COALESCE($2, first_name),
     last_name = COALESCE($3, last_name),
     phone = COALESCE($4, phone),
-    role = COALESCE($5, role),
+    role = COALESCE($5::core.user_role, role),
     is_active = COALESCE($6, is_active),
     updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
@@ -110,19 +110,6 @@ WHERE parent_id = $1 AND child_id = $2;
 -- ----------------------------------------------------------------------------
 -- POOLS (AGE CATEGORIES) QUERIES
 -- ----------------------------------------------------------------------------
-
--- name: CreatePool :one
-INSERT INTO core.pools (
-    sport_id,
-    name,
-    code,
-    min_age,
-    max_age,
-    gender,
-    season_year
-) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
-) RETURNING id, sport_id, name, code, min_age, max_age, gender, season_year, is_active, created_at;
 
 -- name: ListPoolsBySportAndSeason :many
 SELECT id, sport_id, name, code, min_age, max_age, gender, season_year, is_active

@@ -34,3 +34,4 @@ node_modules/
 # Editor/IDE
 # .idea/
 # .vscode/
+sources*.txt
