@@ -32,7 +32,7 @@ Afin d'éviter la fragmentation du code HTTP et la création de répertoires par
 
 ## **Règle 5 : Arborescence Modulaire Standardisée**
 
-Chaque nouveau module fonctionnel (ex: `core`, `scheduling`, `tournament`)[cite: 1] doit suivre rigoureusement l'arborescence ci-dessous :
+Chaque nouveau module fonctionnel (ex: `core`, `scheduling`, `tournament`) doit suivre rigoureusement l'arborescence ci-dessous :
 
 ```text
 internal/
