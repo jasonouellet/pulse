@@ -31,7 +31,7 @@ func SetupTestRedis(t *testing.T) (*redis.Client, *miniredis.Miniredis) {
 	client := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 
 	t.Cleanup(func() {
-		client.Close()
+		_ = client.Close()
 		mr.Close()
 	})
 

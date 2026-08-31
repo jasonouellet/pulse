@@ -14,7 +14,7 @@ type Config struct {
 	DB       int
 }
 
-// Client enveloppe le client officiel go-redis
+// Client wraps the official go-redis client
 type Client struct {
 	*redis.Client
 }
@@ -30,7 +30,7 @@ func New(cfg Config) (*Client, error) {
 	defer cancel()
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
-		return nil, fmt.Errorf("impossible de se connecter à redis: %w", err)
+		return nil, fmt.Errorf("unable to connect to Redis: %w", err)
 	}
 
 	return &Client{rdb}, nil

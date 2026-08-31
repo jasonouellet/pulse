@@ -30,7 +30,7 @@ func (r *TeamRepository) CreateTeam(ctx context.Context, p ports.CreateTeamParam
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	qtx := r.q.WithTx(tx)
 

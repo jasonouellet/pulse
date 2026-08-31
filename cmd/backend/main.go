@@ -30,10 +30,10 @@ import (
 
 // @title           Project PULSE API
 // @version         1.0
-// @description     API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).
+// @description     Modular backend API for managing sports clubs (PULSE OS).
 // @termsOfService  http://swagger.io/terms/
 
-// @contact.name    Équipe Project PULSE
+// @contact.name    Project PULSE team
 // @contact.url     https://github.com/jasonouellet/pulse
 
 // @license.name  Source-Available Non-Commercial (ADR-005)
@@ -90,16 +90,16 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	// Le nginx en amont (contrôlé par nous) écrase X-Real-IP via
-	// `proxy_set_header X-Real-IP $remote_addr;` — donc aucune valeur
-	// fournie par le client ne peut passer. Voir GHSA-3fxj-6jh8-hvhx pour
-	// le contexte sur l'ancien middleware.RealIP, déprécié et vulnérable.
+	// The upstream nginx (controlled by us) overrides X-Real-IP via
+	// `proxy_set_header X-Real-IP $remote_addr;` — therefore no value
+	// provided by the client can pass. See GHSA-3fxj-6jh8-hvhx for
+	// the context on the old, obsolete, and vulnerable RealIP middleware.
 	r.Use(middleware.ClientIPFromHeader("X-Real-IP"))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
 
-	// Endpoint des métriques Prometheus
+	// Prometheus metrics endpoint
 	r.Handle("/metrics", promhttp.Handler())
 
 	apiConfig := huma.DefaultConfig("Project PULSE API", "1.0.0")
@@ -191,33 +191,33 @@ func getEnv(key, fallback string) string {
 }
 
 func initRedis() (*redis.Client, func()) {
-	// Si on est en mode dev local sans Docker, on lance miniredis
+	// If we are in local development mode without Docker, we launch miniredis
 	if os.Getenv("ENV") == "development" || os.Getenv("REDIS_ADDR") == "" {
 		mr, err := miniredis.Run()
 		if err != nil {
-			log.Fatalf("Échec du démarrage de miniredis local : %v", err)
+			log.Fatalf("Failed to start local MiniRedis: %v", err)
 		}
 
-		log.Printf("🚀 Miniredis (In-Memory) démarré localement sur %s", mr.Addr())
+		log.Printf("🚀 MiniRedis (In-Memory) started locally on %s", mr.Addr())
 
 		client := redis.NewClient(&redis.Options{
 			Addr: mr.Addr(),
 		})
 
-		// Cleanup function pour fermer propre au shutdown
+		// Cleanup function to close properly during shutdown
 		cleanup := func() {
-			client.Close()
+			_ = client.Close()
 			mr.Close()
 		}
 		return client, cleanup
 	}
 
-	// Sinon (staging/prod), on se connecte au vrai Redis
+	// Otherwise (staging/prod), we connect to the real Redis
 	client := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_ADDR"),
 		Password: os.Getenv("REDIS_PASSWORD"),
 	})
 
-	cleanup := func() { client.Close() }
+	cleanup := func() { _ = client.Close() }
 	return client, cleanup
 }

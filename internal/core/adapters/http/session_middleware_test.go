@@ -31,7 +31,7 @@ func setupTestStore(t *testing.T) (*session.Store, *miniredis.Miniredis) {
 
 	// Nettoyage automatique en fin de test
 	t.Cleanup(func() {
-		rdb.Close()
+		_ = rdb.Close()
 		mr.Close()
 	})
 
