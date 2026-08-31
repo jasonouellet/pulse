@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="src/components/LanguageSwitcher.test.tsx">
+    <testCase name="LanguageSwitcher Component - renders correctly and calls changeLanguage on click" duration="436" />
+  </file>
+  <file path="src/components/layout/AppLayout.test.tsx">
+    <testCase name="AppLayout Component - renders brand title and toggles theme mode" duration="567" />
+  </file>
+  <file path="src/components/ui/Button.test.tsx">
+    <testCase name="Button Component - renders correctly with children" duration="377" />
+    <testCase name="Button Component - triggers onClick handler when clicked" duration="26" />
+    <testCase name="Button Component - is accessible according to WCAG rules (axe)" duration="92" />
+  </file>
+  <file path="src/context/SessionProvider.test.tsx">
+    <testCase name="SessionProvider - provides default session context and updates role and club" duration="114" />
+    <testCase name="SessionProvider - throws error when useSession is used outside SessionProvider" duration="17" />
+  </file>
+  <file path="src/pages/GuardianChildrenPage.test.tsx">
+    <testCase name="GuardianChildrenPage Component - renders children list and toggles selection" duration="541" />
+  </file>
+  <file path="src/pages/HomePage.test.tsx">
+    <testCase name="HomePage Component - renders welcome title and quick access links" duration="155" />
+  </file>
+  <file path="src/pages/PlayerProfilePage.test.tsx">
+    <testCase name="PlayerProfilePage Component - renders player profile information" duration="201" />
+  </file>
+  <file path="src/pages/PoolsListPage.test.tsx">
+    <testCase name="PoolsListPage Component - renders pools table and title" duration="527" />
+  </file>
+  <file path="src/pages/RegistrationPage.test.tsx">
+    <testCase name="RegistrationPage - navigates to new child form when clicking button" duration="597" />
+  </file>
+  <file path="src/pages/RosterBuilderPage.test.tsx">
+    <testCase name="RosterBuilderPage - renders pool players and moves player between lists" duration="714" />
+  </file>
+</testExecutions>

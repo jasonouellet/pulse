@@ -21,6 +21,9 @@ export default defineConfig({
       exclude: [
         "node_modules/",
         "src/test/",
+        "src/data/mock.ts",
+        "src/i18n/",
+        "src/lib/observability.ts",
         "**/*.d.ts",
         "**/*.config.*",
         "**/snapshot*",

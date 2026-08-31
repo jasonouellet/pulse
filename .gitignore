@@ -34,4 +34,5 @@ node_modules/
 # Editor/IDE
 # .idea/
 # .vscode/
+sources_extract.sh
 sources*.txt
