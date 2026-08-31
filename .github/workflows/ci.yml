@@ -19,22 +19,22 @@ jobs:
 
       # --- Markdown Lint ---
       - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v17
+        uses: DavidAnson/markdownlint-cli2-action@v24
         with:
           globs: "**/*.md"
 
       # --- SQLC Lint / Diff Check ---
       - name: Setup sqlc
-        uses: sqlc-dev/setup-sqlc@v4
+        uses: sqlc-dev/setup-sqlc@v5
         with:
           sqlc-version: "1.27.0"
 
       - name: Verify sqlc Generated Code is Up-to-Date
         run: sqlc diff
-      
+
       # --- Go Lint ---
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.25"
 
@@ -86,7 +86,7 @@ jobs:
 
       # --- Tests Go ---
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: "1.25"
 
@@ -143,7 +143,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: "1.25"
 
@@ -163,7 +163,7 @@ jobs:
         run: snyk test --severity-threshold=high --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk Scan Results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: snyk.sarif
 
@@ -192,7 +192,7 @@ jobs:
           path: frontend/
 
       - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
