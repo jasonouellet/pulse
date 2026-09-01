@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,32 +12,35 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/redis/go-redis/v9"
 	"github.com/riandyrn/otelchi"
 
 	coreHTTP "pulse/internal/core/adapters/http"
 	corePostgres "pulse/internal/core/adapters/postgres"
+	"pulse/internal/platform/session"
 	"pulse/pkg/database"
 	"pulse/pkg/observability"
-
-	_ "pulse/docs/openapi" // Importer la doc générée
-
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // @title           Project PULSE API
 // @version         1.0
-// @description     API du backend modulaire pour la gestion de clubs sportifs (PULSE OS).
+// @description     Modular backend API for managing sports clubs (PULSE OS).
 // @termsOfService  http://swagger.io/terms/
 
-// @contact.name   Équipe Project PULSE
-// @contact.url    https://github.com/jasonouellet/pulse
+// @contact.name    Project PULSE team
+// @contact.url     https://github.com/jasonouellet/pulse
 
 // @license.name  Source-Available Non-Commercial (ADR-005)
 
 // @host      localhost:8080
-// @BasePath  /api/v1
+// @BasePath  /
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
@@ -55,6 +59,13 @@ func main() {
 		defer func() { _ = shutdownTracer(context.Background()) }()
 	}
 
+	// 1.b. Redis Setup
+	rdb, cleanupRedis := initRedis()
+	defer cleanupRedis()
+	// 1.c. Session Store & Middleware Setup
+	sessionStore := session.NewStore(rdb, 15*time.Minute)
+	sessionMiddleware := coreHTTP.NewSessionMiddleware(sessionStore)
+
 	// 2. Database Connection & Auto-Migrations
 	dbCfg := database.Config{
 		Host:     getEnv("DB_HOST", "localhost"),
@@ -68,8 +79,8 @@ func main() {
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		dbCfg.User, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.DBName, dbCfg.SSLMode)
 
-	if err := database.RunMigrations("migrations/core", dbURL); err != nil {
-		slog.Error("Failed to apply core migrations", "error", err)
+	if err := database.RunAllMigrations(dbURL); err != nil {
+		slog.Error("Failed to apply migrations", "error", err)
 	}
 
 	dbPool, err := database.NewPostgresPool(ctx, dbCfg)
@@ -83,32 +94,45 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	// Le nginx en amont (contrôlé par nous) écrase X-Real-IP via
-	// `proxy_set_header X-Real-IP $remote_addr;` — donc aucune valeur
-	// fournie par le client ne peut passer. Voir GHSA-3fxj-6jh8-hvhx pour
-	// le contexte sur l'ancien middleware.RealIP, déprécié et vulnérable.
+	// The upstream nginx (controlled by us) overrides X-Real-IP via
+	// `proxy_set_header X-Real-IP $remote_addr;` — therefore no value
+	// provided by the client can pass. See GHSA-3fxj-6jh8-hvhx for
+	// the context on the old, obsolete, and vulnerable RealIP middleware.
 	r.Use(middleware.ClientIPFromHeader("X-Real-IP"))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(otelchi.Middleware("pulse-backend-api"))
+	r.Use(sessionMiddleware.RequireAuth)
 
-	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		if err := dbPool.Ping(r.Context()); err != nil {
-			http.Error(w, "Database Unavailable", http.StatusServiceUnavailable)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status":"OK","service":"pulse-backend"}`))
-	})
+	// Prometheus metrics endpoint
+	r.Handle("/metrics", promhttp.Handler())
 
-	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
-	))
+	apiConfig := huma.DefaultConfig("Project PULSE API", "1.0.0")
+	apiConfig.OpenAPIPath = "/openapi"
+	apiConfig.DocsPath = "/docs"
+	apiConfig.DocsRenderer = huma.DocsRendererSwaggerUI
+	api := humachi.New(r, apiConfig)
+
+	huma.Register(api, huma.Operation{
+		OperationID:   "liveness-check",
+		Method:        http.MethodGet,
+		Path:          "/livez",
+		Summary:       "Check process liveness",
+		Description:   "Verifies that the backend process can serve requests.",
+		Tags:          []string{"Health"},
+		DefaultStatus: http.StatusOK,
+	}, liveHandler)
+	huma.Register(api, huma.Operation{OperationID: "readiness-check", Method: http.MethodGet, Path: "/readyz", Summary: "Check service readiness", Tags: []string{"Health"}, Errors: []int{http.StatusServiceUnavailable}}, readyHandler(dbPool))
+	huma.Register(api, huma.Operation{OperationID: "health-check", Method: http.MethodGet, Path: "/healthz", Summary: "Check service health", Tags: []string{"Health"}, Errors: []int{http.StatusServiceUnavailable}}, readyHandler(dbPool))
 
 	// 4. Register Core Module Routes
 	coreRepo := corePostgres.NewUserRepository(dbPool)
 	coreHandler := coreHTTP.NewUserHandler(coreRepo)
-	coreHandler.RegisterRoutes(r)
+	coreHandler.RegisterRoutes(api)
+
+	teamRepo := corePostgres.NewTeamRepository(dbPool)
+	teamHandler := coreHTTP.NewTeamHandler(teamRepo)
+	teamHandler.RegisterRoutes(api)
 
 	// 5. Graceful HTTP Shutdown Server
 	port := getEnv("PORT", "8080")
@@ -141,9 +165,64 @@ func main() {
 	}
 }
 
+type healthResponse struct {
+	Status  string `json:"status"`
+	Service string `json:"service"`
+}
+
+type healthOutput struct {
+	Body healthResponse
+}
+
+func liveHandler(_ context.Context, _ *struct{}) (*healthOutput, error) {
+	return &healthOutput{Body: healthResponse{Status: "OK", Service: "pulse-backend"}}, nil
+}
+
+func readyHandler(dbPool *pgxpool.Pool) func(context.Context, *struct{}) (*healthOutput, error) {
+	return func(ctx context.Context, _ *struct{}) (*healthOutput, error) {
+		if err := dbPool.Ping(ctx); err != nil {
+			return nil, huma.Error503ServiceUnavailable("Database unavailable")
+		}
+
+		return &healthOutput{Body: healthResponse{Status: "OK", Service: "pulse-backend"}}, nil
+	}
+}
+
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
 	return fallback
+}
+
+func initRedis() (*redis.Client, func()) {
+	// If we are in local development mode without Docker, we launch miniredis
+	if os.Getenv("ENV") == "development" || os.Getenv("REDIS_ADDR") == "" {
+		mr, err := miniredis.Run()
+		if err != nil {
+			log.Fatalf("Failed to start local MiniRedis: %v", err)
+		}
+
+		log.Printf("🚀 MiniRedis (In-Memory) started locally on %s", mr.Addr())
+
+		client := redis.NewClient(&redis.Options{
+			Addr: mr.Addr(),
+		})
+
+		// Cleanup function to close properly during shutdown
+		cleanup := func() {
+			_ = client.Close()
+			mr.Close()
+		}
+		return client, cleanup
+	}
+
+	// Otherwise (staging/prod), we connect to the real Redis
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+	})
+
+	cleanup := func() { _ = client.Close() }
+	return client, cleanup
 }

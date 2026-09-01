@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
@@ -63,7 +65,8 @@ func TestCreateUser_Success(t *testing.T) {
 	handler := coreHTTP.NewUserHandler(repo)
 
 	r := chi.NewRouter()
-	handler.RegisterRoutes(r)
+	api := humachi.New(r, huma.DefaultConfig("PULSE test API", "1.0.0"))
+	handler.RegisterRoutes(api)
 
 	// Reflète le DTO HTTP réel (createUserRequest côté handler), pas
 	// ports.CreateUserParams qui n'a pas de champ pour le mot de passe

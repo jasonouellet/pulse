@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE OS — Thèmes Multi-Sports & Mode Sombre</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ==========================================================================
+       1. THÈME SOCCER (Pitch & Grass)
+       ========================================================================== */
+    :root[data-sport="soccer"][data-mode="light"] {
+      --bg-main: #F0FDF4;          /* Mint très frais */
+      --card-bg: #FFFFFF;
+      --card-border: #DCFCE7;
+      --text-main: #064E3B;
+      --text-muted: #166534;
+      --primary: #047857;          /* Vert Terrain */
+      --primary-hover: #065F46;
+      --accent-ai: #84CC16;        /* Vert Lime Fluo */
+      --ai-banner-bg: #ECFDF5;
+      --ai-banner-border: #84CC16;
+    }
+    :root[data-sport="soccer"][data-mode="dark"] {
+      --bg-main: #022C22;          /* Vert Nuit Profond */
+      --card-bg: #064E3B;
+      --card-border: #047857;
+      --text-main: #ECFDF5;
+      --text-muted: #A7F3D0;
+      --primary: #10B981;          /* Émeraude lumineux */
+      --primary-hover: #059669;
+      --accent-ai: #A3E635;        /* Lime Électrique */
+      --ai-banner-bg: #065F46;
+      --ai-banner-border: #A3E635;
+    }
+
+    /* ==========================================================================
+       2. THÈME HOCKEY (Ice & Cold Navy)
+       ========================================================================== */
+    :root[data-sport="hockey"][data-mode="light"] {
+      --bg-main: #F0F9FF;          /* Blanc Glacé / Ice Blue */
+      --card-bg: #FFFFFF;
+      --card-border: #E0F2FE;
+      --text-main: #0C4A6E;
+      --text-muted: #0369A1;
+      --primary: #0284C7;          /* Bleu Patinoire */
+      --primary-hover: #0369A1;
+      --accent-ai: #38BDF8;        /* Bleu Cyan vif */
+      --ai-banner-bg: #E0F2FE;
+      --ai-banner-border: #38BDF8;
+    }
+    :root[data-sport="hockey"][data-mode="dark"] {
+      --bg-main: #0B192C;          /* Aréna sombre / Deep Navy */
+      --card-bg: #1E293B;
+      --card-border: #334155;
+      --text-main: #F0F9FF;
+      --text-muted: #94A3B8;
+      --primary: #38BDF8;          /* Bleu Électrique */
+      --primary-hover: #0284C7;
+      --accent-ai: #00F0FF;        /* Cyan Neon */
+      --ai-banner-bg: #0F172A;
+      --ai-banner-border: #00F0FF;
+    }
+
+    /* ==========================================================================
+       3. THÈME BASEBALL (Clay & Diamond)
+       ========================================================================== */
+    :root[data-sport="baseball"][data-mode="light"] {
+      --bg-main: #FFFBEB;          /* Sable / Terre battue clair */
+      --card-bg: #FFFFFF;
+      --card-border: #FEF3C7;
+      --text-main: #78350F;
+      --text-muted: #92400E;
+      --primary: #B45309;          /* Terre battue (Clay Amber) */
+      --primary-hover: #92400E;
+      --accent-ai: #D97706;        /* Ambre d'action */
+      --ai-banner-bg: #FEF3C7;
+      --ai-banner-border: #F59E0B;
+    }
+    :root[data-sport="baseball"][data-mode="dark"] {
+      --bg-main: #1C100B;          /* Cuir / Terre de nuit */
+      --card-bg: #2E1A12;
+      --card-border: #452719;
+      --text-main: #FEF3C7;
+      --text-muted: #D97706;
+      --primary: #F59E0B;          /* Jaune Ambre Vif */
+      --primary-hover: #D97706;
+      --accent-ai: #FBBF24;        /* Doré brillant */
+      --ai-banner-bg: #452719;
+      --ai-banner-border: #FBBF24;
+    }
+
+    /* Styles utilitaires dynamiques */
+    body { background-color: var(--bg-main); color: var(--text-main); transition: all 0.25s ease; }
+    .ui-card { background-color: var(--card-bg); border-color: var(--card-border); }
+    .ui-text-muted { color: var(--text-muted); }
+    .ui-btn-primary { background-color: var(--primary); color: #FFFFFF; }
+    .ui-btn-primary:hover { background-color: var(--primary-hover); }
+    .ui-ai-banner { background-color: var(--ai-banner-bg); border-color: var(--ai-banner-border); }
+    .ui-ai-accent { color: var(--accent-ai); }
+    .ui-ai-btn { background-color: var(--accent-ai); color: #000000; }
+  </style>
+</head>
+<body class="h-full font-sans antialiased p-4 md:p-8">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Panneau de Contrôle : Sport + Mode Light/Dark -->
+    <div class="ui-card border rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+
+      <!-- Sélection du Sport -->
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-bold uppercase tracking-wider ui-text-muted">Sport :</span>
+        <div class="flex bg-black/10 dark:bg-white/10 p-1 rounded-xl">
+          <button onclick="setSport('soccer')" id="btn-soccer" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            ⚽ Soccer
+          </button>
+          <button onclick="setSport('hockey')" id="btn-hockey" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            🏒 Hockey
+          </button>
+          <button onclick="setSport('baseball')" id="btn-baseball" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            ⚾ Baseball
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggle Mode Clair / Sombre -->
+      <div class="flex items-center space-x-2">
+        <span class="text-xs font-bold uppercase tracking-wider ui-text-muted">Apparence :</span>
+        <div class="flex bg-black/10 dark:bg-white/10 p-1 rounded-xl">
+          <button onclick="setMode('light')" id="btn-light" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            ☀️ Light
+          </button>
+          <button onclick="setMode('dark')" id="btn-dark" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+            🌙 Dark
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Interface Applicative PULSE OS -->
+    <div class="ui-card border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+
+      <!-- Topbar Header -->
+      <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+          <span class="font-black text-xl tracking-wider">PULSE<span class="ui-ai-accent">.OS</span></span>
+          <span id="sport-badge" class="bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded-full border border-slate-700 font-semibold">
+            ⚽ Soccer — Fury Rimouski
+          </span>
+        </div>
+        <div class="flex items-center space-x-3 text-xs font-medium">
+          <span class="ui-ai-btn px-3 py-1.5 rounded-lg font-bold shadow-sm">Multi-Tenant (Sport Context)</span>
+        </div>
+      </div>
+
+      <!-- Zone de contenu principal -->
+      <div class="p-6 space-y-6">
+
+        <!-- En-tête -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 id="page-title" class="text-2xl font-black tracking-tight">Alignement de la Saison</h1>
+            <p class="text-sm ui-text-muted mt-0.5">Gestion du bassin et respect de la règle d'unicité par événement</p>
+          </div>
+          <button class="ui-btn-primary px-4 py-2 rounded-xl text-sm font-bold shadow-md transition">
+            + Ajouter un Athlète
+          </button>
+        </div>
+
+        <!-- Banner Copilote IA -->
+        <div class="ui-ai-banner border rounded-xl p-4 flex items-start gap-4 transition-all">
+          <div class="text-2xl ui-ai-accent">⚡</div>
+          <div class="flex-1 text-sm">
+            <h4 class="font-bold text-base">Copilote IA PULSE</h4>
+            <p id="ai-suggestion" class="ui-text-muted text-xs mt-1">
+              Génération automatique des trios/lignes basée sur les évaluations athlétiques et les positions.
+            </p>
+          </div>
+          <button class="ui-ai-btn text-xs px-4 py-2 rounded-lg font-black shadow-sm hover:opacity-90">
+            Optimiser l'alignement
+          </button>
+        </div>
+
+        <!-- Tableau d'exemples -->
+        <div class="border ui-card rounded-xl overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-black/5 dark:bg-white/5 text-xs uppercase tracking-wider border-b ui-card">
+              <tr>
+                <th class="p-3.5">Athlète</th>
+                <th class="p-3.5">Catégorie</th>
+                <th class="p-3.5">Poste / Position</th>
+                <th class="p-3.5">Calibre</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-black/5 dark:divide-white/5">
+              <tr>
+                <td class="p-3.5 font-bold">Sophie Gagnon</td>
+                <td class="p-3.5 ui-text-muted">U10F</td>
+                <td id="pos-1" class="p-3.5 font-medium">Attaquante (Ailier)</td>
+                <td class="p-3.5"><span class="ui-ai-accent font-black text-xs">AA</span></td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-bold">Camille Lévesque</td>
+                <td class="p-3.5 ui-text-muted">U10F</td>
+                <td id="pos-2" class="p-3.5 font-medium">Défenseure Centrale</td>
+                <td class="p-3.5"><span class="ui-ai-accent font-black text-xs">A</span></td>
+              </tr>
+              <tr>
+                <td class="p-3.5 font-bold">Olivia Bouchard</td>
+                <td class="p-3.5 ui-text-muted">U10F</td>
+                <td id="pos-3" class="p-3.5 font-medium">Gardienne</td>
+                <td class="p-3.5"><span class="ui-ai-accent font-black text-xs">AA</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let currentSport = 'soccer';
+    let currentMode = 'light';
+
+    const sportConfigs = {
+      soccer: {
+        badge: '⚽ Soccer — Fury Rimouski',
+        aiText: 'Répartition automatique de 60 joueuses en 4 équipes de 7v7 équilibrées selon le calibre.',
+        pos1: 'Attaquante (Ailier Gauche)',
+        pos2: 'Milieu Défensif',
+        pos3: 'Gardienne de But'
+      },
+      hockey: {
+        badge: '🏒 Hockey — Océanic Junior',
+        aiText: 'Optimisation des 4 trios d\'attaque et 3 pairs de défenseurs selon le temps de jeu.',
+        pos1: 'Ailier Droit (Trio 1)',
+        pos2: 'Défenseur Gaucher (Paire 1)',
+        pos3: 'Gardien Partant'
+      },
+      baseball: {
+        badge: '⚾ Baseball — Ligue Régionale',
+        aiText: 'Calcul du Roster et rotation automatique des lanceurs selon le nombre de lancers autorisés.',
+        pos1: 'Arrêt-court (Shortstop)',
+        pos2: 'Lanceur Partant (Pitcher)',
+        pos3: 'Receveur (Catcher)'
+      }
+    };
+
+    function updateUI() {
+      document.documentElement.setAttribute('data-sport', currentSport);
+      document.documentElement.setAttribute('data-mode', currentMode);
+
+      // Met à jour les textes du sport
+      const config = sportConfigs[currentSport];
+      document.getElementById('sport-badge').innerText = config.badge;
+      document.getElementById('ai-suggestion').innerText = config.aiText;
+      document.getElementById('pos-1').innerText = config.pos1;
+      document.getElementById('pos-2').innerText = config.pos2;
+      document.getElementById('pos-3').innerText = config.pos3;
+
+      // Boutons Sports
+      ['soccer', 'hockey', 'baseball'].forEach(s => {
+        const btn = document.getElementById(`btn-${s}`);
+        btn.className = s === currentSport
+          ? "px-3 py-1.5 rounded-lg text-xs font-black shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+          : "px-3 py-1.5 rounded-lg text-xs font-bold ui-text-muted hover:opacity-80";
+      });
+
+      // Boutons Mode
+      ['light', 'dark'].forEach(m => {
+        const btn = document.getElementById(`btn-${m}`);
+        btn.className = m === currentMode
+          ? "px-3 py-1.5 rounded-lg text-xs font-black shadow-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+          : "px-3 py-1.5 rounded-lg text-xs font-bold ui-text-muted hover:opacity-80";
+      });
+    }
+
+    function setSport(sport) {
+      currentSport = sport;
+      updateUI();
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      updateUI();
+    }
+
+    // Initialisation
+    updateUI();
+  </script>
+</body>
+</html>

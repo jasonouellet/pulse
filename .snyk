@@ -1,0 +1,23 @@
+# Configuration Snyk pour Project PULSE
+version: v1.0.0
+
+# Réglages globaux
+language-settings:
+  go:
+    # Analyse des dépendances Go
+  javascript:
+    # Analyse des packages npm (frontend)
+
+# Exclusions de dossiers
+exclude:
+  global:
+    - "**/node_modules/**"
+    - "**/vendor/**"
+    - "internal/core/adapters/postgres/db/**" # Exclut le code généré sqlc
+
+# Gestion des vulnérabilités ignorées temporairement (avec raison et expiration)
+# ignore:
+#   'SNYK-JS-EXAMPLE-12345':
+#     - '*':
+#         reason: 'Faux positif sous investigation'
+#         expires: 2026-12-31T00:00:00.000Z

@@ -17,6 +17,7 @@ coverage.*
 *.coverprofile
 profile.cov
 coverage/
+test-report-frontend.xml
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -34,3 +35,5 @@ node_modules/
 # Editor/IDE
 # .idea/
 # .vscode/
+sources_extract.sh
+sources*.txt

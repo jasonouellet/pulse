@@ -1,0 +1,8 @@
+resources: [resources.yaml]
+images:
+  - name: pulse-backend
+    newName: pulse-backend
+    newTag: dev
+  - name: pulse-frontend
+    newName: pulse-frontend
+    newTag: dev

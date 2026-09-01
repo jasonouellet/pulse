@@ -5,15 +5,16 @@ import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 
 export function initFrontendObservability() {
-  const provider = new WebTracerProvider();
-
   const exporter = new OTLPTraceExporter({
     url:
       import.meta.env.VITE_OTEL_COLLECTOR_URL ||
       "http://localhost:4318/v1/traces",
   });
 
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  const provider = new WebTracerProvider({
+    spanProcessors: [new SimpleSpanProcessor(exporter)],
+  });
+
   provider.register();
 
   registerInstrumentations({

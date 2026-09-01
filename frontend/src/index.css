@@ -1,111 +1,109 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* Tailwind v4 dropped the JS `darkMode: "class"` option — this replicates
+   the same class-based strategy. AppLayout toggles `.dark` on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================================================
+   SPORT-SCOPED THEME
+   Scoped by [data-sport] on <html>, set from the active club's sport
+   (SessionProvider). Soccer is the only real sport today (ADR-004); hockey
+   and baseball are stubbed here so adding a sport later is a palette swap,
+   not a refactor. Light is the default; .dark overrides per sport.
+   ============================================================================ */
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+:root,
+[data-sport="soccer"] {
+  --pulse-bg: #f0fdf4;
+  --pulse-surface: #ffffff;
+  --pulse-border: #dcfce7;
+  --pulse-text: #064e3b;
+  --pulse-text-muted: #166534;
+  --pulse-primary-50: #ecfdf5;
+  --pulse-primary-500: #047857;
+  --pulse-primary-600: #065f46;
+  --pulse-primary-900: #064e3b;
+  --pulse-accent: #65a30d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+.dark[data-sport="soccer"],
+.dark:not([data-sport]) {
+  --pulse-bg: #022c22;
+  --pulse-surface: #064e3b;
+  --pulse-border: #047857;
+  --pulse-text: #ecfdf5;
+  --pulse-text-muted: #a7f3d0;
+  --pulse-primary-50: #065f46;
+  --pulse-primary-500: #10b981;
+  --pulse-primary-600: #059669;
+  --pulse-primary-900: #022c22;
+  --pulse-accent: #a3e635;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+[data-sport="hockey"] {
+  --pulse-bg: #f0f9ff;
+  --pulse-surface: #ffffff;
+  --pulse-border: #e0f2fe;
+  --pulse-text: #0c4a6e;
+  --pulse-text-muted: #0369a1;
+  --pulse-primary-50: #e0f2fe;
+  --pulse-primary-500: #0284c7;
+  --pulse-primary-600: #0369a1;
+  --pulse-primary-900: #0c4a6e;
+  --pulse-accent: #0ea5e9;
+}
+
+.dark[data-sport="hockey"] {
+  --pulse-bg: #0b192c;
+  --pulse-surface: #1e293b;
+  --pulse-border: #334155;
+  --pulse-text: #f0f9ff;
+  --pulse-text-muted: #94a3b8;
+  --pulse-primary-50: #0f172a;
+  --pulse-primary-500: #38bdf8;
+  --pulse-primary-600: #0284c7;
+  --pulse-primary-900: #0b192c;
+  --pulse-accent: #22d3ee;
+}
+
+[data-sport="baseball"] {
+  --pulse-bg: #fffbeb;
+  --pulse-surface: #ffffff;
+  --pulse-border: #fef3c7;
+  --pulse-text: #78350f;
+  --pulse-text-muted: #92400e;
+  --pulse-primary-50: #fef3c7;
+  --pulse-primary-500: #b45309;
+  --pulse-primary-600: #92400e;
+  --pulse-primary-900: #78350f;
+  --pulse-accent: #d97706;
+}
+
+.dark[data-sport="baseball"] {
+  --pulse-bg: #1c100b;
+  --pulse-surface: #2e1a12;
+  --pulse-border: #452719;
+  --pulse-text: #fef3c7;
+  --pulse-text-muted: #d97706;
+  --pulse-primary-50: #452719;
+  --pulse-primary-500: #f59e0b;
+  --pulse-primary-600: #d97706;
+  --pulse-primary-900: #1c100b;
+  --pulse-accent: #fbbf24;
+}
+
+/* Feeds the CSS vars above into Tailwind's utility generator. bg-brand-500,
+   text-brand-900, etc. all resolve through these — so a data-sport swap
+   re-themes every existing className without touching component code. */
+@theme inline {
+  --color-brand-50: var(--pulse-primary-50);
+  --color-brand-500: var(--pulse-primary-500);
+  --color-brand-600: var(--pulse-primary-600);
+  --color-brand-900: var(--pulse-primary-900);
+  --color-accent: var(--pulse-accent);
 }
 
 body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

@@ -1,0 +1,5 @@
+{
+  "title": "Team Roster",
+  "playerCount_one": "{{count}} player selected",
+  "playerCount_other": "{{count}} players selected"
+}

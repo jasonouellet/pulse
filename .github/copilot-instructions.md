@@ -22,7 +22,7 @@ See `docs/ARCHITECTURE.md`, `docs/ArchitectureTechnique.md`, `docs/ArchitectureC
 
 ## Tech stack
 
-* **Backend**: Go 1.25, `go-chi/chi/v5` router, `jackc/pgx/v5` driver, structured logging via `slog` (JSON handler), OpenTelemetry tracing (`riandyrn/otelchi`) and logging (`otelslog`) bridges.
+* **Backend**: Go 1.26, `go-chi/chi/v5` router, `jackc/pgx/v5` driver, structured logging via `slog` (JSON handler), OpenTelemetry tracing (`riandyrn/otelchi`) and logging (`otelslog`) bridges.
 * **Database**: PostgreSQL 16+ (schema per module), Redis 7+ (cache/pub-sub/locks).
 * **Frontend**: React + TypeScript, Tailwind CSS, Radix UI/Shadcn — `frontend/` folder still empty (scaffold pending).
 * **Containers**: multi-stage Docker builds, non-root distroless images for the backend.

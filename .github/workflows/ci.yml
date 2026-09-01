@@ -2,9 +2,9 @@ name: CI & Code Quality
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -19,27 +19,41 @@ jobs:
 
       # --- Markdown Lint ---
       - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v17
+        uses: DavidAnson/markdownlint-cli2-action@v24
         with:
-          globs: '**/*.md'
+          globs: "**/*.md"
+
+      # --- SQLC Lint / Diff Check ---
+      - name: Setup sqlc
+        uses: sqlc-dev/setup-sqlc@v5
+        with:
+          sqlc-version: "1.27.0"
+
+      - name: Verify sqlc Generated Code is Up-to-Date
+        run: sqlc diff
 
       # --- Go Lint ---
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.26'
+          go-version: "1.26"
 
       - name: Go Linter (golangci-lint)
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.13.1
 
+      - name: Run govulncheck
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: "1.26"
+
       # --- React / Frontend Lint ---
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: "24"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Frontend Linter (ESLint & TSC)
@@ -48,6 +62,11 @@ jobs:
           npm ci
           npm run lint
           npx tsc --noEmit
+
+      - name: Audit npm packages
+        run: |
+          cd frontend
+          npm audit --audit-level=high
 
       # --- Dockerfile Lint ---
       - name: Lint DevContainer Dockerfile (Hadolint)
@@ -77,73 +96,86 @@ jobs:
 
       # --- Tests Go ---
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
-          go-version: '1.26'
+          go-version: "1.26"
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
 
       - name: Run Go Unit Tests
         run: |
-          go test -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
+          gotestsum --junitfile report-go.xml -- -v -race -coverprofile=coverage-go.out ./internal/... ./pkg/...
 
       # --- Tests React (Vitest) ---
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
-          cache: 'npm'
+          node-version: "24"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Run Frontend Unit Tests
         run: |
           cd frontend
           npm ci
-          npm run test -- --coverage
+          npm run test
 
-      # Upload des artefacts de couverture (Go + Frontend)
-      - name: Upload Go Coverage
+      # Upload des artefacts de couverture et résultats de tests (Go + Frontend)
+      - name: Upload Go Test Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-go
-          path: coverage-go.out
+          name: go-test-artifacts
+          path: |
+            coverage-go.out
+            report-go.xml
 
-      - name: Upload Frontend Coverage
+      - name: Upload Frontend Test Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-frontend
-          path: frontend/coverage/
+          name: frontend-test-artifacts
+          path: |
+            frontend/coverage/
+            frontend/test-report-frontend.xml
 
   # ---------------------------------------------------------------------------
-  # 3. SCAN DE SÉCURITÉ (SNYK)
+  # 3. SCAN DE SÉCURITÉ (SNYK & SARIF)
   # ---------------------------------------------------------------------------
   security-snyk:
     name: Snyk Security Scan
     runs-on: ubuntu-latest
     needs: [lint, test]
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
-          go-version: '1.26'
+          go-version: "1.26"
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
 
-      # NOTE: snyk/actions ne publie pas de tags versionnés (v1, v2, ...),
-      # seulement @master. C'est un choix des mainteneurs, pas un oubli
-      # de notre part. Si tu veux éliminer le risque d'un tag/branche
-      # mouvant, épingle un SHA de commit précis à la place de @master.
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
 
       - name: Run Snyk Code Scan
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --severity-threshold=high
+        continue-on-error: true
+        # Le CLI lit automatiquement le fichier .snyk à la racine
+        run: snyk test --severity-threshold=high --sarif-file-output=snyk.sarif
+
+      - name: Upload Snyk Scan Results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: snyk.sarif
 
   # ---------------------------------------------------------------------------
   # 4. ANALYSE SONARQUBE / SONARCLOUD
@@ -158,21 +190,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Go Coverage Artifact
+      - name: Download Go Test Artifacts
         uses: actions/download-artifact@v7
         with:
-          name: coverage-go
+          name: go-test-artifacts
 
-      - name: Download Frontend Coverage Artifact
+      - name: Download Frontend Test Artifacts
         uses: actions/download-artifact@v7
         with:
-          name: coverage-frontend
-          path: frontend/coverage/
+          name: frontend-test-artifacts
+          path: frontend/
 
-      # sonarcloud-github-action est dépréciée; remplacée par
-      # sonarqube-scan-action, qui couvre SonarCloud et SonarQube Server.
       - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
