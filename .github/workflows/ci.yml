@@ -70,17 +70,17 @@ jobs:
 
       # --- Dockerfile Lint ---
       - name: Lint DevContainer Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: .devcontainer/Dockerfile
 
       - name: Lint Backend Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: deployments/docker/backend.Dockerfile
 
       - name: Lint Frontend Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: deployments/docker/frontend.Dockerfile
 
