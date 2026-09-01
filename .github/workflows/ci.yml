@@ -191,12 +191,12 @@ jobs:
           fetch-depth: 0
 
       - name: Download Go Test Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: go-test-artifacts
 
       - name: Download Frontend Test Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: frontend-test-artifacts
           path: frontend/
