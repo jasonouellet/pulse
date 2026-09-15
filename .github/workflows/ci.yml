@@ -170,7 +170,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: true
         # Le CLI lit automatiquement le fichier .snyk à la racine
-        run: snyk test --severity-threshold=high --sarif-file-output=snyk.sarif
+        run: snyk test --all-projects --severity-threshold=high --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk Scan Results to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
