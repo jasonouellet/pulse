@@ -9,7 +9,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/pashagolub/pgxmock/v3 v3.4.0
+	github.com/pashagolub/pgxmock/v4 v4.9.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/riandyrn/otelchi v0.12.3
@@ -54,3 +54,5 @@ require (
 	google.golang.org/grpc v1.83.2 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
+
+replace github.com/jackc/pgx/v5 => github.com/jackc/pgx/v5 v5.7.0
