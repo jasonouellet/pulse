@@ -10,6 +10,11 @@ updates:
       - "dependencies"
       - "backend"
       - "go"
+    groups:
+      non-major:
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps-go)"
 
@@ -23,6 +28,11 @@ updates:
       - "dependencies"
       - "frontend"
       - "react"
+    groups:
+      non-major:
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps-npm)"
 
@@ -35,6 +45,11 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+    groups:
+      non-major:
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps-docker)"
 
@@ -47,5 +62,10 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+    groups:
+      non-major:
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps-ci)"
