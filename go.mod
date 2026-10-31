@@ -4,11 +4,11 @@ go 1.26.7
 
 require (
 	github.com/alicebob/miniredis/v2 v2.40.0
-	github.com/danielgtaylor/huma/v2 v2.39.1
+	github.com/danielgtaylor/huma/v2 v2.40.0
 	github.com/go-chi/chi/v5 v5.5.0
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
-	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jackc/pgx/v5 v5.11.0
 	github.com/pashagolub/pgxmock/v4 v4.9.1-0.20260213173930-87113f870600
 	github.com/prometheus/client_golang v1.25.0
 	github.com/redis/go-redis/v9 v9.23.0
