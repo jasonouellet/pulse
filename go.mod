@@ -4,7 +4,7 @@ go 1.26.7
 
 require (
 	github.com/alicebob/miniredis/v2 v2.40.0
-	github.com/danielgtaylor/huma/v2 v2.39.1
+	github.com/danielgtaylor/huma/v2 v2.40.0
 	github.com/go-chi/chi/v5 v5.5.0
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
